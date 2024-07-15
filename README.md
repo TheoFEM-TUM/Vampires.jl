@@ -3,7 +3,7 @@
 </p>
 
 # VASP Automation of Modular Postprocessing I? for Research Enhancements
-## A collection of Toolkits for VASP Postprocessing in Julia
+## A Collection of Toolkits for VASP Postprocessing in Julia
 
 
 - for now - group internal scripting
