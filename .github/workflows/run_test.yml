@@ -10,7 +10,7 @@ jobs:
         julia-version: ["1.9.3"]
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.julia-version }}
+    - name: Set up Julia ${{ matrix.julia-version }}
       uses: julia-actions/setup-julia@v1
       with:
         julia-version: ${{ matrix.julia-version }}
