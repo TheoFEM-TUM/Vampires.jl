@@ -46,7 +46,7 @@ TASKS["total_energy"] = (args) -> calculate_total_energy(args)
 const TASKS = Dict(
     "testpar" => (args) -> run_parameter_test(args["par"], split(args["val"], ","); path=args["p"]),
     "set" => (args) -> set_keyword_in_incar!(args["par"], args["val"], args["p"]*args["incar"]),
-    "bandgap" => (args) -> get_bandgap(args["p"]*args["eigenval"])
+    "bandgap" => (args) -> run_bandgap_task(args["p"]*args["eigenval"])
 )
 
 """

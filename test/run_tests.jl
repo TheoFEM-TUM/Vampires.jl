@@ -13,5 +13,8 @@ end
 
 @testset "tasks" begin
     include("tasks/param_test/test_param_test.jl")
-    include("tasks/test_eigenvalue_tasks.jl")
+end
+
+@testset "energy" begin
+    include("energy/test_bandgap.jl")
 end

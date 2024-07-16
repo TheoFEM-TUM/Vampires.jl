@@ -6,6 +6,8 @@ include("read_utils.jl")
 include("parser/eigenval.jl"); include("parser/doscar.jl"); include("parser/poscar.jl"); include("parser/xdatcar.jl")
 include("parser/incar.jl")
 
+include("energy/bandgap.jl")
+
 include("tasks/param_test.jl"); include("tasks/change_incar.jl"); include("tasks/eigenvalue_tasks.jl")
 
 include("cli_interface.jl")
