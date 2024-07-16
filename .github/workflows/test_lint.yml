@@ -22,4 +22,4 @@ jobs:
             Pkg.instantiate()'
     - name: Run tests
       run: |
-        julia --project=. test/run_tests.jl
+        julia --project=. test/runtests.jl
