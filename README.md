@@ -19,6 +19,26 @@ vasptools set --par ENCUT --val 350
 vasptools testpar --par ENCUT --val 300,350,400
 ```
 
+## Using VAMPIRE in Python
+
+Install `PyJulia` package
+
+```bash
+pip install julia
+```
+
+Then you can import VAMPIRE into Python if it is installed in Julia
+
+```Python
+import julia
+from julia import Julia
+Julia(compiled_modules=False)
+
+from julia import VaspTools as vamp
+
+vamp.SOMEFUNCTION ...
+```
+
 ## Parsing
 
 ### Atomic configurations
