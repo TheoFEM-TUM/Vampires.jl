@@ -10,7 +10,7 @@ Modify the value of a specified keyword in the INCAR file.
 
 # Example
 ```julia
-change_incar("ENCUT", 520, "INCAR")
+set_keyword_in_incar!("ENCUT", 520, "INCAR")
 
 This changes the value of the ENCUT keyword to 520 in the INCAR file located at the specified path.
 """

@@ -35,7 +35,7 @@ function get_bandgap(file::AbstractString; printit=true)
     _, Es, occs = read_eigenval(file)
     VBM, CBM, _ = get_vbm_and_cbm(Es, occs)
     ΔE = CBM - VBM
-    @show ΔE
+    if printit; @show ΔE; end
     return ΔE
 end
 

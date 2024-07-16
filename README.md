@@ -5,7 +5,7 @@
 # VASP Analysis for Materials Properties In Realistic Energy Landscapes
 ## A Collection of Toolkits for VASP Postprocessing in Julia, currently named:
 
-`VaspTools.jl` is a Julia package designed to streamline the analysis of VASP (Vienna Ab initio Simulation Package) output files. It provides a comprehensive suite of tools for parsing and visualizing data from VASP calculations, including electronic structure, band structure, density of states, and more. With a focus on ease of use and performance, `VaspTools.jl` leverages Julia's capabilities to handle large datasets efficiently.
+`Vampire.jl` is a Julia package designed to streamline the analysis of VASP (Vienna Ab initio Simulation Package) output files. It provides a comprehensive suite of tools for parsing and visualizing data from VASP calculations, including electronic structure, band structure, density of states, and more. With a focus on ease of use and performance, `Vampire.jl` leverages Julia's capabilities to handle large datasets efficiently.
 
 ## CLI interface
 
