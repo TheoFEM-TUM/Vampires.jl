@@ -17,3 +17,8 @@ end
 @testset "energy" begin
     include("energy/test_bandgap.jl")
 end
+
+
+@testset "xdos" begin
+    include("xdos/test_dos.jl")
+end

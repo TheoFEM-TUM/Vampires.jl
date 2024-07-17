@@ -19,6 +19,13 @@ The `TASKS` dictionary maps string keys (task names) to anonymous functions. Eac
 - `"bandgap"`: Computes the bandgap.
     - `args["p"]`: Path to the directory containing the EIGENVAL file.
     - `args["eigenval"]`: EIGENVAL file name.
+- `"plot"`: plots the:
+    - `bandstructure`
+        - `args["p"]`: Path to the directory containing the EIGENVAL file.
+        - `args["eigenval"]`: EIGENVAL file name.
+        - `args["o"]`: output file name (.png).
+
+        
 
 # Adding New Tasks
 To add a new task to the `TASKS` dictionary, follow these steps:
@@ -45,8 +52,10 @@ TASKS["total_energy"] = (args) -> calculate_total_energy(args)
 """
 const TASKS = Dict(
     "testpar" => (args) -> run_parameter_test(args["par"], split(args["val"], ","); path=args["p"]),
-    "set" => (args) -> set_keyword_in_incar!(args["par"], args["val"], args["p"]*args["incar"]),
-    "bandgap" => (args) -> run_bandgap_task(args["p"]*args["eigenval"])
+    "set" => (args) -> set_keyword_in_incar!(args["par"], args["val"], args["p"]*args["input"]),
+    # TODO: this should be a calculation task
+    "bandgap" => (args) -> run_bandgap_task(args["p"]*args["input"]),
+    "plot" => (args) -> run_plot_task(args["p"]*args["input"], args["subtask"], args["o"])
 )
 
 """
@@ -99,6 +108,10 @@ function parse_commandline()
             help = "positional argument 1: task defines which task is to be performed"
             arg_type = String
             default = "none"
+        "subtask"
+            help = "positional argument 2: some tasks require further specification"
+            arg_type = String
+            default = ""
         "--par"
             help = "define a parameter that is to be adapted"
             arg_type = String
@@ -111,12 +124,16 @@ function parse_commandline()
             help = "set the default path"
             arg_type = String
             default = "./"
+        "--o"
+            help = "set the output path"
+            arg_type = String
+            default = "./output"
         "--incar"
             help = "set the name of the INCAR file"
             arg_type = String
             default = "INCAR"
-        "--eigenval"
-            help = "set the name of the EIGENVAL file"
+        "--input"
+            help = "set the name of the input file. Depends on Task"
             arg_type = String
             default = "EIGENVAL"
     end
