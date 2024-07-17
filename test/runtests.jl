@@ -1,4 +1,4 @@
-using VaspTools, Test
+using Vampires, Test
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
