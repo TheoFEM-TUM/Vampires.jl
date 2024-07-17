@@ -7,7 +7,7 @@
 
 `Vampires.jl` is a Julia package designed to streamline the analysis of VASP (Vienna Ab initio Simulation Package) output files. It provides a comprehensive suite of tools for parsing and visualizing data from VASP calculations, including electronic structure, band structure, density of states, and more. With a focus on ease of use and performance, `Vampires.jl` leverages Julia's capabilities to handle large datasets efficiently.
 
-## How to install `Vampire.jl` in Julia
+## How to install `Vampires.jl` in Julia
 
 * First, you need to install Julia itself from the [Julia homepage](https://julialang.org/downloads/)
 * Next, clone the git repository to your computer
@@ -29,7 +29,7 @@ vamp set --par ENCUT --val 350
 vamp testpar --par ENCUT --val 300,350,400
 ```
 
-## Using `Vampires.jl in Python
+## Using `Vampires.jl` in Python
 
 Install `PyJulia` package
 
