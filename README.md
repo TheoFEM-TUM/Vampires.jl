@@ -9,30 +9,24 @@
 
 ## How to install `Vampire.jl` in Julia
 
-* First, you need to install Julia itself from [link text](https://julialang.org/downloads/)
+* First, you need to install Julia itself from the [Julia homepage](https://julialang.org/downloads/)
 * Next, clone the git repository to your computer
-* Then, add then package as a development package
-```julia
-]
+* Then, run the install packages script form the main package folder
+```bash
+julia vampires_install.jl --bashrc <path_to_your_bashrc>
 ```
-```julia
-dev .
-```
-* Finally, install all dependencies
-```julia
-using Pkg; Pkg.instantiate()
-```
+You can then call the `Vampires` CLI interface using `vamp`.
 
 ## CLI interface
 
 * Change a specific parameter in the INCAR file: e.g., change the energy cutoff to 350 eV
 ```bash
-vasptools set --par ENCUT --val 350
+vamp set --par ENCUT --val 350
 ```
 
 * Create a set of folders changing only one parameter: e.g., energy cutoff convergence testing
 ```bash
-vasptools testpar --par ENCUT --val 300,350,400
+vamp testpar --par ENCUT --val 300,350,400
 ```
 
 ## Using VAMPIRE in Python

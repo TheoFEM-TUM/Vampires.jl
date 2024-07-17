@@ -1,3 +1,0 @@
-using VaspTools
-
-VaspTools.main()

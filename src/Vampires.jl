@@ -1,4 +1,4 @@
-module VaspTools
+module Vampires
 
 using OrderedCollections, ArgParse, Plots, BenchmarkTools
 
