@@ -82,7 +82,20 @@ function main()
             println("Task is none. Exiting ...")
         elseif haskey(TASKS, task)
             println("Running task $task ...")
-            TASKS[task](args)
+            
+            if args["r"]
+                #read all path entries
+                all_entries = readdir()
+
+                # Filter all non-folders
+                only_folders = filter(entry -> isdir(joinpath(".", entry)), all_entries) .* "/"
+                for folder in only_folders
+                    args["p"] = joinpath(".", folder)
+                    TASKS[task](args)
+                end
+            else
+                TASKS[task](args)
+            end
         else
             @error "No task of name $task found."
         end
@@ -99,6 +112,9 @@ function parse_commandline()
             help = "positional argument 1: task defines which task is to be performed"
             arg_type = String
             default = "none"
+        "-r"
+            help = "if true, task will be applied recursively to all folders"
+            action = :store_true
         "--par"
             help = "define a parameter that is to be adapted"
             arg_type = String
@@ -120,7 +136,7 @@ function parse_commandline()
             arg_type = String
             default = "EIGENVAL"
     end
-    args :: Dict{String, String} = parse_args(s)
+    args :: Dict = parse_args(s)
     return args
 end
 
