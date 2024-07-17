@@ -53,9 +53,8 @@ TASKS["total_energy"] = (args) -> calculate_total_energy(args)
 const TASKS = Dict(
     "testpar" => (args) -> run_parameter_test(args["par"], split(args["val"], ","); path=args["p"]),
     "set" => (args) -> set_keyword_in_incar!(args["par"], args["val"], args["p"]*args["input"]),
-    # TODO: this should be a calculation task
-    "bandgap" => (args) -> run_bandgap_task(args["p"]*args["input"]),
-    "plot" => (args) -> run_plot_task(args["p"]*args["input"], args["subtask"], args["o"])
+    "calculate" => (args) -> run_calculation_task(args),
+    "plot" => (args) -> run_plot_task(args)
 )
 
 """
@@ -132,10 +131,22 @@ function parse_commandline()
             help = "set the name of the INCAR file"
             arg_type = String
             default = "INCAR"
-        "--input"
-            help = "set the name of the input file. Depends on Task"
+        "--eigenval"
+            help = "set the name of the EIGENVAL file"
             arg_type = String
             default = "EIGENVAL"
+        "--doscar"
+            help = "set the name of the DOSCAR file"
+            arg_type = String
+            default = "DOSCAR"
+        "--poscar"
+            help = "set the name of the POSCAR file"
+            arg_type = String
+            default = "POSCAR"
+        "--xdatcar"
+            help = "set the name of the XDATCAR file"
+            arg_type = String
+            default = "XDATCAR"
     end
     args :: Dict{String, String} = parse_args(s)
     return args

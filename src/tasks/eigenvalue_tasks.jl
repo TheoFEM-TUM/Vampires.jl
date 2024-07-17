@@ -1,1 +1,0 @@
-run_bandgap_task(file) = get_bandgap(file)
