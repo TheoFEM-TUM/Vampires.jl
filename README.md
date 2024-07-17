@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="460" height="460" src="https://github.com/user-attachments/assets/fc004cd7-bcab-42f2-9049-a321b8a64ff6">
+  <img width="460" height="460" src="https://github.com/user-attachments/assets/b0ec8dd0-b5eb-4acc-892a-dc184e10f8c2">
 </p>
 
 # VASP Analysis for Materials Properties In Realistic Energy Landscapes
