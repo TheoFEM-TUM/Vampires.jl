@@ -20,7 +20,7 @@ function parse_commandline()
         "--bashrc"
             help = "sets the path where your executable is located"
             arg_type = String
-            default = "~/"
+            default = "~/.bashrc"
     end
     args :: Dict{String, String} = parse_args(s)
     return args
@@ -49,8 +49,5 @@ open(bashrc_path, "a") do bashrc_file
     println(bashrc_file, "# Create an alias for the Vampires.jl package.")
     println(bashrc_file, alias)
 end
-
-# Source the bashrc file
-run(`bash -c "source $bashrc_path"`)
 
 println("Vampires was configured successfully.")
