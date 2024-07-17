@@ -9,7 +9,7 @@
 
 ## How to install `Vampire.jl` in Julia
 
-* First, you need to install Julia itself
+* First, you need to install Julia itself from [link text](https://julialang.org/downloads/)
 * Next, clone the git repository to your computer
 * Then, add then package as a development package
 ```julia
