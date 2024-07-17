@@ -7,6 +7,22 @@
 
 `Vampire.jl` is a Julia package designed to streamline the analysis of VASP (Vienna Ab initio Simulation Package) output files. It provides a comprehensive suite of tools for parsing and visualizing data from VASP calculations, including electronic structure, band structure, density of states, and more. With a focus on ease of use and performance, `Vampire.jl` leverages Julia's capabilities to handle large datasets efficiently.
 
+## How to install `Vampire.jl` in Julia
+
+* First, you need to install Julia itself
+* Next, clone the git repository to your computer
+* Then, add then package as a development package
+```julia
+]
+```
+```julia
+dev .
+```
+* Finally, install all dependencies
+```julia
+using Pkg; Pkg.instantiate()
+```
+
 ## CLI interface
 
 * Change a specific parameter in the INCAR file: e.g., change the energy cutoff to 350 eV
