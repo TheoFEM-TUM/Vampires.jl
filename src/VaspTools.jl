@@ -9,7 +9,7 @@ include("parser/incar.jl")
 include("calculations/energy/bandstructure.jl")
 include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
 
-include("tasks/param_test.jl"); include("tasks/change_incar.jl"); include("tasks/eigenvalue_tasks.jl"); include("tasks/plot.jl")
+include("tasks/param_test.jl"); include("tasks/change_incar.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl")
 
 include("cli_interface.jl")
 
