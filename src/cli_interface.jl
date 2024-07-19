@@ -1,7 +1,12 @@
 """
     TASKS
 
-A dictionary that maps task names to their corresponding functions.
+Tasks are called using symbols with multiple dispatch
+
+Any task is defined as
+```
+function run_task(::Type{Val{:<task>}}, ::Type{Val{:<subtask>}}, args); end
+```
 
 # Structure
 The `TASKS` dictionary maps string keys (task names) to anonymous functions. Each function takes a single argument `args`, which is a dictionary containing the necessary parameters for the task.
@@ -50,12 +55,6 @@ TASKS["total_energy"] = (args) -> calculate_total_energy(args)
 ```
 
 """
-const TASKS = Dict(
-    "testpar" => (args) -> run_parameter_test(args),
-    "set" => (args) -> set_keyword_in_incar!(args["par"], args["val"], args["p"]*args["input"]),
-    "calculate" => (args) -> run_calculation_task(args),
-    "plot" => (args) -> run_plot_task(args)
-)
 
 """
     main()
