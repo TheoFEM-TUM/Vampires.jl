@@ -1,59 +1,19 @@
+# TODO: automatically collect task strings from task files to cli_interface for an overview
 """
     TASKS
 
 Tasks are called using symbols with multiple dispatch
 
+
+# Adding New Tasks
 Any task is defined as
 ```
 function run_task(::Type{Val{:<task>}}, ::Type{Val{:<subtask>}}, args); end
 ```
-
-# Structure
-The `TASKS` dictionary maps string keys (task names) to anonymous functions. Each function takes a single argument `args`, which is a dictionary containing the necessary parameters for the task.
-
-# Tasks
-- `"testpar"`: Runs a parameter test.
-    - `args["par"]`: Parameter name.
-    - `args["val"]`: Comma-separated string of parameter values.
-    - `args["p"]`: Path where the test will be executed.
-- `"set"`: Sets a keyword in the INCAR file.
-    - `args["par"]`: Parameter name.
-    - `args["val"]`: Parameter value.
-    - `args["p"]`: Path to the INCAR file directory.
-    - `args["incar"]`: INCAR file name.
-- `"bandgap"`: Computes the bandgap.
-    - `args["p"]`: Path to the directory containing the EIGENVAL file.
-    - `args["eigenval"]`: EIGENVAL file name.
-- `"plot"`: plots the:
-    - `bandstructure`
-        - `args["p"]`: Path to the directory containing the EIGENVAL file.
-        - `args["eigenval"]`: EIGENVAL file name.
-        - `args["o"]`: output file name (.png).
-
-        
-
-# Adding New Tasks
-To add a new task to the `TASKS` dictionary, follow these steps:
-
-1. Define the task function that takes a single argument `args` (a dictionary of parameters).
-2. Add a new entry to the `TASKS` dictionary with the task name as the key and the function as the value.
-
-## Example
-Suppose you want to add a task that calculates the total energy from a file. First, define the function:
-
-```julia
-function calculate_total_energy(args)
-    file_path = args["p"] * args["energyfile"]
-    return sum(read_energies(file_path))
-end
-```
-
-Then, add the new task to the TASKS dictionary:
-
-```julia
-TASKS["total_energy"] = (args) -> calculate_total_energy(args)
-```
-
+`<task>` and `<subtask>` define the task and subtask, respectively.
+To add a new task or subtask, define a run_task function in /src/tasks/*.jl.
+If there are no task/file for your specific task, create it and add a task
+description to the file header. New subtask should also be listed in the header.
 """
 
 """
@@ -62,8 +22,8 @@ TASKS["total_energy"] = (args) -> calculate_total_energy(args)
 Main function to execute tasks based on command-line arguments.
 
 # Description
-This function parses command-line arguments to determine which task to run. It then executes the corresponding task from the `TASKS` dictionary.
-
+This function parses command-line arguments to determine which task to run. It then executes the corresponding task from the `src/tasks` directory using multiple dispatch.
+If `-r` is specified, the task will run in every subfolder of the specified directory (default: "./")
 # Command-line Arguments
 The command-line arguments are parsed into a dictionary `args`.
 
