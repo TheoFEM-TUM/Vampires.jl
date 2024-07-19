@@ -1,4 +1,11 @@
-# TODO: add comment listing options
+"""
+list of available tasks:
+
+plot
+    bandstructure: plots the bandstructure
+    dos: plots the density of states
+"""
+
 function run_task(::Type{Val{:plot}}, ::Type{Val{:bandstructure}}, args)
     output_filename = args["o"]
     input_filename = args["p"] * args["eigenval"]

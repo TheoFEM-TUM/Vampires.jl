@@ -1,0 +1,3 @@
+using Vampires
+
+Vampires.main()

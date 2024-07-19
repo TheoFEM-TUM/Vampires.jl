@@ -51,7 +51,7 @@ TASKS["total_energy"] = (args) -> calculate_total_energy(args)
 
 """
 const TASKS = Dict(
-    "testpar" => (args) -> run_parameter_test(args["par"], split(args["val"], ","); path=args["p"]),
+    "testpar" => (args) -> run_parameter_test(args),
     "set" => (args) -> set_keyword_in_incar!(args["par"], args["val"], args["p"]*args["input"]),
     "calculate" => (args) -> run_calculation_task(args),
     "plot" => (args) -> run_plot_task(args)
@@ -91,7 +91,12 @@ function main()
         else
             try
                 println("Running task $task ...")
-                run_task(Val{Symbol(args["task"])}, Val{Symbol(args["subtask"])}, args)
+                # i
+                if args["r"]
+                    run_task_recursive()
+                else
+                    run_task(Val{Symbol(args["task"])}, Val{Symbol(args["subtask"])}, args)
+                end
             catch e 
                 if e == ArgumentError
                     @error "No task of name $task found."
@@ -117,6 +122,9 @@ function parse_commandline()
             help = "positional argument 2: some tasks require further specification"
             arg_type = String
             default = ""
+        "-r"
+            help = "if true, task will be applied recursively to all folders"
+            action = :store_true
         "--par"
             help = "define a parameter that is to be adapted"
             arg_type = String
@@ -141,7 +149,7 @@ function parse_commandline()
             help = "set the name of the EIGENVAL file"
             arg_type = String
             default = "EIGENVAL"
-        "--doscar"
+            "--doscar"
             help = "set the name of the DOSCAR file"
             arg_type = String
             default = "DOSCAR"

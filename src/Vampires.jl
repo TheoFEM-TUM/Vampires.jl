@@ -1,4 +1,4 @@
-module VaspTools
+module Vampires
 
 using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
 
@@ -11,7 +11,7 @@ include("io/output/incar.jl")
 include("calculations/energy/bandstructure.jl")
 include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
 
-include("tasks/modify_task.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl")
+include("tasks/modify_task.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl"); include("tasks/convergence_task.jl")
 
 include("cli_interface.jl")
 
@@ -22,7 +22,7 @@ export get_value_for_keyword, change_incar!
 export write_to_file, read_from_file
 export plot_bandstructure
 
-export run_parameter_test, get_bandgap, get_vbm_and_cbm, get_fermi_energy
+export convergence_create_subdirectories, get_bandgap, get_vbm_and_cbm, get_fermi_energy
 export compute_dos
 
 end # module
