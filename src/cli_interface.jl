@@ -88,11 +88,17 @@ function main()
         
         if task == "none"
             println("Task is none. Exiting ...")
-        elseif haskey(TASKS, task)
-            println("Running task $task ...")
-            TASKS[task](args)
         else
-            @error "No task of name $task found."
+            try
+                println("Running task $task ...")
+                run_task(Val{Symbol(args["task"])}, Val{Symbol(args["subtask"])}, args)
+            catch e 
+                if e == ArgumentError
+                    @error "No task of name $task found."
+                else
+                    rethrow(e)
+                end
+            end
         end
     end
 
