@@ -3,13 +3,15 @@ module VaspTools
 using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
 
 include("read_utils.jl")
-include("parser/eigenval.jl"); include("parser/doscar.jl"); include("parser/poscar.jl"); include("parser/xdatcar.jl")
-include("parser/incar.jl")
+include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/input/poscar.jl"); include("io/input/xdatcar.jl")
+include("io/input/incar.jl")
+
+include("io/output/incar.jl")
 
 include("calculations/energy/bandstructure.jl")
 include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
 
-include("tasks/param_test.jl"); include("tasks/change_incar.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl")
+include("tasks/modify_task.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl")
 
 include("cli_interface.jl")
 

@@ -8,7 +8,7 @@ Create directories for parameter testing and copy necessary files into each dire
 - `param_range::AbstractVector`: A range or vector of values to test for the parameter.
 - `path::AbstractString="./"`: The base path where the directories and files are located. Default is the current directory.
 """
-function run_parameter_test(param, param_range; path="./")
+function run_task(::Type{Val{:modify}}, ::Type{Val{:incar}}, param, param_range; path="./")
     for value in param_range
         folder = param*"_"*value
         mkdir(path*folder)

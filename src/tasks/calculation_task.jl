@@ -1,3 +1,3 @@
-function run_calculation_task(args)
+function run_task(::Type{Val{:calculate}}, ::Type{Val{:bandgap}}, args)
     get_bandgap(args["p"]*args["eigenval"])    
 end
