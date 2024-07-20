@@ -16,7 +16,7 @@ jobs:
         julia-version: ${{ matrix.julia-version }}
         arch: x64
     - name: Extract docstrings and update TASKS.md
-        run: julia .github/extract_docstrings.jl
+      run: julia .github/extract_docstrings.jl
 
     - name: Commit and push changes
       run: |
