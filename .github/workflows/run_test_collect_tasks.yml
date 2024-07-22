@@ -18,8 +18,13 @@ jobs:
     - name: Extract docstrings and update TASKS.md
       run: julia .github/update_tasks_md_from_docstrings.jl
 
-
+    - name: Check if there are any changes
+      id: verify_diff
+      run: |
+        git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
+  
     - name: Commit and push changes
+      if: steps.verify_diff.outputs.changed == 'true'
       env:
         GH_TOKEN: ${{ secrets.VAMPIRE_ACTION_TOKEN }}
       run: |
