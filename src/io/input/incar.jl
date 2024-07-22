@@ -1,7 +1,16 @@
 """
-    IncarLine
+    mutable struct IncarLine
 
-Storage container for one line of the INCAR file.
+A mutable struct representing a line in an INCAR file used by VASP.
+
+# Fields
+- `keyword::String`: The keyword or parameter name in the INCAR file.
+- `value::String`: The value associated with the keyword.
+- `comment::String`: An optional comment describing the line or providing additional information.
+
+# Description
+The `IncarLine` struct is used to model a single line in a VASP INCAR file. This file is used to specify parameters and settings for a VASP calculation. 
+Each line typically consists of a keyword and its associated value, and optionally a comment that explains the purpose or details of the line.
 """
 mutable struct IncarLine
     keyword :: String

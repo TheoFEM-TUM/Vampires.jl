@@ -36,7 +36,10 @@ exec_name bandgap --p=./path/to/files --eigenval=EIGENVAL
 function main()
     time = @elapsed begin
         @time args = parse_commandline()
-        task = args["task"]
+        
+        # Read task and subtask parameters
+        task = Val{Symbol(args["task"])}
+        subtask = Val{Symbol(args["subtask"])}
         
         println("Parsed args:")
         for (arg,val) in args
@@ -45,25 +48,23 @@ function main()
 
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
         
-        if task == "none"
-            println("Task is none. Exiting ...")
-        else
-            try
-                println("Running task $task ...")
-                # i
-                if args["r"]
-                    run_task_recursive()
-                else
-                    run_task(Val{Symbol(args["task"])}, Val{Symbol(args["subtask"])}, args)
-                end
-            catch e 
-                if e == ArgumentError
-                    @error "No task of name $task found."
-                else
-                    rethrow(e)
-                end
+        try
+            task_string = args["task"]
+            println("Running task $task_string ...")
+            # i
+            if args["r"]
+                run_task_recursive(task, subtask, args)
+            else
+                run_task(task, subtask, args)
+            end
+        catch e 
+            if e == ArgumentError
+                @error "No task of name $task found."
+            else
+                rethrow(e)
             end
         end
+
     end
 
     println("Time: $time s")
@@ -120,8 +121,13 @@ function parse_commandline()
             help = "set the name of the XDATCAR file"
             arg_type = String
             default = "XDATCAR"
+        "--vasp_exe"
+            help = "set the name of the VASP executable"
+            arg_type = String
+            default = "vasp_std"
     end
-    args :: Dict{String, String} = parse_args(s)
+    args :: Dict{String, Any} = parse_args(s)
     return args
 end
 
+run_task(::Type{Val{:none}}, subtask, args) = println("Task is none. Exiting ...")

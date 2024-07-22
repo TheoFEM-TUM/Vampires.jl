@@ -4,6 +4,7 @@ list of available tasks:
 convergence
     create: creates the folder structure where the specified parameter is changed in the different subdirectories
     read: reads a specific output (e.g., energy) from a convergence test
+    plot: plots a specific output (e.g., TOTEN) vs folder seed (e.g., ENCUT)
 """
 # TODO: unify this with time series and ionic relaxation
 
@@ -15,6 +16,29 @@ function run_task(::Type{Val{:convergence}}, ::Type{Val{:create}}, args)
     convergence_create_subdirectories(param, param_range; path=path)
 end
 
+function run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args)
+    convergence_read_value(args["par"], args["p"])
+end
+
+function run_task(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
+    #TODO: What should this do?
+    throw("convergence plots are currently only implemented in recursive mode.")
+end
+
+function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
+    convergence_plot_value(args["par"], args["p"], args["o"])
+end
+
+"""
+    convergence_create_subdirectories(param, param_range; path="./")
+
+Creates subdirectories for a parameter convergence study and copies necessary VASP input files into each subdirectory.
+
+# Arguments
+- `param::String`: The parameter to be varied for the convergence study.
+- `param_range::AbstractVector`: A range or array of parameter values to be used for the subdirectories.
+- `path::String`: The base path where the subdirectories will be created. Defaults to `"./"`.
+"""
 function convergence_create_subdirectories(param, param_range; path="./")
     for value in param_range
         folder = param*"_"*value
@@ -28,6 +52,45 @@ function convergence_create_subdirectories(param, param_range; path="./")
     end
 end
 
-function run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args)
-    return 0
+"""
+    convergence_read_value(param, path)
+
+Reads and prints the value of a specified parameter from a VASP OUTCAR file.
+
+# Arguments
+- `param::String`: The parameter to be read from the OUTCAR file.
+- `path::String`: The path to the directory containing the OUTCAR file.
+"""
+function convergence_read_value(param, path)
+    value = read_value_from_file(param, path*"OUTCAR")
+    println("The value of $param in $path is: $value")
+end
+
+"""
+    convergence_plot_value(param, path, output_filename)
+
+Generates a convergence plot of a specified parameter from VASP OUTCAR files.
+
+# Arguments
+- `param::String`: The parameter to extract from the OUTCAR files.
+- `path::String`: The base path where the folders containing OUTCAR files are located.
+- `output_filename::String`: The filename for saving the generated plot.
+"""
+function convergence_plot_value(param, path, output_filename)
+    xs = Float64[]
+    ys = Float64[]
+    seeds = String[]
+    for folder in readfolders()
+        seed, x = split(folder, "_")
+        push!(seeds, seed)
+        push!(xs, parse(Float64, x))
+        y = read_value_from_file(param, path*folder*"/OUTCAR")
+        push!(ys, y)
+    end
+    if length(unique(seeds)) == 1
+        plot(xs, ys, xlabel=seeds[1], ylabel=param)
+    else
+        throw("More than one folder seed found.")
+    end
+    savefig(output_filename)
 end
