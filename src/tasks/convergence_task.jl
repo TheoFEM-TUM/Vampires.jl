@@ -29,5 +29,10 @@ function convergence_create_subdirectories(param, param_range; path="./")
 end
 
 function run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args)
-    return 0
+    convergence_read_value(args["par"], args["p"])
+end
+
+function convergence_read_value(param, path)
+    value = read_value_from_file(param, path*"OUTCAR")
+    println("The value of $param in $path is: $value")
 end
