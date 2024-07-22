@@ -69,3 +69,24 @@ function get_vbm_and_cbm(Es, occs; occ_threshold=0.9)
     vbm_index = vbm_indices[vbm_k_index]
     return maximum(val_maxs), minimum(cond_mins), (vbm_index, vbm_k_index)
 end
+
+
+"""
+    get_fermi_level(Es, occ; occ_threshold=0.9)
+
+Calculate the Fermi level of a system given the energy levels and their corresponding occupancies.
+
+# Arguments
+- `Es::Array{Float64, 2}`: A 2D array of energy values where rows correspond to different energy bands and columns correspond to different k-points.
+- `occs::Array{Float64, 2}`: A 2D array of occupation values corresponding to the energy values in `Es`.
+- `occ_threshold::Float64=0.9`: The occupation threshold to distinguish between occupied and unoccupied bands. Default is `0.9`.
+
+# Returns
+- `E_fermi::Float64`: Fermi energy for semiconductor
+"""
+function get_fermi_energy(Es, occ; occ_threshold=0.9, printit=false)
+    vbm, cbm, _ = get_vbm_and_cbm(Es, occ; occ_threshold)
+    E_fermi = cbm - abs(cbm - vbm) * 0.5
+    if printit; @show E_fermi; end
+    return E_fermi
+end

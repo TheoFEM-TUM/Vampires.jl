@@ -13,9 +13,14 @@ include("test_read_utils.jl")
 end
 
 @testset "tasks" begin
-    include("tasks/param_test/test_param_test.jl")
+    include("tasks/param_test/test_convergence_create.jl")
 end
 
 @testset "energy" begin
     include("energy/test_bandgap.jl")
+end
+
+
+@testset "xdos" begin
+    include("xdos/test_dos.jl")
 end
