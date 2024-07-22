@@ -1,3 +1,6 @@
-# VaspTools.jl
+Welcome to the Vampires.jl package.
 
-Documentation for VaspTools.jl
+Test something below
+```@docs
+Vampires.main()
+```

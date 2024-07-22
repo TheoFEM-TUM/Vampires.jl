@@ -1,10 +1,13 @@
 using Documenter
-using VaspTools
+using Vampires
 
 makedocs(
-    sitename = "VaspTools",
+    sitename = "Vampires Documentation",
     format = Documenter.HTML(),
-    modules = [VaspTools]
+    modules = [Vampires],
+    pages = [
+        "Welcome" => "index.md"
+    ]
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
