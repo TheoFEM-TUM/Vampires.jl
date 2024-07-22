@@ -108,7 +108,7 @@ function parse_commandline()
             help = "set the name of the EIGENVAL file"
             arg_type = String
             default = "EIGENVAL"
-            "--doscar"
+        "--doscar"
             help = "set the name of the DOSCAR file"
             arg_type = String
             default = "DOSCAR"
