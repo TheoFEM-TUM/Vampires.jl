@@ -1,6 +1,14 @@
 """
 list of available tasks:
 
+### recursive wrapper for all tasks:
+any_task
+    any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
+
+### recursive wrapper for data extraction tasks
+any_task
+    any_subtask: if the option `-rcalc` is specified, the calculation  
+    
 """
 
 """
@@ -24,5 +32,16 @@ function run_task_recursive(task, subtask, args)
         run_task(task, subtask, args)
     end
 end
+
+
+
+function run_calculation_recursive_merge_task(task, subtask, args)
+    for folder in readfolders()
+        args["p"] = joinpath(".", folder*"/")
+        run_task(task, subtask, args)
+    end
+end
+
+
 
 readfolders(path=".") = filter(entry -> isdir(joinpath(".", entry)), readdir(path))
