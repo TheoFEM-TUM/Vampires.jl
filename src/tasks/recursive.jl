@@ -14,12 +14,10 @@ This function scans the current directory for subdirectories. For each subdirect
 The function assumes that the `task` function accepts the `subtask` function and an `args` dictionary as parameters, and that the `args` dictionary should include the path to the current subdirectory.
 """
 function run_task_recursive(task, subtask, args)
-    all_entries = readdir()
-
-    # Filter all non-folders
-    only_folders = filter(entry -> isdir(joinpath(".", entry)), all_entries) .* "/"
-    for folder in only_folders
-        args["p"] = joinpath(".", folder)
+    for folder in readfolders()
+        args["p"] = joinpath(".", folder*"/")
         run_task(task, subtask, args)
     end
 end
+
+readfolders(path=".") = filter(entry -> isdir(joinpath(".", entry)), readdir(path))
