@@ -2,7 +2,7 @@ module Vampires
 
 using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
 
-include("read_utils.jl")
+include("io/read_utils.jl")
 # input
 include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/input/poscar.jl"); include("io/input/xdatcar.jl")
 include("io/input/incar.jl")
