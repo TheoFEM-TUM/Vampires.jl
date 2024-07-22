@@ -5,7 +5,7 @@ using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
 include("io/read_utils.jl")
 # input
 include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/input/poscar.jl"); include("io/input/xdatcar.jl")
-include("io/input/incar.jl")
+include("io/input/incar.jl"); include("io/input/outcar.jl")
 
 # output
 include("io/output/incar.jl")
@@ -23,7 +23,7 @@ include("tasks/modify_task.jl"); include("tasks/calculation_task.jl"); include("
 include("cli_interface.jl")
 
 export read_eigenval, read_doscar, read_incar, set_keyword!, write_incar, Poscar, read_poscar, write_poscar, read_xdatcar
-export get_value_for_keyword, change_incar!
+export get_value_for_keyword, change_incar!, read_value_from_file
 export write_to_file, read_from_file
 export plot_bandstructure
 

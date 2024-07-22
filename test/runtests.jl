@@ -10,6 +10,7 @@ include("test_read_utils.jl")
     include("parser/test_poscar.jl")
     include("parser/test_xdatcar.jl")
     include("parser/test_incar.jl")
+    include("parser/test_outcar.jl")    
 end
 
 @testset "tasks" begin

@@ -28,10 +28,10 @@ Split each line of the input vector of strings into its constituent non-empty el
 - `split_lines::Vector{Vector{String}}`: A vector of vectors of strings, where each inner vector 
 contains the non-empty elements of the corresponding line from the input.
 """
-function split_lines(lines)
+function split_lines(lines; char=" ")
     split_lines = Vector{Vector{String}}(undef, length(lines))
     Threads.@threads for l in eachindex(lines)
-        split_lines[l] = split_line(lines[l])
+        split_lines[l] = split_line(lines[l]; char=char)
     end
     return split_lines
 end
@@ -47,7 +47,7 @@ Splits a line of text into individual words, removing any extra spaces.
 # Returns
 - `Vector{String}`: An array of words from the input line, excluding any empty elements.
 """
-split_line(line) = filter(!isempty, split(line, " "))
+split_line(line; char=" ") = filter(!isempty, split(line, char))
 
 """
     parse_lines_as_array(line; i1, i2, type)
