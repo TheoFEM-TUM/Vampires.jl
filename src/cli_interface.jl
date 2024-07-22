@@ -1,53 +1,20 @@
+# TODO: automatically collect task strings from task files to cli_interface for an overview
 """
     TASKS
 
-A dictionary that maps task names to their corresponding functions.
+Tasks are called using symbols with multiple dispatch
 
-# Structure
-The `TASKS` dictionary maps string keys (task names) to anonymous functions. Each function takes a single argument `args`, which is a dictionary containing the necessary parameters for the task.
-
-# Tasks
-- `"testpar"`: Runs a parameter test.
-    - `args["par"]`: Parameter name.
-    - `args["val"]`: Comma-separated string of parameter values.
-    - `args["p"]`: Path where the test will be executed.
-- `"set"`: Sets a keyword in the INCAR file.
-    - `args["par"]`: Parameter name.
-    - `args["val"]`: Parameter value.
-    - `args["p"]`: Path to the INCAR file directory.
-    - `args["incar"]`: INCAR file name.
-- `"bandgap"`: Computes the bandgap.
-    - `args["p"]`: Path to the directory containing the EIGENVAL file.
-    - `args["eigenval"]`: EIGENVAL file name.
 
 # Adding New Tasks
-To add a new task to the `TASKS` dictionary, follow these steps:
-
-1. Define the task function that takes a single argument `args` (a dictionary of parameters).
-2. Add a new entry to the `TASKS` dictionary with the task name as the key and the function as the value.
-
-## Example
-Suppose you want to add a task that calculates the total energy from a file. First, define the function:
-
-```julia
-function calculate_total_energy(args)
-    file_path = args["p"] * args["energyfile"]
-    return sum(read_energies(file_path))
-end
+Any task is defined as
 ```
-
-Then, add the new task to the TASKS dictionary:
-
-```julia
-TASKS["total_energy"] = (args) -> calculate_total_energy(args)
+function run_task(::Type{Val{:<task>}}, ::Type{Val{:<subtask>}}, args); end
 ```
-
+`<task>` and `<subtask>` define the task and subtask, respectively.
+To add a new task or subtask, define a run_task function in /src/tasks/*.jl.
+If there are no task/file for your specific task, create it and add a task
+description to the file header. New subtask should also be listed in the header.
 """
-const TASKS = Dict(
-    "testpar" => (args) -> run_parameter_test(args["par"], split(args["val"], ","); path=args["p"]),
-    "set" => (args) -> set_keyword_in_incar!(args["par"], args["val"], args["p"]*args["incar"]),
-    "bandgap" => (args) -> run_bandgap_task(args["p"]*args["eigenval"])
-)
 
 """
     main()
@@ -55,8 +22,8 @@ const TASKS = Dict(
 Main function to execute tasks based on command-line arguments.
 
 # Description
-This function parses command-line arguments to determine which task to run. It then executes the corresponding task from the `TASKS` dictionary.
-
+This function parses command-line arguments to determine which task to run. It then executes the corresponding task from the `src/tasks` directory using multiple dispatch.
+If `-r` is specified, the task will run in every subfolder of the specified directory (default: "./")
 # Command-line Arguments
 The command-line arguments are parsed into a dictionary `args`.
 
@@ -80,24 +47,22 @@ function main()
         
         if task == "none"
             println("Task is none. Exiting ...")
-        elseif haskey(TASKS, task)
-            println("Running task $task ...")
-            
-            if args["r"]
-                #read all path entries
-                all_entries = readdir()
-
-                # Filter all non-folders
-                only_folders = filter(entry -> isdir(joinpath(".", entry)), all_entries) .* "/"
-                for folder in only_folders
-                    args["p"] = joinpath(".", folder)
-                    TASKS[task](args)
-                end
-            else
-                TASKS[task](args)
-            end
         else
-            @error "No task of name $task found."
+            try
+                println("Running task $task ...")
+                # i
+                if args["r"]
+                    run_task_recursive()
+                else
+                    run_task(Val{Symbol(args["task"])}, Val{Symbol(args["subtask"])}, args)
+                end
+            catch e 
+                if e == ArgumentError
+                    @error "No task of name $task found."
+                else
+                    rethrow(e)
+                end
+            end
         end
     end
 
@@ -112,6 +77,10 @@ function parse_commandline()
             help = "positional argument 1: task defines which task is to be performed"
             arg_type = String
             default = "none"
+        "subtask"
+            help = "positional argument 2: some tasks require further specification"
+            arg_type = String
+            default = ""
         "-r"
             help = "if true, task will be applied recursively to all folders"
             action = :store_true
@@ -127,6 +96,10 @@ function parse_commandline()
             help = "set the default path"
             arg_type = String
             default = "./"
+        "--o"
+            help = "set the output path"
+            arg_type = String
+            default = "./output"
         "--incar"
             help = "set the name of the INCAR file"
             arg_type = String
@@ -135,8 +108,20 @@ function parse_commandline()
             help = "set the name of the EIGENVAL file"
             arg_type = String
             default = "EIGENVAL"
+        "--doscar"
+            help = "set the name of the DOSCAR file"
+            arg_type = String
+            default = "DOSCAR"
+        "--poscar"
+            help = "set the name of the POSCAR file"
+            arg_type = String
+            default = "POSCAR"
+        "--xdatcar"
+            help = "set the name of the XDATCAR file"
+            arg_type = String
+            default = "XDATCAR"
     end
-    args :: Dict = parse_args(s)
+    args :: Dict{String, String} = parse_args(s)
     return args
 end
 

@@ -2,7 +2,7 @@ path = string(@__DIR__)*"/"
 
 keyword = "ENCUT"
 values = ["300", "350", "400"]
-run_parameter_test(keyword, values; path=path)
+convergence_create_subdirectories(keyword, values; path=path)
 
 for (folder, value) in zip(keyword * "_" .* values, values)
     @test "INCAR" in readdir(path*folder) && "KPOINTS" in readdir(path*folder) && "POSCAR" in readdir(path*folder) && "POTCAR" in readdir(path*folder)
