@@ -2,6 +2,8 @@ using Vampires, Test
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
+include("test_read_utils.jl")
+
 @testset "parser" begin
     include("parser/test_eigenval.jl")
     include("parser/test_doscar.jl")
