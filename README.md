@@ -29,7 +29,7 @@ vamp set --par ENCUT --val 350
 vamp testpar --par ENCUT --val 300,350,400
 ```
 
-## Using `Vampires.jl in Python
+## Using `Vampires.jl` in Python
 
 Install `PyJulia` package
 
