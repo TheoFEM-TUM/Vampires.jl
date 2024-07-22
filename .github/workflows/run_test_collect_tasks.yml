@@ -1,0 +1,39 @@
+name: Update TASKS.md and Run Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        julia-version: ["1.9.3"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Julia ${{ matrix.julia-version }}
+      uses: julia-actions/setup-julia@v1
+      with:
+        julia-version: ${{ matrix.julia-version }}
+        arch: x64
+    - name: Extract docstrings and update TASKS.md
+      run: julia .github/update_tasks_md_from_docstrings.jl
+
+
+    - name: Commit and push changes
+      env:
+        GH_TOKEN: ${{ secrets.VAMPIRE_ACTION_TOKEN }}
+      run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add TASKS.md
+          git commit -m "Update TASKS.md with latest docstrings"
+          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+
+    - name: Install dependencies
+      run: |
+          julia --project=. -e '
+            import Pkg
+            Pkg.instantiate()'
+    - name: Run tests
+      run: |
+        julia --project=. test/runtests.jl
