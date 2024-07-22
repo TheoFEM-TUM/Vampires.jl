@@ -20,7 +20,7 @@ The `mode` argument specifies whether to extract the "first" or "last" value of 
 If `mode` is "first", the function extracts the first occurrence of a value of the specified type; if `mode` is "last", it extracts the last occurrence.
 The function returns a maximum of `N` values. If `N` is set to 0, all matching values are returned.
 """
-function read_value_from_file(param, file; mode="first", type=Float64, N=1)
+function read_value_from_file(param, file; mode="last", type=Float64, N=1, line_mode="first")
     lines = open_and_read(file)
     param_values = type[]
     for line in lines
@@ -34,18 +34,21 @@ function read_value_from_file(param, file; mode="first", type=Float64, N=1)
 
             line_elements_of_type = filter(x->x≠nothing, tryparse.(type, split_line(line_)))
 
-            if mode == "first"
+            if line_mode == "first"
                 push!(param_values, line_elements_of_type[1])
-            elseif mode == "last"
+            elseif line_mode == "last"
                 push!(param_values, line_elements_of_type[end])
             end
         end
-        if N ≠ 0 && length(param_values) ≥ N; break; end
     end
     if length(param_values) == 0
         throw("No value for parameter $param found.")
-    elseif length(param_values) == 1
-        return param_values[1]
+    elseif length(param_values) == 1 || N == 1
+        if mode == "first"
+            return param_values[1]
+        elseif mode == "last"
+            return param_values[end]
+        end
     else
         return param_values
     end

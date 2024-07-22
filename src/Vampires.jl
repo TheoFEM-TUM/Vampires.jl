@@ -18,7 +18,9 @@ include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
 include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); 
 
 # tasks
+include("tasks/recursive.jl")
 include("tasks/modify_task.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl"); include("tasks/convergence_task.jl")
+include("tasks/run_script.jl")
 
 include("cli_interface.jl")
 
