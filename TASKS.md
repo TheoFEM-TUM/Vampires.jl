@@ -15,6 +15,10 @@ convergence
 ```
 modify
     incar: changes a parameter _par_ to a given value _value_
+addincar
+    block_label: add certain tags to the INCAR file.
+rmincar
+    block_label: remove block from the INCAR file.
 ```
 
 ```
