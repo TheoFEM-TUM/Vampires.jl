@@ -39,7 +39,6 @@ function run_task(::Type{Val{:r}}, task, subtask, args)
 end
 
 
-
 function run_task(::Type{Val{:rcalc}}, task, subtask, args)
     collected_value = Matrix{Float64}[]
     base_path = args["p"]
