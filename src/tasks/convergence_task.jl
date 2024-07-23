@@ -17,28 +17,5 @@ function run_task(::Type{Val{:convergence}}, ::Type{Val{:create}}, args)
 end
 
 function run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args)
-    convergence_read_value(args["par"], args["p"])
-end
-
-function run_task(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
-    #TODO: What should this do?
-    throw("convergence plots are currently only implemented in recursive mode.")
-end
-
-function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
-    convergence_plot_value(args["par"], args["p"], args["o"])
-end
-
-"""
-    convergence_read_value(param, path)
-
-Reads and prints the value of a specified parameter from a VASP OUTCAR file.
-
-# Arguments
-- `param::String`: The parameter to be read from the OUTCAR file.
-- `path::String`: The path to the directory containing the OUTCAR file.
-"""
-function convergence_read_value(param, path)
-    value = read_value_from_outcar(param, path*"OUTCAR")[end]
-    println("The value of $param in $path is: $value")
+    read_value_from_outcar(args["par"], args["p"]*args["outcar"])
 end

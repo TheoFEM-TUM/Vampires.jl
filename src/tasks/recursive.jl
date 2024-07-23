@@ -50,5 +50,5 @@ function run_task(::Type{Val{:rconv}}, task, subtask, args)
         push!(x_values, split(folder, "_")[2])
         push!(collected_value, run_task(task, subtask, args))
     end
-    plot_value_convergence(collected_values, x_, split(folder, "_")[1])
+    plot_value_convergence(string(subtask), split(folder, "_")[1], x_values, collected_values, args["o"])
 end

@@ -16,9 +16,6 @@ Read values associated with a parameter from a file.
 # Description
 This function reads a file line-by-line and searches for lines containing the specified parameter `param`. 
 It extracts the values associated with the parameter from each line, converts them to the specified `type`, and collects them in a vector.
-The `mode` argument specifies whether to extract the "first" or "last" value of the specified type in the line. 
-If `mode` is 1, the function extracts the first occurrence of a value of the specified type; if `mode` is :end, it extracts the last occurrence.
-If `mode` is a range, this range is returned. if `mode=1:end`, all matching values are returned.
 """
 function read_value_from_outcar(param, file; type=Float64, line_mode="first")::Vector
     lines = open_and_read(file)
