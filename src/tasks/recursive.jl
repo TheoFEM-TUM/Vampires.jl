@@ -11,6 +11,7 @@ any_task
     
 """
 
+
 """
     run_task_recursive(task, subtask, args)
 
@@ -26,22 +27,24 @@ This function scans the current directory for subdirectories. For each subdirect
 
 The function assumes that the `task` function accepts the `subtask` function and an `args` dictionary as parameters, and that the `args` dictionary should include the path to the current subdirectory.
 """
-function run_task_recursive(task, subtask, args)
-    for folder in readfolders()
-        args["p"] = joinpath(".", folder*"/")
+
+readfolders(path=".") = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
+
+function run_task(::Type{Val{:r}}, task, subtask, args)
+    base_path = args["p"]
+    for folder in readfolders(base_path)
+        args["p"] =  joinpath(base_path, folder * "/")
         run_task(task, subtask, args)
     end
 end
 
 
 
-function run_calculation_recursive_merge_task(task, subtask, args)
-    for folder in readfolders()
-        args["p"] = joinpath(".", folder*"/")
-        run_task(task, subtask, args)
+function run_task(::Type{Val{:rcalc}}, task, subtask, args)
+    collected_value = Matrix{Float64}[]
+    base_path = args["p"]
+    for folder in readfolders(base_path)
+        args["p"] =  joinpath(base_path, folder * "/")
+        push!(collected_value, run_task(task, subtask, args))
     end
 end
-
-
-
-readfolders(path=".") = filter(entry -> isdir(joinpath(".", entry)), readdir(path))

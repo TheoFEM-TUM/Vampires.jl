@@ -10,4 +10,3 @@ for (folder, value) in zip(keyword * "_" .* values, values)
     @test get_value_for_keyword(keyword, incar_) == value
     rm(path*folder, recursive=true)
 end
-

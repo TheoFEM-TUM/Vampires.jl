@@ -51,9 +51,10 @@ function main()
         try
             task_string = args["task"]
             println("Running task $task_string ...")
-            # i
             if args["r"]
-                run_task_recursive(task, subtask, args)
+                run_task(Val{Symbol("r")}, task, subtask, args)
+            elseif args["rcalc"]
+                run_task(Val{Symbol("rcalc")}, task, subtask, args)
             else
                 run_task(task, subtask, args)
             end
@@ -82,8 +83,11 @@ function parse_commandline()
             help = "positional argument 2: some tasks require further specification"
             arg_type = String
             default = ""
-        "-r"
+        "--r"
             help = "if true, task will be applied recursively to all folders"
+            action = :store_true
+        "--rcalc"
+            help = "if true, calculations will be applied recursively to all folders; task will be run based on the calculations in top-level folder"
             action = :store_true
         "--par"
             help = "define a parameter that is to be adapted"

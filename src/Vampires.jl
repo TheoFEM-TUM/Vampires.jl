@@ -18,6 +18,7 @@ include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
 include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); 
 
 # tasks
+# recursive.jl has to be the first include as it defines the @rcalc macro
 include("tasks/recursive.jl")
 include("tasks/modify_task.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl"); include("tasks/convergence_task.jl")
 include("tasks/run_script.jl")
