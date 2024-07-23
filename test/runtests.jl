@@ -1,4 +1,4 @@
-using Vampires, Test
+using Vampires, Test, LinearAlgebra
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
@@ -17,10 +17,10 @@ end
     include("tasks/param_test/test_convergence_create.jl")
 end
 
-@testset "energy" begin
-    include("energy/test_bandgap.jl")
+@testset "calculations" begin
+    include("calculations/test_bandgap.jl")
+    include("calculations/test_vectors.jl")
 end
-
 
 @testset "xdos" begin
     include("xdos/test_dos.jl")

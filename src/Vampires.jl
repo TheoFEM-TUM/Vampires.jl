@@ -11,7 +11,7 @@ include("io/input/incar.jl"); include("io/input/outcar.jl")
 include("io/output/incar.jl")
 
 # calculations
-include("calculations/energy/bandstructure.jl")
+include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl")
 include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
 
 # plotting
@@ -30,6 +30,7 @@ export write_to_file, read_from_file
 export plot_bandstructure
 
 export convergence_create_subdirectories, get_bandgap, get_vbm_and_cbm, get_fermi_energy
+export frac_to_cart, cart_to_frac, get_volume, get_bs
 export compute_dos
 
 end # module
