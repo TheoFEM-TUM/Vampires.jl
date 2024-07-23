@@ -15,6 +15,7 @@ end
 
 @testset "tasks" begin
     include("tasks/param_test/test_convergence_create.jl")
+    include("tasks/test_recursive.jl")
 end
 
 @testset "energy" begin

@@ -40,10 +40,12 @@ end
 
 
 function run_task(::Type{Val{:rcalc}}, task, subtask, args)
-    collected_value = Matrix{Float64}[]
+    collected_value = Float64[]
     base_path = args["p"]
     for folder in readfolders(base_path)
         args["p"] =  joinpath(base_path, folder * "/")
+        curr_val = run_task(Val, subtask, args)
         push!(collected_value, run_task(task, subtask, args))
     end
+    collected_value
 end

@@ -33,4 +33,6 @@ export plot_bandstructure
 export convergence_create_subdirectories, get_bandgap, get_vbm_and_cbm, get_fermi_energy
 export compute_dos
 
+export run_task
+
 end # module
