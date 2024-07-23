@@ -39,7 +39,7 @@ function run_task(::Type{Val{:r}}, task, subtask, args)
 end
 
 
-function run_task(::Type{Val{:rcalc}}, task, subtask, args)
+function run_task(::Type{Val{:rconv}}, task, subtask, args)
     collected_value = Float64[]
     base_path = args["p"]
     for folder in readfolders(base_path)
@@ -47,5 +47,5 @@ function run_task(::Type{Val{:rcalc}}, task, subtask, args)
         curr_val = run_task(Val, subtask, args)
         push!(collected_value, run_task(task, subtask, args))
     end
-    collected_value
+    convergence_plot_value()
 end
