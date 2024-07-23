@@ -16,7 +16,7 @@ subtask =Val{Symbol("bandgap")}
 
 args = Dict{String, String}("p" => path_recursive, "eigenval" => "EIGENVAL_gaas") 
 run_task(Val{Symbol("r")}, task, subtask, args)
-run_task(Val{Symbol("rcalc")}, task, subtask, args)
+run_task(Val{Symbol("rconv")}, task, subtask, args)
 
 
 rm(path_recursive, recursive=true)

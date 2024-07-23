@@ -8,7 +8,7 @@ Generates a convergence plot of a specified parameter from VASP OUTCAR files.
 - `path::String`: The base path where the folders containing OUTCAR files are located.
 - `output_filename::String`: The filename for saving the generated plot.
 """
-function convergence_plot_value(param, x_values, y_values, output_filename)
-    plot(x_values, y_values, xlabel=seeds[1], ylabel=param)
+function plot_value_convergence(y_param, x_param, x_values, y_values, output_filename)
+    plot(x_values, y_values, xlabel=y_param, ylabel=x_param)
     savefig(output_filename)
 end

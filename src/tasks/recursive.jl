@@ -41,11 +41,14 @@ end
 
 function run_task(::Type{Val{:rconv}}, task, subtask, args)
     collected_value = Float64[]
+    x_values = []
     base_path = args["p"]
     for folder in readfolders(base_path)
         args["p"] =  joinpath(base_path, folder * "/")
-        curr_val = run_task(Val, subtask, args)
+        # curr_val = run_task(Val{Symbol("calcuation")}, subtask, args)
+        curr_val = run_task(task, subtask, args)
+        push!(x_values, split(folder, "_")[2])
         push!(collected_value, run_task(task, subtask, args))
     end
-    convergence_plot_value()
+    plot_value_convergence(collected_values, x_, split(folder, "_")[1])
 end
