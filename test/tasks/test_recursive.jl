@@ -14,7 +14,7 @@ end
 task =Val{Symbol("calculate")}
 subtask =Val{Symbol("bandgap")}
 
-args = Dict{String, String}("p" => path_recursive, "eigenval" => "EIGENVAL_gaas") 
+args = Dict{String, String}("p" => path_recursive, "eigenval" => "EIGENVAL_gaas", "o" => "./output.png") 
 run_task(Val{Symbol("r")}, task, subtask, args)
 run_task(Val{Symbol("rconv")}, task, subtask, args)
 

@@ -8,7 +8,7 @@ include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/inpu
 include("io/input/incar.jl"); include("io/input/outcar.jl")
 
 # output
-include("io/output/incar.jl"); include("io/output/file_management.jl"); 
+include("io/output/incar.jl"); include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl"); 
 
 # calculations
 include("calculations/energy/bandstructure.jl")
@@ -30,7 +30,8 @@ export get_value_for_keyword, change_incar!, read_value_from_outcar
 export write_to_file, read_from_file
 export plot_bandstructure, plot_value_convergence
 
-export convergence_create_subdirectories, get_bandgap, get_vbm_and_cbm, get_fermi_energy
+export convergence_create_subdirectories, write_run_script, add_path_to_folders
+export get_bandgap, get_vbm_and_cbm, get_fermi_energy
 export compute_dos
 
 export run_task

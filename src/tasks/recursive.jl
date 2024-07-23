@@ -40,15 +40,16 @@ end
 
 
 function run_task(::Type{Val{:rconv}}, task, subtask, args)
-    collected_value = Float64[]
+    collected_values = Float64[]
     x_values = []
     base_path = args["p"]
-    for folder in readfolders(base_path)
+    param_name = ""
+    for (i, folder) in enumerate(readfolders(base_path))
+        if i == 1; param_name = split(folder, "_")[1]; end
         args["p"] =  joinpath(base_path, folder * "/")
         # curr_val = run_task(Val{Symbol("calcuation")}, subtask, args)
-        curr_val = run_task(task, subtask, args)
         push!(x_values, split(folder, "_")[2])
-        push!(collected_value, run_task(task, subtask, args))
+        push!(collected_values, run_task(task, subtask, args))
     end
-    plot_value_convergence(string(subtask), split(folder, "_")[1], x_values, collected_values, args["o"])
+    plot_value_convergence(string(subtask), param_name, x_values, collected_values, args["o"])
 end
