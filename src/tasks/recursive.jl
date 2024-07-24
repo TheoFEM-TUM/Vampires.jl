@@ -12,10 +12,14 @@ any_task
 """
 
 
+
+
+readfolders(path=".") = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
+
 """
     run_task_recursive(task, subtask, args)
 
-Executes a specified task on all subdirectories of the current directory.
+Executes a specified task on all subdirectories of the current directory. This serves as default wrapper for any other recursive task.
 
 # Arguments
 - `task::Function`: The main task function to run.
@@ -27,29 +31,10 @@ This function scans the current directory for subdirectories. For each subdirect
 
 The function assumes that the `task` function accepts the `subtask` function and an `args` dictionary as parameters, and that the `args` dictionary should include the path to the current subdirectory.
 """
-
-readfolders(path=".") = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
-
-function run_task(::Type{Val{:r}}, task, subtask, args)
+function run_task_recursive(task, subtask, args)
     base_path = args["p"]
     for folder in readfolders(base_path)
         args["p"] =  joinpath(base_path, folder * "/")
         run_task(task, subtask, args)
     end
-end
-
-
-function run_task(::Type{Val{:rconv}}, task, subtask, args)
-    collected_values = Float64[]
-    x_values = []
-    base_path = args["p"]
-    param_name = ""
-    for (i, folder) in enumerate(readfolders(base_path))
-        if i == 1; param_name = split(folder, "_")[1]; end
-        args["p"] =  joinpath(base_path, folder * "/")
-        # curr_val = run_task(Val{Symbol("calcuation")}, subtask, args)
-        push!(x_values, split(folder, "_")[2])
-        push!(collected_values, run_task(task, subtask, args))
-    end
-    plot_value_convergence(string(subtask), param_name, x_values, collected_values, args["o"])
 end

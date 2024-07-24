@@ -16,6 +16,30 @@ function run_task(::Type{Val{:convergence}}, ::Type{Val{:create}}, args)
     convergence_create_subdirectories(param, param_range; path=path)
 end
 
+
+# TODO: make sure, that matching non-recursive and recursive tasks are matched in Documentation
+"""
+reads last value in OUTCAR of parameter for each directory
+"""
 function run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args)
-    read_value_from_outcar(args["par"], args["p"]*args["outcar"])
+    values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
+    println(values)
+    return values
+end
+
+
+
+function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
+    collected_values = Float64[]
+    x_values = []
+    base_path = args["p"]
+    param_name = ""
+    for (i, folder) in enumerate(readfolders(base_path))
+        if i == 1; param_name = split(folder, "_")[1]; end
+        args["p"] =  joinpath(base_path, folder * "/")
+        # curr_val = run_task(Val{Symbol("calcuation")}, subtask, args)
+        push!(x_values, split(folder, "_")[2])
+        push!(collected_values, run_task(task, subtask, args))
+    end
+    plot_value_convergence(string(subtask), param_name, x_values, collected_values, args["o"])
 end

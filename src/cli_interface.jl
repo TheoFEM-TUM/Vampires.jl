@@ -52,9 +52,7 @@ function main()
             task_string = args["task"]
             println("Running task $task_string ...")
             if args["r"]
-                run_task(Val{Symbol("r")}, task, subtask, args)
-            elseif args["rcalc"]
-                run_task(Val{Symbol("rcalc")}, task, subtask, args)
+                run_task_recursive(task, subtask, args)
             else
                 run_task(task, subtask, args)
             end
@@ -83,11 +81,8 @@ function parse_commandline()
             help = "positional argument 2: some tasks require further specification"
             arg_type = String
             default = ""
-        "--r"
+        "-r"
             help = "if true, task will be applied recursively to all folders"
-            action = :store_true
-        "--rcalc"
-            help = "if true, calculations will be applied recursively to all folders; task will be run based on the calculations in top-level folder"
             action = :store_true
         "--par"
             help = "define a parameter that is to be adapted"
@@ -125,6 +120,10 @@ function parse_commandline()
             help = "set the name of the XDATCAR file"
             arg_type = String
             default = "XDATCAR"
+        "--outcar"
+            help = "set the name of the OUTCAR file"
+            arg_type = String
+            default = "OUTCAR"
         "--vasp_exe"
             help = "set the name of the VASP executable"
             arg_type = String
@@ -134,4 +133,4 @@ function parse_commandline()
     return args
 end
 
-run_task(::Type{Val{:none}}, subtask, args) = println("Task is none. Exiting ...")
+run_task(task, subtask, args) = println("Task is none. Exiting ...")
