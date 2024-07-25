@@ -1,7 +1,7 @@
 using Suppressor
 
 """
-this file contains all recursive tests, even if the function has been defined in a different task file
+this file contains all recursive tests. Even if the run_task_recursive function is defined in a different task file
 """
 
 path = string(@__DIR__)*"/../test_files/"

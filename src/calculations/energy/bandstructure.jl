@@ -11,7 +11,7 @@ Calculate the bandgap from the given energy values.
 # Returns
 - `ΔE::Float64`: The calculated bandgap energy.
 """
-function get_bandgap(Es, kvalmax::Int64; printit=true)
+function get_bandgap(Es, kvalmax::Int64; printit=false)
     valmax = maximum(Es[kvalmax, :])
     condmin = minimum(Es[kvalmax+1, :])
     ΔE = condmin - valmax
@@ -31,7 +31,7 @@ Calculate the bandgap from the EIGENVAL file.
 # Returns
 - `ΔE::Float64`: The calculated bandgap energy.
 """
-function get_bandgap(file::AbstractString; printit=true)
+function get_bandgap(file::AbstractString; printit=false)
     _, Es, occs = read_eigenval(file)
     VBM, CBM, _ = get_vbm_and_cbm(Es, occs)
     ΔE = CBM - VBM
