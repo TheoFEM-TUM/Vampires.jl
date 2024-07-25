@@ -1,4 +1,4 @@
-path = string(@__DIR__)*"/"
+path = test_file_path*"param_test/"
 
 keyword = "ENCUT"
 values = ["300", "350", "400"]

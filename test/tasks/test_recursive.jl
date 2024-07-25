@@ -1,23 +1,27 @@
+using Suppressor
+
+"""
+this file contains all recursive tests, even if the function has been defined in a different task file
+"""
+
 path = string(@__DIR__)*"/../test_files/"
 
-path_recursive = path * "recursive/"
+path_recursive = path * "convergence/"
 
-mkpath(path_recursive)
+task = Val{Symbol("calculate")}
+subtask = Val{Symbol("bandgap")}
+args = Dict{String, String}("p" => path_recursive, "eigenval" => "EIGENVAL")
 
-file = "EIGENVAL_gaas"
-
-for folder in ["a", "b", "C"]
-    mkpath(path_recursive*folder)
-    cp(path*file, path_recursive*folder*"/$file", force=true)
-end
-
-task =Val{Symbol("calculate")}
-subtask =Val{Symbol("bandgap")}
-
-args = Dict{String, String}("p" => path_recursive, "eigenval" => "EIGENVAL_gaas", "o" => "./output.png") 
-run_task(Val{Symbol("r")}, task, subtask, args)
-run_task(Val{Symbol("rconv")}, task, subtask, args)
+output = @capture_out run_task_recursive(task, subtask, args)
+@test output == "ΔE = 0.5946059999999997\nΔE = 0.595008\nΔE = 0.594897\n" 
 
 
-rm(path_recursive, recursive=true)
+task = Val{Symbol("convergence")}
+subtask = Val{Symbol("read")}
+
+args = Dict{String, Any}("p" => path_recursive, "outcar" => "OUTCAR", "par" => "TOTEN", "N" => -1) 
+
+output = @capture_out run_task_recursive(task, subtask, args)
+
+@test output == "ENCUT_250\n-8.25135668\nENCUT_300\n-8.25251696\nENCUT_350\n-8.25259894\n"
         

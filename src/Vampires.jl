@@ -34,6 +34,6 @@ export convergence_create_subdirectories, write_run_script, add_path_to_folders
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy
 export compute_dos
 
-export run_task
+export run_task, run_task_recursive
 
 end # module
