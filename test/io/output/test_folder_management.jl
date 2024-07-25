@@ -1,4 +1,4 @@
-path = string(@__DIR__)*"/"
+path = test_file_path*"param_test/"
 
 keyword = "ENCUT"
 values = ["300", "350", "400"]
@@ -10,4 +10,3 @@ for (folder, value) in zip(keyword * "_" .* values, values)
     @test get_value_for_keyword(keyword, incar_) == value
     rm(path*folder, recursive=true)
 end
-
