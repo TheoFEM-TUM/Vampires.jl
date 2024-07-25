@@ -29,16 +29,16 @@ end
 
 
 function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
-    collected_values = Float64[]
+    y_values = Float64[]
     x_values = []
     base_path = args["p"]
-    param_name = ""
+    x_par_name = ""
     for (i, folder) in enumerate(readfolders(base_path))
-        if i == 1; param_name = split(folder, "_")[1]; end
+        if i == 1; x_par_name = split(folder, "_")[1]; end
         args["p"] =  joinpath(base_path, folder * "/")
-        # curr_val = run_task(Val{Symbol("calcuation")}, subtask, args)
         push!(x_values, split(folder, "_")[2])
-        push!(collected_values, run_task(task, subtask, args))
+        y_value = read_value_from_outcar(args["par"], args["p"]*args["outcar"])[end]
+        push!(y_values, y_value)
     end
-    plot_value_convergence(string(subtask), param_name, x_values, collected_values, args["o"])
+    plot_value_convergence(x_par_name, args["par"], x_values, y_values, args["o"])
 end
