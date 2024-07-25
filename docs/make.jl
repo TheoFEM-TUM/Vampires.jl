@@ -2,18 +2,16 @@ using Documenter
 using Vampires
 
 makedocs(
-    sitename = "Vampires Documentation",
+    sitename = "Vampires.jl",
     format = Documenter.HTML(),
     modules = [Vampires],
     pages = [
-        "Welcome" => "index.md"
+        "Home" => "index.md",
+        "Manual" => [
+            "man/install.md",
+            "man/cli_interface.md",
+            "man/examples.md"
+        ],
+        "tasks.md"
     ]
 )
-#TODO
-
-# Documenter can also automatically deploy documentation to gh-pages.
-# See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
-#=deploydocs(
-    repo = "<repository url>"
-)=#
