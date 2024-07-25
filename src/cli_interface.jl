@@ -100,6 +100,10 @@ function parse_commandline()
             help = "set the output path"
             arg_type = String
             default = "./output"
+        "--N"
+            help = "general task dependent number parameter"
+            arg_type = Int64
+            default = 0
         "--incar"
             help = "set the name of the INCAR file"
             arg_type = String

@@ -30,7 +30,6 @@ function read_value_from_outcar(param, file; type=Float64, line_mode="first")::V
             end
 
             line_elements_of_type = filter(x->x≠nothing, tryparse.(type, split_line(line_)))
-            println(line_elements_of_type)
             if line_mode == "first"
                 push!(param_values, line_elements_of_type[1])
             elseif line_mode == "last"

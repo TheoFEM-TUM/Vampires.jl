@@ -23,7 +23,6 @@ reads last value in OUTCAR of parameter for each directory
 """
 function run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args)
     values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
-    println(values)
     return values
 end
 

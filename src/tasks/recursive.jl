@@ -35,6 +35,16 @@ function run_task_recursive(task, subtask, args)
     base_path = args["p"]
     for folder in readfolders(base_path)
         args["p"] =  joinpath(base_path, folder * "/")
-        run_task(task, subtask, args)
+        values = run_task(task, subtask, args)
+        if typeof(values) <: AbstractVector
+            println(folder)
+            if args["N"] == 0
+                println(values)
+            elseif args["N"] == -1
+                println(values[end])
+            else
+                println(values[args["N"]])
+            end
+        end
     end
 end
