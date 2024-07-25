@@ -7,5 +7,7 @@ calculation
 
 
 function run_task(::Type{Val{:calculate}}, ::Type{Val{:bandgap}}, args)
-    return get_bandgap(args["p"]*args["eigenval"])
+    ΔE = get_bandgap(args["p"]*args["eigenval"])
+    @show ΔE
+    return ΔE
 end
