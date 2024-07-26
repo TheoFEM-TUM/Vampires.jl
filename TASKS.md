@@ -28,10 +28,6 @@ plot
 any_task
     any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
 
-### recursive wrapper for data extraction tasks
-any_task
-    any_subtask: if the option `-rcalc` is specified, the calculation  
-    
 ```
 
 ```
