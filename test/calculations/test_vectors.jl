@@ -24,6 +24,10 @@ end
 
     @test frac_to_cart(r⃗_frac, lattice) == r⃗_cart
     @test cart_to_frac(r⃗_cart, lattice) ≈ r⃗_frac
+
+    lattice = [2.825 0.0 2.825; 2.825 2.825 0.0; 0.0 2.825 2.825]
+    R = [1, -1, 2]
+    @test frac_to_cart(R, lattice) == @. R[1]*lattice[:, 1] + R[2]*lattice[:, 2] + R[3]*lattice[:, 3]
 end
 
 @testset "volume" begin
