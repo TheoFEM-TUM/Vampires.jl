@@ -1,3 +1,4 @@
+# Install `Vampires.jl`
 ## How to install `Vampires.jl` in Julia
 
 * First, you need to install Julia itself from the [Julia homepage](https://julialang.org/downloads/)
