@@ -24,7 +24,10 @@ plot
 ```
 
 ```
-"""
+### recursive wrapper for all tasks:
+any_task
+    any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
+
 ```
 
 ```

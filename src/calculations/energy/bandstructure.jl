@@ -1,5 +1,5 @@
 """
-    get_bandgap(Es::Array{Float64, 2}, kvalmax::Int64; printit::Bool=true) -> Float64
+    get_bandgap(Es::Array{Float64, 2}, kvalmax::Int64; printit::Bool=false) -> Float64
 
 Calculate the bandgap from the given energy values.
 
@@ -11,7 +11,7 @@ Calculate the bandgap from the given energy values.
 # Returns
 - `ΔE::Float64`: The calculated bandgap energy.
 """
-function get_bandgap(Es, kvalmax::Int64; printit=true)
+function get_bandgap(Es, kvalmax::Int64; printit=false)
     valmax = maximum(Es[kvalmax, :])
     condmin = minimum(Es[kvalmax+1, :])
     ΔE = condmin - valmax
@@ -20,7 +20,7 @@ function get_bandgap(Es, kvalmax::Int64; printit=true)
 end
 
 """
-    get_bandgap(file::AbstractString; printit::Bool=true) -> Float64
+    get_bandgap(file::AbstractString; printit::Bool=false) -> Float64
 
 Calculate the bandgap from the EIGENVAL file.
 
@@ -31,7 +31,7 @@ Calculate the bandgap from the EIGENVAL file.
 # Returns
 - `ΔE::Float64`: The calculated bandgap energy.
 """
-function get_bandgap(file::AbstractString; printit=true)
+function get_bandgap(file::AbstractString; printit=false)
     _, Es, occs = read_eigenval(file)
     VBM, CBM, _ = get_vbm_and_cbm(Es, occs)
     ΔE = CBM - VBM
@@ -40,7 +40,7 @@ function get_bandgap(file::AbstractString; printit=true)
 end
 
 """
-    get_vbm_and_cbm(Es::Array{Float64, 2}, occs::Array{Float64, 2}; occ_threshold::Float64=0.9) -> Tuple{Float64, Float64, Tuple{Int64, Int64}}
+    get_vbm_and_cbm(Es::Array{Float64, 2}, occs::Array{Float64, 2}; occ_threshold::Float64=0.9, printit::Bool=false) -> Tuple{Float64, Float64, Tuple{Int64, Int64}}
 
 Determine the valence band maximum (VBM) and conduction band minimum (CBM) from energy values and occupations.
 
@@ -54,7 +54,7 @@ Determine the valence band maximum (VBM) and conduction band minimum (CBM) from 
 - `CBM::Float64`: The conduction band minimum energy.
 - `VBM_Index::Tuple{Int64, Int64}`: A tuple containing the band index and k-point index of the VBM.
 """
-function get_vbm_and_cbm(Es, occs; occ_threshold=0.9)
+function get_vbm_and_cbm(Es, occs; occ_threshold=0.9, printit=false)
     val_maxs = Float64[]
     cond_mins = Float64[]
     vbm_indices = Int64[]
@@ -67,12 +67,15 @@ function get_vbm_and_cbm(Es, occs; occ_threshold=0.9)
     end
     _, vbm_k_index = findmax(val_maxs)
     vbm_index = vbm_indices[vbm_k_index]
-    return maximum(val_maxs), minimum(cond_mins), (vbm_index, vbm_k_index)
+    vbm = maximum(val_maxs)
+    cbm = minimum(cond_mins)
+    if printit; @show (vbm, cbm); end
+    return vbm, cbm, (vbm_index, vbm_k_index)
 end
 
 
 """
-    get_fermi_level(Es, occ; occ_threshold=0.9)
+    get_fermi_level(Es, occ; occ_threshold=0.9, printit::Bool=false)
 
 Calculate the Fermi level of a system given the energy levels and their corresponding occupancies.
 
@@ -85,6 +88,7 @@ Calculate the Fermi level of a system given the energy levels and their correspo
 - `E_fermi::Float64`: Fermi energy for semiconductor
 """
 function get_fermi_energy(Es, occ; occ_threshold=0.9, printit=false)
+    println(printit)
     vbm, cbm, _ = get_vbm_and_cbm(Es, occ; occ_threshold)
     E_fermi = cbm - abs(cbm - vbm) * 0.5
     if printit; @show E_fermi; end
