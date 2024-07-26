@@ -1,37 +1,29 @@
 """
-    add_incar_block!(incar::OrderedDict{String, Vector{IncarLine}}, block_label::String, block_lines::Vector{IncarLine})
+    add_incar_block!(block_label::AbstractString, incar; verbose=true)
 
-Add a block of lines to the INCAR file under a specified block label. If the block label 
-already exists in the INCAR file, the lines will be appended to the existing block. 
-If the block label does not exist, a new block will be created.
+Add a block of keywords to an INCAR dictionary.
+
+This function adds a block of keywords and their default values to the provided `incar` dictionary. The block of keywords is identified by the `block_label`. 
+Each keyword is fetched using `get_keywords_for_block(block_label)` and their default values are obtained using `get_default_for_keyword(keyword)`. 
+The function then sets each keyword in the `incar` dictionary using `set_keyword!`.
 
 # Arguments
-- `incar::OrderedDict{String, Vector{IncarLine}}`: The dictionary representing the INCAR file where the keys are block labels and the values are vectors of `IncarLine` objects.
-- `block_label::String`: The label of the block to which the lines should be added.
-- `block_lines::Vector{IncarLine}`: A vector of `IncarLine` objects to be added to the block.
+- `block_label::AbstractString`: The label identifying the block of keywords to add.
+- `incar`: The INCAR dictionary where the keywords and their values will be added.
+- `verbose::Bool`: If true, print detailed information during the addition process. Defaults to `true`.
 """
-function add_incar_block!(incar::OrderedDict{String, Vector{IncarLine}}, block_label::String, block_lines::Vector{IncarLine})
-    if haskey(incar, block_label)
-        append!(incar[block_label], block_lines)
-    else
-        incar[block_label] = block_lines
+function add_incar_block!(block_label::AbstractString, incar; verbose=true)
+    keywords = get_keywords_for_block(block_label)
+    for keyword in keywords
+        value = get_default_for_keyword(keyword)
+        set_keyword!(keyword, value, incar, block_label=block_label, verbose=verbose)
     end
 end
 
-function add_incar_block!(incar, block_label::Type{Val{:Parallelization}})
-    block_lines = IncarLine[]
-    push!(block_lines, IncarLine("NCORE", "1", get_comment("NCORE")))
-    push!(block_lines, IncarLine("KPAR", "1", get_comment("KPAR")))
-    add_incar_block!(incar, string(block_label.parameters[1]), block_lines)
-end
-
-function add_incar_block!(incar, block_label::Type{Val{:Convergence}})
-    block_lines = IncarLine[]
-    push!(block_lines, IncarLine("ENCUT", "250", get_comment("ENCUT")))
-    push!(block_lines, IncarLine("EDIFF", "1e-5", get_comment("EDIFF")))
-    push!(block_lines, IncarLine("KGAMMA", "True", get_comment("KGAMMA")))
-    push!(block_lines, IncarLine("KSPACING", "0.5", get_comment("KSPACING")))
-    add_incar_block!(incar, string(block_label.parameters[1]), block_lines)
+function add_incar_block!(block_labels::Vector, incar; verbose=true) 
+    for block_label in block_labels
+        add_incar_block!(block_label, incar, verbose=verbose)
+    end
 end
 
 """

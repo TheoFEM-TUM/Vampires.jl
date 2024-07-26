@@ -19,13 +19,13 @@ include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl");
 
 # tasks
 include("tasks/recursive.jl")
-include("tasks/modify_task.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl"); include("tasks/convergence_task.jl")
+include("tasks/incar_tasks.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl"); include("tasks/convergence_task.jl")
 include("tasks/run_script.jl")
 
 include("cli_interface.jl")
 
 export read_eigenval, read_doscar, read_incar, set_keyword!, write_incar, Poscar, read_poscar, write_poscar, read_xdatcar
-export get_value_for_keyword, change_incar!, read_value_from_file, add_incar_block!, rm_incar_block!
+export get_value_for_keyword, change_incar!, read_value_from_file, add_incar_block!, rm_incar_block!, remove_keyword!
 export write_to_file, read_from_file
 export plot_bandstructure
 
