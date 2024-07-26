@@ -29,7 +29,7 @@ end
 function add_block_to_incar!(block_label, filename)
     incar = read_incar(filename)
     add_incar_block!(block_label, incar)
-    write_incar(filename)
+    write_incar(incar, filename)
 end
 
 function remove_block_from_incar!(block_label, filename)

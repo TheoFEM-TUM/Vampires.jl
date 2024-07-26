@@ -15,8 +15,12 @@ The function then sets each keyword in the `incar` dictionary using `set_keyword
 function add_incar_block!(block_label::AbstractString, incar; verbose=true)
     keywords = get_keywords_for_block(block_label)
     for keyword in keywords
-        value = get_default_for_keyword(keyword)
-        set_keyword!(keyword, value, incar, block_label=block_label, verbose=verbose)
+        try get_value_for_keyword(keyword, incar)
+            nothing
+        catch e
+            value = get_default_for_keyword(keyword)
+            set_keyword!(keyword, value, incar, block_label=block_label, verbose=verbose)
+        end
     end
 end
 
