@@ -2,19 +2,23 @@ using Vampires, Test, LinearAlgebra
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
-include("test_read_utils.jl")
+include("io/test_read_utils.jl")
 
-@testset "parser" begin
-    include("parser/test_eigenval.jl")
-    include("parser/test_doscar.jl")
-    include("parser/test_poscar.jl")
-    include("parser/test_xdatcar.jl")
-    include("parser/test_incar.jl")
-    include("parser/test_outcar.jl")    
+@testset "io/input" begin
+    include("io/input/test_eigenval.jl")
+    include("io/input/test_doscar.jl")
+    include("io/input/test_poscar.jl")
+    include("io/input/test_xdatcar.jl")
+    include("io/input/test_incar.jl")
+    include("io/input/test_outcar.jl")    
+end
+
+@testset "io/output" begin
+    include("io/output/test_folder_management.jl")
 end
 
 @testset "tasks" begin
-    include("tasks/param_test/test_convergence_create.jl")
+    include("tasks/test_recursive.jl")
 end
 
 @testset "calculations" begin

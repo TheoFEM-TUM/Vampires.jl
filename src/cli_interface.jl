@@ -54,7 +54,6 @@ function main()
         try
             task_string = args["task"]
             println("Running task $task_string ...")
-            # i
             if args["r"]
                 run_task_recursive(task, subtask, args)
             else
@@ -111,6 +110,10 @@ function parse_commandline()
             help = "set the output path"
             arg_type = String
             default = "./output"
+        "--N"
+            help = "general task dependent number parameter"
+            arg_type = Int64
+            default = 0
         "--incar"
             help = "set the name of the INCAR file"
             arg_type = String
@@ -131,6 +134,10 @@ function parse_commandline()
             help = "set the name of the XDATCAR file"
             arg_type = String
             default = "XDATCAR"
+        "--outcar"
+            help = "set the name of the OUTCAR file"
+            arg_type = String
+            default = "OUTCAR"
         "--vasp_exe"
             help = "set the name of the VASP executable"
             arg_type = String
@@ -140,4 +147,4 @@ function parse_commandline()
     return args
 end
 
-run_task(::Type{Val{:none}}, subtask, args) = println("Task is none. Exiting ...")
+run_task(task, subtask, args) = println("Task is none. Exiting ...")

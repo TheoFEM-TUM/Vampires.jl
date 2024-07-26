@@ -4,7 +4,6 @@ function compute_dos(E_bands, occs, sigma, E_grid)
     E_bands_flattened = vec(E_bands)
 
     efermi = get_fermi_energy(E_bands, occs)
-    println(efermi)
     # E_bands_flattened .+= efermi
     # Compute DOS using Gaussian broadening
     # TODO: implement Lorentzian broadening as alternative

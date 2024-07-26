@@ -1,12 +1,21 @@
 """
 list of available tasks:
 
+### recursive wrapper for all tasks:
+any_task
+    any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
+
 """
+
+
+
+
+readfolders(path=".") = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
 
 """
     run_task_recursive(task, subtask, args)
 
-Executes a specified task on all subdirectories of the current directory.
+Executes a specified task on all subdirectories of the current directory. This serves as default wrapper for any other recursive task.
 
 # Arguments
 - `task::Function`: The main task function to run.
@@ -19,10 +28,19 @@ This function scans the current directory for subdirectories. For each subdirect
 The function assumes that the `task` function accepts the `subtask` function and an `args` dictionary as parameters, and that the `args` dictionary should include the path to the current subdirectory.
 """
 function run_task_recursive(task, subtask, args)
-    for folder in readfolders()
-        args["p"] = joinpath(".", folder*"/")
-        run_task(task, subtask, args)
+    base_path = args["p"]
+    for folder in readfolders(base_path)
+        args["p"] =  joinpath(base_path, folder * "/")
+        values = run_task(task, subtask, args)
+        if typeof(values) <: AbstractVector
+            println(folder)
+            if args["N"] == 0
+                println(values)
+            elseif args["N"] == -1
+                println(values[end])
+            else
+                println(values[args["N"]])
+            end
+        end
     end
 end
-
-readfolders(path=".") = filter(entry -> isdir(joinpath(".", entry)), readdir(path))
