@@ -1,26 +1,7 @@
-# Using `Vampires.jl` in Python
+# Examples
+## Using `Vampires.jl` in Julia
 
-Install `PyJulia` package
-
-```bash
-pip install julia
-```
-
-Then you can import `Vampires.jl` into Python if it is installed in Julia
-
-```Python
-import julia
-from julia import Julia
-Julia(compiled_modules=False)
-
-from julia import Vampires as vamp
-
-vamp.SOMEFUNCTION ...
-```
-
-# Parsing
-
-## Atomic configurations
+### Atomic configurations
 
 Read the POSCAR input file from VASP.
 
@@ -39,7 +20,7 @@ xdatcar = read_xdatcar(xdatcar_path)
 
 ```
 
-## DFT Eigenvalues
+### DFT Eigenvalues
 
 Here's an example of how to read the EIGENVAL file from a VASP calculation and extract the k-points, energy bands and occupancies:
 
@@ -49,7 +30,7 @@ eigenval_path = "path/to/EIGENVAL"
 kpoints, E_bands, occs = read_eigenval(eigenval_path)
 ```
 
-## DFT Density of States (DOS)
+### DFT Density of States (DOS)
 
 To read the DOSCAR file and extract the density of states:
 
@@ -58,4 +39,24 @@ doscar_path = "path/to/DOSCAR"
 
 # Read the DOSCAR file
 dos, meta = read_doscar(doscar_path)
+```
+
+## Using `Vampires.jl` in Python
+
+Install `PyJulia` package
+
+```bash
+pip install julia
+```
+
+Then you can import `Vampires.jl` into Python if it is installed in Julia
+
+```Python
+import julia
+from julia import Julia
+Julia(compiled_modules=False)
+
+from julia import Vampires as vamp
+
+vamp.SOMEFUNCTION ...
 ```
