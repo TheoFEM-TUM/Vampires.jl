@@ -39,7 +39,7 @@ Creates subdirectories for a parameter convergence study and copies necessary VA
 - `param_range::AbstractVector`: A range or array of parameter values to be used for the subdirectories.
 - `path::String`: The base path where the subdirectories will be created. Defaults to `"./"`.
 """
-function convergence_create_subdirectories(param, param_range; path="./")
+function convergence_create_subdirectories(param, param_range; path="./", verbose=true)
     for value in param_range
         folder = param*"_"*value
         mkdir(path*folder)
@@ -48,7 +48,7 @@ function convergence_create_subdirectories(param, param_range; path="./")
                 cp(path*file, path*folder*"/$file", force=true)
             end
         end
-        set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR")
+        set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
     end
 end
 
