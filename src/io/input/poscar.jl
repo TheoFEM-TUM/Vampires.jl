@@ -47,17 +47,19 @@ function read_poscar(poscar)
     # Lattice vectors
     lattice = zeros(Float64, 3, 3)
     for i in 1:3
-        lattice[i, :] = a .* [parse(Float64, el) for el in lines[2+i]]
+        lattice[:, i] = @. a * parse(Float64, lines[2+i])
     end
+
     # Atom names and numbers
-    atom_names = [el for el in lines[6]]
-    atom_numbers = [parse(Int64, el) for el in lines[7]]
+    atom_names = lines[6]
+    atom_numbers = parse.(Int64, lines[7])
     if !(length(atom_names) == length(atom_numbers))
         @info "Length of atom_names and atom_numbers not equal!"; end
     atom_types = String[]
-    for (k, atom_number) in enumerate(atom_numbers), n in 1:atom_number
+    for (k, atom_number) in enumerate(atom_numbers), _ in 1:atom_number
         push!(atom_types, atom_names[k])
     end
+
     # Atom positions and types
     Nion = sum(atom_numbers)
     rs_atom = zeros(Float64, 3, Nion)
@@ -86,7 +88,7 @@ function write_poscar(poscar::Poscar; system_name="unknown_system")
     for i in 1:3
         sp1 = poscar.lattice[1, i] ≥ 0 ? " " : ""
         sps = [poscar.lattice[k, i] ≥ 0 ? "   " : "  " for k in 2:3]
-        println(file, sp1, poscar.lattice[i, 1], sps[1], poscar.lattice[i, 2], sps[2], poscar.lattice[i, 3])
+        println(file, sp1, poscar.lattice[1, i], sps[1], poscar.lattice[2, i], sps[2], poscar.lattice[3, i])
     end
     print(file, "  ")
     for type in poscar.atom_names; print(file, type); print(file, "  "); end

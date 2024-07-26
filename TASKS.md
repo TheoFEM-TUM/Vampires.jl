@@ -13,8 +13,16 @@ convergence
 ```
 
 ```
-modify
-    incar: changes a parameter _par_ to a given value _value_
+set/add
+    incar: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
+rm
+    incar: remove a certain tag or block from the INCAR file.
+read
+    incar: read the value of a certain INCAR tag and print it
+create
+    incar: create an INCAR file with certain tags or blocks in it
+whatis
+    return the default comment for an INCAR tag.
 ```
 
 ```
@@ -28,10 +36,6 @@ plot
 any_task
     any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
 
-### recursive wrapper for data extraction tasks
-any_task
-    any_subtask: if the option `-rcalc` is specified, the calculation  
-    
 ```
 
 ```

@@ -23,7 +23,7 @@ end
 
 Write the  IncarLine `line` to `file`.
 """
-function write_line!(line::IncarLine, file::IOStream)
+function write_line(line::IncarLine, file)
     line_string = " " * line.keyword * " = " * line.value
     L = length(line_string)
     N_spaces = 25 - L
@@ -127,7 +127,7 @@ function write_incar(blocks::OrderedDict, filename="INCAR")
         k += 1
         println(file, "!"*block_label)
         for line in block_lines
-            write_line!(line, file)
+            write_line(line, file)
         end
         if k ≠ length(blocks); println(file, ""); end
     end
@@ -165,7 +165,7 @@ function get_value_for_keyword(keyword, blocks; block_label="")
             end
         end
     end
-    throw("Value not found!")
+    throw(KeyError("Value for $keyword not found!"))
 end
 
 """
@@ -173,7 +173,7 @@ end
 
 Sets the `keyword` to `value` in `blocks` with `comment`.
 """
-function set_keyword!(keyword::AbstractString, value::AbstractString, blocks::OrderedDict{String, Vector{IncarLine}}; comment="", block_label="")
+function set_keyword!(keyword, value, blocks; comment=get_comment(keyword), block_label="", verbose=true)
     value_set = false
     if haskey(blocks, block_label)
         block_lines = blocks[block_label]
@@ -187,6 +187,9 @@ function set_keyword!(keyword::AbstractString, value::AbstractString, blocks::Or
         if value_set == false
             push!(block_lines, IncarLine(keyword, value, comment))
         end
+    elseif !haskey(blocks, block_label) && block_label ≠ ""
+        remove_keyword!(keyword, blocks, verbose=false)
+        blocks[block_label] = [IncarLine(keyword, value, comment)]
     else
         for (block_label, block_lines) in blocks
             for line in block_lines
@@ -198,8 +201,34 @@ function set_keyword!(keyword::AbstractString, value::AbstractString, blocks::Or
             end
         end
         if value_set == false
-            push!(blocks[collect(keys(blocks))[end]], IncarLine(keyword, value, comment))
+            block_label = get_block_label_for_keyword(keyword)
+            if haskey(blocks, block_label)
+                push!(blocks[block_label], IncarLine(keyword, value, comment))
+            else
+                blocks[block_label] = [IncarLine(keyword, value, comment)]
+            end
         end
+    end
+    if verbose
+        print("Changed line: ")
+        write_line(IncarLine(keyword, value, get_comment(keyword)), stdout)
+    end
+    check_for_empty_blocks!(blocks)
+end
+
+function set_keyword!(keywords::AbstractVector, values::AbstractVector, blocks::OrderedDict{String, Vector{IncarLine}}; block_label="", verbose=true)
+    for (keyword, value) in zip(keywords, values)
+        set_keyword!(keyword, value, blocks, block_label=block_label, verbose=verbose)
     end
 end
 
+function remove_keyword!(keyword::AbstractString, blocks::OrderedDict{String, Vector{IncarLine}}; verbose=true)
+    for (block_label, block_lines) in blocks
+        keyword_line = [line for line in block_lines if line.keyword == keyword]
+        filter!(line -> line.keyword ≠ keyword, block_lines)
+        if verbose && length(keyword_line) > 0
+            print("Removed line: ")
+            write_line.(keyword_line, stdout)
+        end
+    end
+end

@@ -40,10 +40,13 @@ function main()
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
         subtask = Val{Symbol(args["subtask"])}
-        
-        println("Parsed args:")
-        for (arg,val) in args
-            println("  $arg  =>  $val")
+        verbose = args["v"]
+
+        if verbose 
+            println("Parsed args:")
+            for (arg,val) in args
+                println("  $arg  =>  $val")
+            end
         end
 
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
@@ -66,7 +69,7 @@ function main()
 
     end
 
-    println("Time: $time s")
+    if verbose; println("Time: $time s"); end
 end
 
 function parse_commandline()
@@ -80,9 +83,12 @@ function parse_commandline()
         "subtask"
             help = "positional argument 2: some tasks require further specification"
             arg_type = String
-            default = ""
+            default = "none"
         "-r"
             help = "if true, task will be applied recursively to all folders"
+            action = :store_true
+        "-v"
+            help = "if true, Vampires are verbose."
             action = :store_true
         "--par"
             help = "define a parameter that is to be adapted"
@@ -90,6 +96,10 @@ function parse_commandline()
             default = ""
         "--val"
             help = "define the value of the parameter"
+            arg_type = String
+            default = ""
+        "--block"
+            help = "define the block that a parameter belongs to"
             arg_type = String
             default = ""
         "--p"
@@ -102,8 +112,8 @@ function parse_commandline()
             default = "./output"
         "--N"
             help = "general task dependent number parameter"
-            arg_type = Int64
-            default = 0
+            arg_type = String
+            default = "1"
         "--incar"
             help = "set the name of the INCAR file"
             arg_type = String
@@ -133,7 +143,7 @@ function parse_commandline()
             arg_type = String
             default = "vasp_std"
     end
-    args :: Dict{String, Any} = parse_args(s)
+    args :: Dict{String, Union{String, Bool}} = parse_args(s)
     return args
 end
 
