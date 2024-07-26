@@ -112,8 +112,8 @@ function parse_commandline()
             default = "./output"
         "--N"
             help = "general task dependent number parameter"
-            arg_type = Int64
-            default = 0
+            arg_type = String
+            default = "1"
         "--incar"
             help = "set the name of the INCAR file"
             arg_type = String
