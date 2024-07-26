@@ -13,12 +13,16 @@ convergence
 ```
 
 ```
-modify
-    incar: changes a parameter _par_ to a given value _value_
-addincar
-    block_label: add certain tags to the INCAR file.
-rmincar
-    block_label: remove block from the INCAR file.
+set/add
+    incar: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
+rm
+    incar: remove a certain tag or block from the INCAR file.
+read
+    incar: read the value of a certain INCAR tag and print it
+create
+    incar: create an INCAR file with certain tags or blocks in it
+whatis
+    return the default comment for an INCAR tag.
 ```
 
 ```
