@@ -93,7 +93,20 @@ function write_slurm_script(vasp_exe, module_list, path; time=1, nodes=1, ntasks
             #SBATCH --nodes=$nodes
             #SBATCH -t $hrs:$min:$sec 
             #SBATCH --ntasks-per-node=$ntasks_per_node
-            #SBATCH --partition=$partition
+            """)
+            if num_gpu > 0
+                print("""
+                #SBATCH --gres=gpu:$num_gpu
+                # this is required in VASP 6.4.1 - supports only one rank per GPU
+                #SBATCH --ntasks-per-node=$num_gpu
+                #SBATCH --partition=$partition
+                """)
+            else
+                print("""
+                #SBATCH --partition=$partition
+                """)
+            end
+            print("""
             #SBATCH --error=ERROR.%j
             """)
             if typeof(mail) <: AbstractString
@@ -122,7 +135,7 @@ function write_slurm_script(vasp_exe, module_list, path; time=1, nodes=1, ntasks
                 end
             end
             print("""
-            #ALL RUNS IN \$WORK !
+            # ALL RUNS IN \$WORK !
             # ... better
             # start the jobs inside the correct directory
             # as per default initial directory is the directory
@@ -146,9 +159,19 @@ function write_slurm_script(vasp_exe, module_list, path; time=1, nodes=1, ntasks
             #========================================#
             # 4. Parallel execution
             #========================================#
-            export MKL_NUM_THREADS=$mkl_num_threads
             export OMP_NUM_THREADS=$omp_num_threads
-            
+            # make sure that MKL does not overwrite your OMP configuration
+            export MKL_NUM_THREADS=$omp_num_threads
+            """)
+            if num_gpu > 0
+                print("""
+                export MKL_THREADING_LAYER=INTEL
+                export OMP_PLACES=cores
+                export OMP_PROC_BIND=close
+                export OMP_STACKSIZE=512m
+                """)
+            end
+            print("""
             #========================================#
             # 5. Systam info
             #========================================#
@@ -172,7 +195,7 @@ function write_slurm_script(vasp_exe, module_list, path; time=1, nodes=1, ntasks
                 """)
             else
                 print("""
-                orterun \${vasp_exe} > vasp.log
+                orterun --map-by ppr:$num_gpu:node --bind-to core -np $num_gpu \${vasp_exe} > vasp.log
                 """)
             end
         end
