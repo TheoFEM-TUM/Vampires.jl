@@ -3,8 +3,7 @@ poscar = read_poscar(test_file_path * "POSCAR_gaas")
 pc_poscar = multiply_primitive_cell(poscar, 1)
 Ns = [4, 4, 4]
 sc_poscar = multiply_primitive_cell(poscar, Ns)
-sc_poscar_true = read_poscar(test_file_path*"SC_POSCAR_4x4x4")
-write_poscar(sc_poscar)
+
 @testset "Supercell generation" begin
     # Test identity operation
     @test pc_poscar.atom_types == poscar.atom_types
