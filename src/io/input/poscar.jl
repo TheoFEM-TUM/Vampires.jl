@@ -70,7 +70,7 @@ function read_poscar(poscar)
 end
 
 """
-    write_poscar(poscar::Poscar; system_name="unknown_system")
+    write_poscar(poscar::Poscar; system_name="unknown_system", filename="POSCAR")
 
 Write a `Poscar` struct to a POSCAR file.
 
@@ -79,10 +79,10 @@ Write a `Poscar` struct to a POSCAR file.
 - `system_name::String`: The name of the system to be written at the top of the POSCAR file. Default is "unknown_system".
 
 # Returns
-- Nothing. The function writes the data to a file named "POSCAR".
+- Nothing. The function writes the data to a file named "POSCAR" (default).
 """
-function write_poscar(poscar::Poscar; system_name="unknown_system")
-    file = open("POSCAR", "w+")
+function write_poscar(poscar::Poscar; system_name="unknown_system", filename="POSCAR")
+    file = open(filename, "w+")
     println(file, system_name)
     println(file, " 1.00")
     for i in 1:3

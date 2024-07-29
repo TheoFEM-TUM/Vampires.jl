@@ -26,6 +26,11 @@ whatis
 ```
 
 ```
+supercell
+    create: create a supercell POSCAR file from an existing POSCAR file
+```
+
+```
 plot
     bandstructure: plots the bandstructure
     dos: plots the density of states
