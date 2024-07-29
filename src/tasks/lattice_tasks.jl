@@ -11,5 +11,6 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:create}}, args)
     N = occursin(',', args["N"]) ? split_line(args["N"], char=',') : args["N"]
     N = parse.(Int64, N)
     sc_poscar = transform_primitive_cell(poscar, N)
-    write_poscar(sc_poscar, filename=args["p"]*"SC_POSCAR") #TODO: args["o"]?
+    filename = args["o"] == "none" ? "SC_POSCAR" : args["o"]
+    write_poscar(sc_poscar, filename=args["p"]*filename)
 end

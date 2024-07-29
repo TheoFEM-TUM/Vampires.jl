@@ -107,9 +107,9 @@ function parse_commandline()
             arg_type = String
             default = "./"
         "--o"
-            help = "set the output path"
+            help = "set the output (file-) name"
             arg_type = String
-            default = "./output"
+            default = "none"
         "--N"
             help = "general task dependent number parameter"
             arg_type = String
