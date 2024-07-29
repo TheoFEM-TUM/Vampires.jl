@@ -1,8 +1,8 @@
 poscar = read_poscar(test_file_path * "POSCAR_gaas")
 
-pc_poscar = multiply_primitive_cell(poscar, 1)
+pc_poscar = transform_primitive_cell(poscar, 1)
 Ns = [4, 4, 4]
-sc_poscar = multiply_primitive_cell(poscar, Ns)
+sc_poscar = transform_primitive_cell(poscar, Ns)
 
 @testset "Supercell generation" begin
     # Test identity operation

@@ -32,7 +32,7 @@ export plot_bandstructure, plot_value_convergence
 
 export convergence_create_subdirectories, write_run_script, add_path_to_folders
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy
-export frac_to_cart, cart_to_frac, get_volume, get_bs, multiply_primitive_cell
+export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell
 export compute_dos
 
 export run_task, run_task_recursive
