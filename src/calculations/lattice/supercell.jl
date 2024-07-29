@@ -33,10 +33,9 @@ function multiply_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     # For each N, translate each atom by the respective translation vector
     k=1
     for n1 in 1:Ns[1], n2 in 1:Ns[2], n3 in 1:Ns[3]
-        N = [n1, n2, n3] .- 1
-        ΔR⃗ = frac_to_cart(N, poscar.lattice)
+        ΔR⃗ = [n1, n2, n3] .- 1
         for i in 1:Nion
-            Rs_sc[:, k] = cart_to_frac(frac_to_cart(poscar.rs_atom[:, i], poscar.lattice) .+ ΔR⃗, sc_lattice)
+            Rs_sc[:, k] = transform_basis(poscar.rs_atom[:, i] .+ ΔR⃗, inv(diagm(Ns)))
             sc_ion_types[k] = poscar.atom_types[i]
             k += 1
         end
