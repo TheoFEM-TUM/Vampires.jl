@@ -6,11 +6,6 @@ nscf
 """
 
 
-
-
-
-
-
 function run_task(::Type{Val{:nscf}}, ::Type{Val{:make}}, args)
     nscf_create_subdirectories(args["p"], args["kpoints"])
     filename = args["p"]*"run_nscf.sh"
