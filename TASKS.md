@@ -41,8 +41,8 @@ nscf
 ```
 
 ```
-"""
-reads last value in OUTCAR of parameter for each directory
+outcar
+    read: read a certain value from the outcar file
 ```
 
 ```
