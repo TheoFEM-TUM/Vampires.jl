@@ -26,6 +26,11 @@ whatis
 ```
 
 ```
+kpoints
+    make: generate a kpoint file for a certain grid size or kspacing, respectively.
+```
+
+```
 supercell
     create: create a supercell POSCAR file from an existing POSCAR file
 ```
