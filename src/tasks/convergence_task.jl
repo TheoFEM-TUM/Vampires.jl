@@ -33,3 +33,5 @@ function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
     end
     plot_value_convergence(x_par_name, args["par"], x_values, y_values, args["o"])
 end
+
+run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args) = run_task(Val{Symbol("outcar")}, Val{Symbol("read")}, args)
