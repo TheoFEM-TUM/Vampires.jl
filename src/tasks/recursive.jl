@@ -30,16 +30,15 @@ The function assumes that the `task` function accepts the `subtask` function and
 function run_task_recursive(task, subtask, args)
     base_path = args["p"]
     for folder in readfolders(base_path)
-        args["p"] =  joinpath(base_path, folder * "/")
+        args["p"] = joinpath(base_path, folder * "/")
         values = run_task(task, subtask, args)
         if typeof(values) <: AbstractVector
-            println(folder)
-            if args["N"] == 0
-                println(values)
-            elseif args["N"] == -1
-                println(values[end])
+            index = parse(Int64, args["N"])
+             #TODO: This is all suboptimal
+            if index == 1 # The default should be end
+                println("The value in $folder is: ", values[end])
             else
-                println(values[args["N"]])
+                println("The value in $folder is: ", values[index])
             end
         end
     end
