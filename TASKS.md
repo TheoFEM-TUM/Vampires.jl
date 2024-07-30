@@ -31,6 +31,11 @@ supercell
 ```
 
 ```
+nscf
+    make: generate the folder structure for a scf->nscf calculation
+```
+
+```
 plot
     bandstructure: plots the bandstructure
     dos: plots the density of states
