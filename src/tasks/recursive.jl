@@ -34,7 +34,7 @@ function run_task_recursive(task, subtask, args)
         values = run_task(task, subtask, args)
         if typeof(values) <: AbstractVector
             index = parse(Int64, args["N"])
-             #TODO: This is all suboptimal
+            #TODO: This is all suboptimal
             if index == 1 # The default should be end
                 println("The value in $folder is: ", values[end])
             else
