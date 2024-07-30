@@ -62,3 +62,13 @@ any_task
 
 ```
 
+```
+strong_scaling
+    cpu: create a folder structure with slurm files to analyze CPU scaling in VASP
+    gpu: create a folder structure with slurm files to analyze GPU scaling in VASP
+
+weak_scaling
+    cpu: create a folder structure with slurm files to analyze weak CPU scaling in VASP
+    gpu: create a folder structure with slurm files to analyze weak GPU scaling in VASP
+```
+
