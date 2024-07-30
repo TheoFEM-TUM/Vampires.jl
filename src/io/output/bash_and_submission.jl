@@ -40,7 +40,7 @@ end
 """
     add_path_to_folders(file::String, new_path::String)
 
-Adds a new path to the `folders` line in a bash script file.
+Adds a new path to the `folders` line in a bash script file. Helper function for write_run_script.
 
 # Arguments
 - `file::String`: The path to the bash script file (`run_job.sh`).
@@ -70,6 +70,138 @@ function add_path_to_folders(file::String, new_path::String)
                 write(f, new_folders_line * "\n")
             else
                 write(f, line * "\n")
+            end
+        end
+    end
+end
+
+
+"""
+    TODO
+"""
+function write_slurm_script(vasp_exe, module_list, path; time=1, nodes=1, ntasks_per_node=48, num_gpu=0, partition="batch", mail=nothing, out="batch_script")
+    if out in readdir()
+        add_path_to_folders(out, path)
+    else
+        hrs = trunc(Int, x)
+        min = trunc(Int, modf(x)[1]*60)
+        sec = trunc(Int, modf(modf(x)[1]*60)[1]*60)
+
+        open(out, "a") do runfile
+            print("""
+            #!/bin/bash
+            #========================================#
+            # batch script for VASP
+            #========================================#
+            # Batch setup -> system reads # s batch
+            ###
+            #SBATCH --nodes=$nodes
+            #SBATCH -t $hrs:$min:$sec 
+            #SBATCH --ntasks-per-node=$ntasks_per_node
+            """)
+            if num_gpu > 0
+                print("""
+                #SBATCH --gres=gpu:$num_gpu
+                # this is required in VASP 6.4.1 - supports only one rank per GPU
+                #SBATCH --ntasks-per-node=$num_gpu
+                #SBATCH --partition=$partition
+                """)
+            else
+                print("""
+                #SBATCH --partition=$partition
+                """)
+            end
+            print("""
+            #SBATCH --error=ERROR.%j
+            """)
+            if typeof(mail) <: AbstractString
+                print("""
+                #SBATCH --mail-user=$mail
+                #SBATCH --mail-type=START,FAIL,END
+                """)
+            end
+            if typeof(module_path) <: AbstractString || typeof(module_list) <: AbstractArray
+                print("""
+                #========================================#
+                # module setup for VASP
+                #========================================#
+                """)
+            end
+            if typeof(module_path) <: AbstractString
+                print("""
+                module use $path
+                """)
+            end
+            if typeof(module_list) <: AbstractArray
+                for mod in module_list
+                    print("""
+                    module load $mod
+                    """)
+                end
+            end
+            print("""
+            # ALL RUNS IN \$WORK !
+            # ... better
+            # start the jobs inside the correct directory
+            # as per default initial directory is the directory
+            # from where the job was submitted
+            
+            #========================================#
+            # 3. Integrity check
+            #========================================#
+            
+            echo "Starting at `date`"
+            echo "Running on hosts: \$SLURM_NODELIST"
+            echo "Running on \$SLURM_NNODES nodes."
+            echo "Running on \$SLURM_NPROCS processors."
+            echo "Work directory is `pwd`"
+            echo "VASP binary at " \$vasp_exe
+            
+            echo
+            echo "Starting VASP run at" `date`
+            echo
+            
+            #========================================#
+            # 4. Parallel execution
+            #========================================#
+            export OMP_NUM_THREADS=$omp_num_threads
+            # make sure that MKL does not overwrite your OMP configuration
+            export MKL_NUM_THREADS=$omp_num_threads
+            """)
+            if num_gpu > 0
+                print("""
+                export MKL_THREADING_LAYER=INTEL
+                export OMP_PLACES=cores
+                export OMP_PROC_BIND=close
+                export OMP_STACKSIZE=512m
+                """)
+            end
+            print("""
+            #========================================#
+            # 5. Systam info
+            #========================================#
+            hostname > host.info
+            grep 'Linux' /etc/issue >> host.info
+            grep 'model name' /proc/cpuinfo |cut -d: -f2 |uniq -c >> host.info
+            grep 'cpu M' /proc/cpuinfo >> host.info
+            grep 'MemTotal' /proc/meminfo >> host.info
+            free -g >> host.info
+            ulimit -a >> host.info
+            echo \$SLURM_NODELIST >> host.info
+            echo The VASP version is \${vasp_exe} >> host.info
+
+            #========================================#
+            # 5. VASP run
+            #========================================#
+            """)
+            if num_gpu == 0
+                print("""
+                srun \${vasp_exe} > vasp.log
+                """)
+            else
+                print("""
+                orterun --map-by ppr:$num_gpu:node --bind-to core -np $num_gpu \${vasp_exe} > vasp.log
+                """)
             end
         end
     end

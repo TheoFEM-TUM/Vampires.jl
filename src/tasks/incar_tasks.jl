@@ -1,14 +1,12 @@
 """
 list of available tasks:
 
-set/add
-    incar: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
-rm
-    incar: remove a certain tag or block from the INCAR file.
-read
-    incar: read the value of a certain INCAR tag and print it
-create
-    incar: create an INCAR file with certain tags or blocks in it
+incar
+    set/add: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
+    rm: remove a certain tag or block from the INCAR file.
+    read: read the value of a certain INCAR tag and print it
+    create: create an INCAR file with certain tags or blocks in it
+    whatis: return the default comment for an INCAR tag. 
 whatis
     return the default comment for an INCAR tag.
 """
@@ -24,7 +22,7 @@ Create directories for parameter testing and copy necessary files into each dire
 - `param_range::AbstractVector`: A range or vector of values to test for the parameter.
 - `path::AbstractString="./"`: The base path where the directories and files are located. Default is the current directory.
 """
-function run_task(::Type{Val{:set}}, ::Type{Val{:incar}}, args)
+function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
     if length(args["par"]) > 0 
         set_keyword_in_incar!(split_line(args["par"], char=','), split_line(args["val"], char=','), args["p"]*args["incar"], out=args["p"]*args["incar"], block_label=args["block"])
     elseif length(args["block"]) > 0
@@ -32,9 +30,9 @@ function run_task(::Type{Val{:set}}, ::Type{Val{:incar}}, args)
     end
 end
 
-run_task(::Type{Val{:setincar}}, subtask, args) = run_task(Val{Symbol("set")}, Val{Symbol("incar")}, args)
-run_task(::Type{Val{:add}}, ::Type{Val{:incar}}, args) = run_task(Val{Symbol("set")}, Val{Symbol("incar")}, args)
-run_task(::Type{Val{:addincar}}, subtask, args) = run_task(Val{Symbol("set")}, Val{Symbol("incar")}, args)
+run_task(::Type{Val{:setincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
+run_task(::Type{Val{:incar}}, ::Type{Val{:add}}, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
+run_task(::Type{Val{:addincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 
 function run_task(::Type{Val{:rm}}, ::Type{Val{:incar}}, args)
     if length(args["par"]) > 0 
@@ -46,12 +44,14 @@ end
 
 run_task(::Type{Val{:rmincar}}, subtask, args) = run_task(Val{Symbol("rm")}, Val{Symbol("incar")}, args)
 
-function run_task(::Type{Val{:whatis}}, subtask, args)
+run_task(::Type{Val{:incar}}, subtask, args) =  run_task(Val{Symbol("incar")}, Val{Symbol("whatis")}, args) 
+
+function run_task(::Type{Val{:incar}}, ::Type{::Val{:whatis}}, args)
     param = args["par"]
     println("The $param keyword ", get_comment(param))
 end
 
-function run_task(::Type{Val{:read}}, ::Type{Val{:incar}}, args)
+function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
     incar = read_incar(args["p"]*args["incar"])
     for keyword in split_line(args["par"], char=',')
         value = get_value_for_keyword(keyword, incar)
@@ -59,7 +59,7 @@ function run_task(::Type{Val{:read}}, ::Type{Val{:incar}}, args)
     end
 end
 
-function run_task(::Type{Val{:create}}, ::Type{Val{:incar}}, args)
+function run_task(::Type{Val{:incar}}, ::Type{Val{:create}}, args)
     incar = OrderedDict{String, Vector{IncarLine}}()
     if length(args["par"]) > 0
         for keyword in split_line(args["par"], char=',')
