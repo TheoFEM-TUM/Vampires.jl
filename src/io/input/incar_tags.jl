@@ -87,6 +87,7 @@ VASP_DEFAULTS = Dict{String, String}(
 BLOCK_KEYWORDS = Dict{String, Vector{String}}(
     "Parallelization" => ["NCORE", "KPAR"],
     "MolecularDynamics" => ["IBRION", "ISIF", "TEBEG", "TEEND", "POTIM", "NSW", "SMASS"],
-    "ElectronicConvergence" => ["ISMEAR", "SIGMA", "EDIFF", "NELMIN", "NELM"],
-    "Output" => ["NWRITE", "LCHARG", "LWAVE"]
+    "ElectronicConvergence" => ["ISMEAR", "SIGMA", "EDIFF", "NELMIN", "NELM", "PREC"],
+    "Output" => ["NWRITE", "LCHARG", "LWAVE", "LORBIT"],
+    "Setup" => ["ISTART", "ICHARG"]
 )

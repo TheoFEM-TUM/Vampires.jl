@@ -26,6 +26,11 @@ whatis
 ```
 
 ```
+kpoints
+    make: generate a kpoint file for a certain grid size or kspacing, respectively.
+```
+
+```
 supercell
     create: create a supercell POSCAR file from an existing POSCAR file
 ```
@@ -33,6 +38,11 @@ supercell
 ```
 nscf
     make: generate the folder structure for a scf->nscf calculation
+```
+
+```
+outcar
+    read: read a certain value from the outcar file
 ```
 
 ```
