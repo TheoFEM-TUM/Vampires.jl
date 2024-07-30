@@ -18,15 +18,6 @@ end
 
 
 # TODO: make sure, that matching non-recursive and recursive tasks are matched in Documentation
-"""
-reads last value in OUTCAR of parameter for each directory
-"""
-function run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args)
-    values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
-    return values
-end
-
-
 
 function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
     y_values = Float64[]
@@ -35,10 +26,12 @@ function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
     x_par_name = ""
     for (i, folder) in enumerate(readfolders(base_path))
         if i == 1; x_par_name = split(folder, "_")[1]; end
-        args["p"] =  joinpath(base_path, folder * "/")
+        args["p"] = joinpath(base_path, folder * "/")
         push!(x_values, split(folder, "_")[2])
         y_value = read_value_from_outcar(args["par"], args["p"]*args["outcar"])[end]
         push!(y_values, y_value)
     end
     plot_value_convergence(x_par_name, args["par"], x_values, y_values, args["o"])
 end
+
+run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args) = run_task(Val{Symbol("outcar")}, Val{Symbol("read")}, args)
