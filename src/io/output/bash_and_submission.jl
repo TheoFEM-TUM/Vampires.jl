@@ -19,7 +19,11 @@ function write_run_script(vasp_exe, path; out="run_job.sh", cb="none")
     else
         open(out, "a") do runfile
             println(runfile, "#!/bin/bash")
-            println(runfile, "folders=(\"$path\")")
+            if path ≠ "./" 
+                println(runfile, "folders=(\"$path\")")
+            else
+                println(runfile, "folders=()")
+            end
             println(runfile, "for folder in \"\${folders[@]}\"")
             println(runfile, "do")
             println(runfile, "    cd \$folder")
