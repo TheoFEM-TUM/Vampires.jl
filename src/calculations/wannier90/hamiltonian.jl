@@ -1,7 +1,7 @@
 """
     exp_2πi(R⃗::AbstractArray, k⃗::AbstractArray) -> AbstractArray
 
-Calculate the exponential of \(2πi \cdot (\mathbf{R} \cdot \mathbf{k})\) element-wise for vectors \(\mathbf{R}\) and \(\mathbf{k}\).
+Calculate the phase factor for `R⃗` and `k⃗`.
 
 # Arguments
 - `R⃗::AbstractArray`: A vector or matrix representing the real-space coordinates.
