@@ -36,6 +36,11 @@ supercell
 ```
 
 ```
+nscf
+    make: generate the folder structure for a scf->nscf calculation
+```
+
+```
 """
 reads last value in OUTCAR of parameter for each directory
 ```
