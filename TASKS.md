@@ -31,6 +31,11 @@ supercell
 ```
 
 ```
+"""
+reads last value in OUTCAR of parameter for each directory
+```
+
+```
 plot
     bandstructure: plots the bandstructure
     dos: plots the density of states
