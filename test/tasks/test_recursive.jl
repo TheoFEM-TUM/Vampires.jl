@@ -19,7 +19,7 @@ output = @capture_out run_task_recursive(task, subtask, args)
 task = Val{Symbol("outcar")}
 subtask = Val{Symbol("read")}
 
-args = Dict{String, Any}("p" => path_recursive, "outcar" => "OUTCAR", "par" => "TOTEN", "N" => "1") 
+args = Dict{String, Any}("p" => path_recursive, "outcar" => "OUTCAR", "par" => "TOTEN", "N" => "0") 
 
 output = @capture_out run_task_recursive(task, subtask, args)
 
