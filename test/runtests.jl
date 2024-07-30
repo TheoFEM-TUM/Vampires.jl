@@ -25,6 +25,7 @@ end
     include("calculations/test_bandgap.jl")
     include("calculations/test_vectors.jl")
     include("calculations/test_supercell.jl")
+    include("calculations/test_kspace.jl")
 end
 
 @testset "xdos" begin
