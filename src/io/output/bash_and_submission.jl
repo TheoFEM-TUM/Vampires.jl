@@ -13,7 +13,7 @@ This function creates a bash script named `run_job.sh` (or the name specified by
 If the file does not exist, it creates a new script with the necessary structure to run VASP in each folder specified in the `folders` array.
 The script will iterate over each folder in the `folders` array, change to that directory, execute the VASP command, and then return to the parent directory.
 """
-function write_run_script(vasp_exe, path; out="run_job.sh")
+function write_run_script(vasp_exe, path; out="run_job.sh", cb="none")
     if out in readdir()
         add_path_to_folders(out, path)
     else
@@ -24,6 +24,7 @@ function write_run_script(vasp_exe, path; out="run_job.sh")
             println(runfile, "do")
             println(runfile, "    cd \$folder")
             println(runfile, "    srun $vasp_exe  > vasp.log")
+            if cb ≠ "none"; println(runfile, "    "*cb); end 
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
