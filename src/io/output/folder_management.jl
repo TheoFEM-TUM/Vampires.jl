@@ -14,10 +14,14 @@ function convergence_create_subdirectories(param, param_range; path="./", verbos
         mkpath(path*folder)
         for file in ["KPOINTS", "POTCAR", "POSCAR"]
             if !isfile(path*file)
-                throw("Please supply a basic $file for your job in the base path ($path)")
+                @info "$file file was not found in current path ($path)."
             end
             cp(path*file, path*folder*"/$file", force=true)
         end
         set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
     end
+end
+
+function nscf_create_subdirectories()
+    mkdir("scf"); mkdir("nscf")
 end
