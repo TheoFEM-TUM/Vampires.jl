@@ -138,6 +138,10 @@ function parse_commandline()
             help = "set the name of the OUTCAR file"
             arg_type = String
             default = "OUTCAR"
+        "--kpoints"
+            help = "set the name of the kpoints file"
+            arg_type = String
+            default = "KPOINTS"
         "--vasp_exe"
             help = "set the name of the VASP executable"
             arg_type = String

@@ -21,7 +21,7 @@ include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); in
 # recursive.jl has to be the first include as it defines the @rcalc macro
 include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl"); include("tasks/convergence_task.jl")
-include("tasks/lattice_tasks.jl"); include("tasks/run_script.jl")
+include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/run_script.jl")
 
 include("cli_interface.jl")
 
@@ -30,7 +30,7 @@ export get_value_for_keyword, change_incar!, read_value_from_outcar, add_incar_b
 export write_to_file, read_from_file
 export plot_bandstructure, plot_value_convergence
 
-export convergence_create_subdirectories, write_run_script, add_path_to_folders
+export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy
 export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell
 export compute_dos
