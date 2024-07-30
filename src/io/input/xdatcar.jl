@@ -1,20 +1,4 @@
 """
-    struct Xdatcar
-
-A structure to represent the data contained in a VASP XDATCAR file.
-
-# Fields
-- `lattice::Array{Float64, 2}`: A 3x3 array representing the lattice vectors.
-- `configs::Array{Float64, 3}`: A 3xNionxNconfig array where each slice `configs[:, :, j]` represents the atomic positions for configuration `j`.
-"""
-struct Xdatcar
-    lattice :: Array{Float64, 2}
-    configs :: Array{Float64, 3}
-end
-
-Xdatcar(path_to_xdatcar::AbstractString) = read_xdatcar(path_to_xdatcar)
-
-"""
     read_xdatcar(xdatcar::AbstractString) -> Xdatcar
 
 Read the configurations in the `xdatcar` file and store them in an `Xdatcar` object.
@@ -25,7 +9,7 @@ Read the configurations in the `xdatcar` file and store them in an `Xdatcar` obj
 # Returns
 - `Xdatcar`: An `Xdatcar` object containing the lattice vectors and configurations.
 """
-function read_xdatcar(xdatcar::AbstractString)
+function read_xdatcar(xdatcar="XDATCAR")
     lines = open_and_read(xdatcar)
     lines = split_lines(lines)
 
@@ -54,7 +38,7 @@ function read_xdatcar(xdatcar::AbstractString)
         configs[:, i, j] = parse.(Float64, lines[k][1:3])
     end
 
-    return Xdatcar(lattice, configs)
+    return lattice, configs
 end
 
 """
