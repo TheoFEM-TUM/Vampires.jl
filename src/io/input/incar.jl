@@ -179,7 +179,7 @@ function set_keyword!(keyword, value, blocks; comment=get_comment(keyword), bloc
         block_lines = blocks[block_label]
         for line in block_lines
             if line.keyword == keyword
-                line.value = value
+                line.value = string(value)
                 if length(comment) > 1; line.comment = comment; end
                 value_set = true
             end
@@ -194,7 +194,7 @@ function set_keyword!(keyword, value, blocks; comment=get_comment(keyword), bloc
         for (block_label, block_lines) in blocks
             for line in block_lines
                 if line.keyword == keyword
-                    line.value = value
+                    line.value = string(value)
                     if length(comment) > 1; line.comment = comment; end
                     value_set = true
                 end
@@ -211,7 +211,7 @@ function set_keyword!(keyword, value, blocks; comment=get_comment(keyword), bloc
     end
     if verbose
         print("Changed line: ")
-        write_line(IncarLine(keyword, value, get_comment(keyword)), stdout)
+        write_line(IncarLine(keyword, string(value), get_comment(keyword)), stdout)
     end
     check_for_empty_blocks!(blocks)
 end

@@ -67,11 +67,12 @@ end
 """
 TODO
 """
-function strong_scaling_create_subdirectories(kpar_range<:AbstractArray,  ncore_nsim_range<:AbstractArray; path="./", verbose=true, keyword="CPU")
-    if keyword ∉ ["CPU", "GPU"]; throw("Scaling Tests for $keyword are not supported"); end
+function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_nsim_range::AbstractArray;
+                                              path="./", verbose=true, keyword="CPU")
+    if keyword ∉ ["CPU", "GPU"]; throw("Scaling tests for $keyword are not supported"); end
     @assert length(kpar_range) == length(ncore_nsim_range)
-    for (i, kpar, ncore_nsim) in zip(range(length(kpar_range)), kpar_range, ncore_nsim_range)
-        folder = "strong_scaling_$i\_"*keyword
+    for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
+        folder = "strong_scaling_$(i)_"*keyword
         mkpath(path*folder)
         for file in ["KPOINTS", "POTCAR", "POSCAR"]
             if !isfile(path*file)
@@ -83,7 +84,7 @@ function strong_scaling_create_subdirectories(kpar_range<:AbstractArray,  ncore_
         if keyword == "CPU"
             set_keyword_in_incar!("NCORE", ncore_nsim, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         elseif keyword == "GPU"
-            set_keyword_in_incar!("NSIM", ncore_nsim, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+            set_keyword_in_incar!("NSIM", ncore_nsim, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
         end
         write_slurm_script()
     end
