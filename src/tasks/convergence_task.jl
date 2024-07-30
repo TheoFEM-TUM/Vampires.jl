@@ -26,7 +26,7 @@ function run_task_recursive(::Type{Val{:convergence}}, ::Type{Val{:plot}}, args)
     x_par_name = ""
     for (i, folder) in enumerate(readfolders(base_path))
         if i == 1; x_par_name = split(folder, "_")[1]; end
-        args["p"] =  joinpath(base_path, folder * "/")
+        args["p"] = joinpath(base_path, folder * "/")
         push!(x_values, split(folder, "_")[2])
         y_value = read_value_from_outcar(args["par"], args["p"]*args["outcar"])[end]
         push!(y_values, y_value)
