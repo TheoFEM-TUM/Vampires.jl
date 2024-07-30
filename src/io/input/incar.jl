@@ -173,13 +173,13 @@ end
 
 Sets the `keyword` to `value` in `blocks` with `comment`.
 """
-function set_keyword!(keyword, value, blocks; comment=get_comment(keyword), block_label="", verbose=true)
+function set_keyword!(keyword::String, value::String, blocks; comment=get_comment(keyword), block_label="", verbose=true)
     value_set = false
     if haskey(blocks, block_label)
         block_lines = blocks[block_label]
         for line in block_lines
             if line.keyword == keyword
-                line.value = string(value)
+                line.value = value
                 if length(comment) > 1; line.comment = comment; end
                 value_set = true
             end
@@ -194,7 +194,7 @@ function set_keyword!(keyword, value, blocks; comment=get_comment(keyword), bloc
         for (block_label, block_lines) in blocks
             for line in block_lines
                 if line.keyword == keyword
-                    line.value = string(value)
+                    line.value = value
                     if length(comment) > 1; line.comment = comment; end
                     value_set = true
                 end
@@ -211,7 +211,7 @@ function set_keyword!(keyword, value, blocks; comment=get_comment(keyword), bloc
     end
     if verbose
         print("Changed line: ")
-        write_line(IncarLine(keyword, string(value), get_comment(keyword)), stdout)
+        write_line(IncarLine(keyword, value, get_comment(keyword)), stdout)
     end
     check_for_empty_blocks!(blocks)
 end

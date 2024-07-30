@@ -68,7 +68,7 @@ end
 TODO
 """
 function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_nsim_range::AbstractArray;
-                                              path="./", verbose=true, keyword="CPU")
+                                              path="./", verbose=true, keyword="CPU", time=1, gpus_per_node=4, cpus_per_node=2)
     if keyword ∉ ["CPU", "GPU"]; throw("Scaling tests for $keyword are not supported"); end
     @assert length(kpar_range) == length(ncore_nsim_range)
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
@@ -80,12 +80,14 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_
             end
             cp(path*file, path*folder*"/$file", force=true)
         end
-        set_keyword_in_incar!("KPAR", kpar, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+        set_keyword_in_incar!("KPAR", string(kpar), path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         if keyword == "CPU"
-            set_keyword_in_incar!("NCORE", ncore_nsim, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+            set_keyword_in_incar!("NCORE", string(ncore_nsim), path*folder*"/INCAR", out=path*folder*"/INCAR", verbose=verbose)
+            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / cpus_per_node), ntasks=kpar*24, num_gpu=0, omp_num_threads=1, partition="batch", mail="", script_filename="batch_jobscript")
         elseif keyword == "GPU"
-            set_keyword_in_incar!("NSIM", ncore_nsim, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
+            set_keyword_in_incar!("NSIM", string(ncore_nsim), path*folder*"/INCAR", out=path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
+            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / gpus_per_node), ntasks=kpar, num_gpu=kpar, omp_num_threads=40 * ceil(Int, kpar / gpus_per_node), partition="batch", mail="", script_filename="batch_jobscript")
         end
-        write_slurm_script()
+    
     end
 end

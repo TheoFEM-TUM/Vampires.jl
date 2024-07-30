@@ -46,7 +46,7 @@ run_task(::Type{Val{:rmincar}}, subtask, args) = run_task(Val{Symbol("rm")}, Val
 
 run_task(::Type{Val{:incar}}, subtask, args) =  run_task(Val{Symbol("incar")}, Val{Symbol("whatis")}, args) 
 
-function run_task(::Type{Val{:incar}}, ::Type{::Val{:whatis}}, args)
+function run_task(::Type{Val{:incar}}, ::Type{Val{:whatis}}, args)
     param = args["par"]
     println("The $param keyword ", get_comment(param))
 end
