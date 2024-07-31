@@ -26,6 +26,7 @@ end
     include("calculations/test_vectors.jl")
     include("calculations/test_supercell.jl")
     include("calculations/test_kspace.jl")
+    include("calculations/test_hamiltonian.jl")
 end
 
 @testset "xdos" begin
