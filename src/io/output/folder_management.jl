@@ -65,10 +65,49 @@ end
 
 
 """
-TODO
+    strong_scaling_create_subdirectories(kpar_range::AbstractArray, ncore_nsim_range::AbstractArray;
+                                         path::String="./", verbose::Bool=true, keyword::String="CPU", 
+                                         time::Int=1, gpus_per_node::Int=4, cpus_per_node::Int=2)
+
+Create subdirectories and prepare input files for strong scaling tests for VASP simulations.
+
+# Arguments
+- `kpar_range::AbstractArray`: An array of KPAR values to be tested.
+- `ncore_nsim_range::AbstractArray`: A corresponding array of NCORE (for CPU) or NSIM (for GPU) values to be tested.
+- `path::String="./"`: The base directory where the input files (`KPOINTS`, `POTCAR`, `POSCAR`) are located.
+- `verbose::Bool=true`: If `true`, enables verbose output for the function calls.
+- `keyword::String="CPU"`: Specifies the type of scaling test, either `"CPU"` or `"GPU"`.
+- `time::Float64=1.0`: The wall time limit for the SLURM job scripts (in hours).
+- `gpus_per_node::Int=4`: The number of GPUs available per compute node.
+- `cpus_per_node::Int=2`: The number of CPUs available per compute node.
+
+# Description
+This function performs the following steps for each combination of KPAR and NCORE/NSIM values:
+1. Creates a directory for the scaling test.
+2. Copies the necessary VASP input files (`KPOINTS`, `POTCAR`, `POSCAR`) to the test directory.
+3. Modifies the `INCAR` file with the appropriate KPAR and NCORE/NSIM values.
+4. Writes a SLURM batch job script tailored to either CPU or GPU runs, based on the `keyword` parameter.
+
+# Throws
+- `ArgumentError`: If `keyword` is not `"CPU"` or `"GPU"`.
+- `AssertionError`: If `kpar_range` and `ncore_nsim_range` do not have the same length.
+- `SystemError`: If the required input files (`KPOINTS`, `POTCAR`, `POSCAR`) are not found in the base path.
+
+# Example
+```julia
+strong_scaling_create_subdirectories(
+    kpar_range=[1, 2, 4],
+    ncore_nsim_range=[8, 4, 2],
+    path="./",
+    verbose=true,
+    keyword="CPU",
+    time=1,
+    gpus_per_node=4,
+    cpus_per_node=2
+)
 """
 function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_nsim_range::AbstractArray;
-                                              path="./", verbose=true, keyword="CPU", time=1, gpus_per_node=4, cpus_per_node=2)
+                                              path="./", verbose=true, keyword="CPU", time=1.0, gpus_per_node=4, cpus_per_node=2)
     if keyword ∉ ["CPU", "GPU"]; throw("Scaling tests for $keyword are not supported"); end
     @assert length(kpar_range) == length(ncore_nsim_range)
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
@@ -82,10 +121,10 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_
         end
         set_keyword_in_incar!("KPAR", string(kpar), path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         if keyword == "CPU"
-            set_keyword_in_incar!("NCORE", string(ncore_nsim), path*folder*"/INCAR", out=path*folder*"/INCAR", verbose=verbose)
+            set_keyword_in_incar!("NCORE", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose)
             write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / cpus_per_node), ntasks=kpar*24, num_gpu=0, omp_num_threads=1, partition="batch", mail="", script_filename="batch_jobscript")
         elseif keyword == "GPU"
-            set_keyword_in_incar!("NSIM", string(ncore_nsim), path*folder*"/INCAR", out=path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
+            set_keyword_in_incar!("NSIM", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
             write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / gpus_per_node), ntasks=kpar, num_gpu=kpar, omp_num_threads=40 * ceil(Int, kpar / gpus_per_node), partition="batch", mail="", script_filename="batch_jobscript")
         end
     
