@@ -53,7 +53,8 @@ function main()
         
         try
             task_string = args["task"]
-            println("Running task $task_string ...")
+            subtask_string = args["subtask"]
+            println("Running task $task_string $subtask_string ...")
             if args["r"]
                 run_task_recursive(task, subtask, args)
             else
