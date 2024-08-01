@@ -29,7 +29,7 @@ and adjusting INCAR settings.
 """
 function nscf_create_subdirectories(path, kpoints; verbose=true)
     for folder in ["scf", "nscf"]
-        mkdir(path*folder)
+        mkpath(path*folder)
         copy_vasp_input(path, folder, ignore=["KPOINTS"])
     end
     kpoint_files = split_line(kpoints, char=',')
@@ -126,7 +126,7 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_
             write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / avail_cpus_per_node), ntasks=kpar*24, num_gpu=0, omp_num_threads=1, partition="batch", mail="", script_filename="batch_jobscript")
         elseif keyword == "GPU"
             set_keyword_in_incar!("NSIM", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
-            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks=kpar, num_gpu=kpar, omp_num_threads=40 * ceil(Int, kpar / gpus_per_node), partition="batch", mail="", script_filename="batch_jobscript")
+            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks=kpar, num_gpu=kpar, omp_num_threads=40 * ceil(Int, kpar / avail_gpus_per_node), partition="batch", mail="", script_filename="batch_jobscript")
         end
     
     end

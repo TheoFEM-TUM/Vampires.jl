@@ -1,17 +1,17 @@
 begin batch_file_gpu
-    module_path /path/to/cpu_modules/
-    module_list module1, module2
-    vasp_exe vasp_exe
-    partition batch
-    mail user.name@mail.com
-    omp_num_threads 40
+    module_path = /path/to/cpu_modules/
+    module_list  = module1,module2
+    vasp_exe = vasp_exe
+    partition = batch
+    mail = user.name@mail.com
+    omp_num_threads = 40
 end
 
 begin batch_file_cpu
-    module_path /path/to/gpu_modules/
-    module_list module1, module2
-    vasp_exe vasp_exe
-    partition gpus
-    mail user.name@mail.com
-    omp_num_threads 1
+    module_path = /path/to/gpu_modules/
+    module_list = module1, module2
+    vasp_exe = vasp_exe
+    partition = gpus
+    mail = user.name@mail.com
+    omp_num_threads = 1
 end

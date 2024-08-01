@@ -3,7 +3,9 @@ module Vampires
 using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
 
 include("io/read_utils.jl")
+
 # input
+include("io/input/extended_config.jl")
 include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/input/poscar.jl"); include("io/input/xdatcar.jl")
 include("io/input/incar.jl"); include("io/input/incar_tags.jl"); include("io/input/incar_blocks.jl");include("io/input/outcar.jl")
 include("io/input/w90_hr.jl")
@@ -30,6 +32,7 @@ include("tasks/kpoint_tasks.jl")
 
 include("cli_interface.jl")
 
+export read_config
 export read_eigenval, read_doscar, read_incar, set_keyword!, write_incar, Poscar, read_poscar, write_poscar, read_xdatcar
 export get_value_for_keyword, change_incar!, read_value_from_outcar, add_incar_block!, rm_incar_block!, remove_keyword!
 export write_to_file, read_from_file, write_kpoints

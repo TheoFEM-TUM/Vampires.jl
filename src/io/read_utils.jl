@@ -17,7 +17,7 @@ function open_and_read(file)
 end
 
 """
-    split_lines(lines::Vector{String}) -> Vector{Vector{String}}
+    split_lines(lines::Vector{String}; char::Union{AbstractChar, Regex}) -> Vector{Vector{String}}
 
 Split each line of the input vector of strings into its constituent non-empty elements.
 
