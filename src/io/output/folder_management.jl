@@ -58,8 +58,9 @@ function copy_vasp_input(path, folder; ignore=String[])
     for file in ["KPOINTS", "POTCAR", "POSCAR", "INCAR"]
         if !isfile(path*file) && file ∉ ignore
             @info "$file file was not found in current path ($path)."
+        elseif isfile(path*file) && file ∉ ignore
+            cp(path*file, path*folder*"/$file", force=true)
         end
-        if file ∉ ignore; cp(path*file, path*folder*"/$file", force=true); end
     end
 end
 

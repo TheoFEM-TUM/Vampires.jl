@@ -63,6 +63,7 @@ any_task
 ```
 
 ```
+<<<<<<< HEAD
 strong_scaling
     cpu: create a folder structure with slurm files to analyze CPU scaling in VASP
     gpu: create a folder structure with slurm files to analyze GPU scaling in VASP
@@ -70,5 +71,9 @@ strong_scaling
 weak_scaling
     cpu: create a folder structure with slurm files to analyze weak CPU scaling in VASP
     gpu: create a folder structure with slurm files to analyze weak GPU scaling in VASP
+=======
+run_script
+    make: creates a bash script that runs vasp in a specific folder
+>>>>>>> main
 ```
 

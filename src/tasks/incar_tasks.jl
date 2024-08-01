@@ -44,13 +44,16 @@ end
 
 run_task(::Type{Val{:rmincar}}, subtask, args) = run_task(Val{Symbol("rm")}, Val{Symbol("incar")}, args)
 
-run_task(::Type{Val{:incar}}, subtask, args) =  run_task(Val{Symbol("incar")}, Val{Symbol("whatis")}, args) 
-
 function run_task(::Type{Val{:incar}}, ::Type{Val{:whatis}}, args)
     param = args["par"]
-    println("The $param keyword ", get_comment(param))
+    println("The $param keyword ", get_comment(param), " (see https://www.vasp.at/wiki/index.php/$param for more info).")
 end
 
+<<<<<<< HEAD
+=======
+run_task(::Type{Val{:whatis}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("whatis")}, args)
+
+>>>>>>> main
 function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
     incar = read_incar(args["p"]*args["incar"])
     for keyword in split_line(args["par"], char=',')
