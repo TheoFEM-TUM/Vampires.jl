@@ -67,7 +67,7 @@ end
 """
     strong_scaling_create_subdirectories(kpar_range::AbstractArray, ncore_nsim_range::AbstractArray;
                                          path::String="./", verbose::Bool=true, keyword::String="CPU", 
-                                         time::Int=1, gpus_per_node::Int=4, cpus_per_node::Int=2)
+                                         time::Int=1, avail_gpus_per_node::Int=4, avail_cpus_per_node::Int=2)
 
 Create subdirectories and prepare input files for strong scaling tests for VASP simulations.
 
@@ -78,8 +78,8 @@ Create subdirectories and prepare input files for strong scaling tests for VASP 
 - `verbose::Bool=true`: If `true`, enables verbose output for the function calls.
 - `keyword::String="CPU"`: Specifies the type of scaling test, either `"CPU"` or `"GPU"`.
 - `time::Float64=1.0`: The wall time limit for the SLURM job scripts (in hours).
-- `gpus_per_node::Int=4`: The number of GPUs available per compute node.
-- `cpus_per_node::Int=2`: The number of CPUs available per compute node.
+- `avail_gpus_per_node::Int=4`: The number of GPUs available per compute node.
+- `avail_cpus_per_node::Int=2`: The number of CPUs available per compute node.
 
 # Description
 This function performs the following steps for each combination of KPAR and NCORE/NSIM values:
@@ -107,7 +107,7 @@ strong_scaling_create_subdirectories(
 )
 """
 function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_nsim_range::AbstractArray;
-                                              path="./", verbose=true, keyword="CPU", time=1.0, gpus_per_node=4, cpus_per_node=2)
+                                              path="./", verbose=true, keyword="CPU", time=1.0, avail_gpus_per_node=4, avail_cpus_per_node=2)
     if keyword ∉ ["CPU", "GPU"]; throw("Scaling tests for $keyword are not supported"); end
     @assert length(kpar_range) == length(ncore_nsim_range)
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
@@ -122,10 +122,10 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_
         set_keyword_in_incar!("KPAR", string(kpar), path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         if keyword == "CPU"
             set_keyword_in_incar!("NCORE", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose)
-            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / cpus_per_node), ntasks=kpar*24, num_gpu=0, omp_num_threads=1, partition="batch", mail="", script_filename="batch_jobscript")
+            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / avail_cpus_per_node), ntasks=kpar*24, num_gpu=0, omp_num_threads=1, partition="batch", mail="", script_filename="batch_jobscript")
         elseif keyword == "GPU"
             set_keyword_in_incar!("NSIM", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
-            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / gpus_per_node), ntasks=kpar, num_gpu=kpar, omp_num_threads=40 * ceil(Int, kpar / gpus_per_node), partition="batch", mail="", script_filename="batch_jobscript")
+            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks=kpar, num_gpu=kpar, omp_num_threads=40 * ceil(Int, kpar / gpus_per_node), partition="batch", mail="", script_filename="batch_jobscript")
         end
     
     end

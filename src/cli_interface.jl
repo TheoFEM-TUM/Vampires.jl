@@ -146,6 +146,10 @@ function parse_commandline()
             help = "set the name of the VASP executable"
             arg_type = String
             default = "vasp_std"
+        "--ext_par_file"
+            help = "path to an extended parameter file"
+            arg_type = String
+            default = "none"
     end
     args :: Dict{String, Union{String, Bool}} = parse_args(s)
     return args
