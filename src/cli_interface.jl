@@ -36,13 +36,13 @@ exec_name bandgap --p=./path/to/files --eigenval=EIGENVAL
 function main()
     time = @elapsed begin
         @time args = parse_commandline()
-        
+    
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
         subtask = Val{Symbol(args["subtask"])}
         verbose = args["v"]
 
-        if verbose 
+        if verbose
             println("Parsed args:")
             for (arg,val) in args
                 println("  $arg  =>  $val")
@@ -50,7 +50,7 @@ function main()
         end
 
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
-        
+
         try
             task_string = args["task"]
             subtask_string = args["subtask"]
@@ -60,7 +60,7 @@ function main()
             else
                 run_task(task, subtask, args)
             end
-        catch e 
+        catch e
             if e == ArgumentError
                 @error "No task of name $task found."
             else
@@ -148,7 +148,19 @@ function parse_commandline()
             arg_type = String
             default = "vasp_std"
         "--ext_par_file"
-            help = "path to an extended parameter file"
+            help = "Path to an extended parameter file that contains additional settings for the simulation."
+            arg_type = String
+            default = "none"
+        "--ncore"
+            help = "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)"
+            arg_type = String
+            default = "none"
+        "--nsim"
+            help = "Vector of numbers of bands to work on concurrently (scaling tasks only)"
+            arg_type = String
+            default = "none"
+        "--kpar"
+            help = "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)"
             arg_type = String
             default = "none"
     end

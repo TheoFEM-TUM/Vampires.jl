@@ -5,6 +5,8 @@ begin batch_file_gpu
     partition = batch
     mail = user.name@mail.com
     omp_num_threads = 40
+    avail_gpus_per_node = 2
+    avail_gpus_per_node = 4
 end
 
 begin batch_file_cpu
@@ -14,4 +16,5 @@ begin batch_file_cpu
     partition = gpus
     mail = user.name@mail.com
     omp_num_threads = 1
+    avail_gpus_per_node = 2
 end

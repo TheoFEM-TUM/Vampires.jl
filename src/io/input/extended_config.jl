@@ -19,8 +19,7 @@ The function performs the following steps:
 4. Within each section, extracts key-value pairs and stores them in a nested dictionary structure.
 
 """
-
-function read_config(filename::String)
+function read_config(filename::String)::Dict{String, Dict{String, String}}
     # read the input file
     input_text = open_and_read(filename)
     # Split the input text into lines
@@ -29,10 +28,10 @@ function read_config(filename::String)
     # Initialize variables
     config_dict = Dict{String, Dict{String, String}}()
     current_section = ""
-    
+
     # Iterate over each line
     for line in lines
-        if length(line) == 0; continue; end 
+        if length(line) == 0; continue; end
         # Check for section start
         if line[1] == "begin"
             # Extract section name
@@ -42,7 +41,7 @@ function read_config(filename::String)
             current_section = ""
         elseif !isempty(current_section) && !isempty(line)
             key = line[1]
-            value = line[2] == "=" ? join(line[3:end], ",") : join(line[2:end], ",") 
+            value = line[2] == "=" ? join(line[3:end], ",") : join(line[2:end], ",")
             # Store key-value pair in the current section dictionary
             config_dict[current_section][key] = value
         end

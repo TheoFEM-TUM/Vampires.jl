@@ -103,7 +103,7 @@ function read_incar(file::String)
     for i in axes(block_ranges, 1)
         block_lines = split_lines(lines[block_ranges[i]])
         incar_lines = IncarLine[]
-        for block_line in block_lines 
+        for block_line in block_lines
             if length(block_line) > 1
                 comment = get_comment(block_line)
                 push!(incar_lines, IncarLine(block_line[1], block_line[3], comment))

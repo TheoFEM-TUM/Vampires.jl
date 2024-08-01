@@ -24,7 +24,7 @@ function add_incar_block!(block_label::AbstractString, incar; verbose=true)
     end
 end
 
-function add_incar_block!(block_labels::Vector, incar; verbose=true) 
+function add_incar_block!(block_labels::Vector, incar; verbose=true)
     for block_label in block_labels
         add_incar_block!(block_label, incar, verbose=verbose)
     end
@@ -33,8 +33,8 @@ end
 """
     rm_incar_block!(incar::OrderedDict{String, Vector{IncarLine}}, block_label::String)
 
-Remove a block of lines from the INCAR file under a specified block label. 
-If the block label exists in the INCAR file, it will be removed. 
+Remove a block of lines from the INCAR file under a specified block label.
+If the block label exists in the INCAR file, it will be removed.
 If the block label does not exist, a message will be printed indicating that the block is not found.
 
 # Arguments

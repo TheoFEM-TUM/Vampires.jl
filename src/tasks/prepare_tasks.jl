@@ -12,5 +12,7 @@ end
 
 
 function run_task(::Type{Val{:prepare}}, ::Type{Val{:slurm_script}}, args)
-    write_slurm_script(args["p"], args["o"], args["nnodes"], args["gpu"])
+    if args["ext_par_file"] == "none"; throw("Slurm script tasks require a parameter file."); end
+    extended_args = read_config(args["ext_par_file"])[args["block"]]
+    # write_slurm_script(args["p"], args["o"], args["nnodes"], args["gpu"])
 end

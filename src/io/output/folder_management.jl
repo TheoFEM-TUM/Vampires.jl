@@ -107,8 +107,22 @@ strong_scaling_create_subdirectories(
     cpus_per_node=2
 )
 """
-function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_nsim_range::AbstractArray;
-                                              path="./", verbose=true, keyword="CPU", time=1.0, avail_gpus_per_node=4, avail_cpus_per_node=2)
+function strong_scaling_create_subdirectories(kpar_range::AbstractArray{Int},
+                                              ncore_nsim_range::AbstractArray{Int};
+                                              path::String = "",
+                                              verbose::Bool = true,
+                                              keyword::String = "",
+                                              time::Int = 1,
+                                              avail_cpus_per_node::Int = 2,
+                                              avail_gpus_per_node::Int = 4,
+                                              module_path::String = "",
+                                              module_list::String = "",
+                                              vasp_exe::String = "vasp_exe",
+                                              partition::String = "batch",
+                                              omp_num_threads::Int = 0,
+                                              mail::String = "",
+                                              script_filename::String = "batch_jobscript",
+                                             )
     if keyword ∉ ["CPU", "GPU"]; throw("Scaling tests for $keyword are not supported"); end
     @assert length(kpar_range) == length(ncore_nsim_range)
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
@@ -122,12 +136,20 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray,  ncore_
         end
         set_keyword_in_incar!("KPAR", string(kpar), path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         if keyword == "CPU"
+            # if omp_num_threads is default, set to 1 for correct scaling tests
+            omp_num_threads = omp_num_threads == 0 ? 1 : omp_num_threads
             set_keyword_in_incar!("NCORE", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose)
-            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / avail_cpus_per_node), ntasks=kpar*24, num_gpu=0, omp_num_threads=1, partition="batch", mail="", script_filename="batch_jobscript")
+            write_slurm_script(path*folder;  module_path=module_path, module_list=module_list, vasp_exe=vasp_exe,
+                               time=time, nodes=ceil(Int, kpar / avail_cpus_per_node), ntasks=kpar*24,
+                               num_gpu=0, omp_num_threads=omp_num_threads, partition=partition, mail=mail, script_filename=script_filename)
         elseif keyword == "GPU"
+            # if omp_num_threads is default, set to 20 * number of avail gpus per node (vasp recommendation)
+            omp_num_threads = omp_num_threads == 0 ? 20 * avail_cpus_per_node : omp_num_threads
             set_keyword_in_incar!("NSIM", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
-            write_slurm_script(path*folder;  module_path="", module_list=[], vasp_exe="vasp_exe", time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks=kpar, num_gpu=kpar, omp_num_threads=40 * ceil(Int, kpar / avail_gpus_per_node), partition="batch", mail="", script_filename="batch_jobscript")
+            write_slurm_script(path*folder;  module_path="", module_list=module_list, vasp_exe=vasp_exe,
+                               time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks=kpar, num_gpu=kpar,
+                               omp_num_threads=omp_num_threads, partition=partition,
+                               mail=mail, script_filename=script_filename)
         end
-    
     end
 end

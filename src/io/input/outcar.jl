@@ -22,7 +22,7 @@ function read_value_from_outcar(param, file; type=Float64, line_mode="first")::V
     param_values = type[]
     for line in lines
         if occursin(param, line)
-            
+
             # Replace some symbols with space
             line_ = line
             for special_char in [':', '=']

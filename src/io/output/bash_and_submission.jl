@@ -19,7 +19,7 @@ function write_run_script(vasp_exe, path; out="run_job.sh", cb="none")
     else
         open(out, "a") do runfile
             println(runfile, "#!/bin/bash")
-            if path ≠ "./" 
+            if path ≠ "./"
                 println(runfile, "folders=(\"$path\")")
             else
                 println(runfile, "folders=()")
@@ -28,7 +28,7 @@ function write_run_script(vasp_exe, path; out="run_job.sh", cb="none")
             println(runfile, "do")
             println(runfile, "    cd \$folder")
             println(runfile, "    srun $vasp_exe  > vasp.log")
-            if cb ≠ "none"; println(runfile, "    "*cb); end 
+            if cb ≠ "none"; println(runfile, "    "*cb); end
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
@@ -47,26 +47,26 @@ Adds a new path to the `folders` line in a bash script file. Helper function for
 - `new_path::String`: The new path to add to the `folders` line.
 
 # Description
-This function reads the specified file line-by-line, looks for the line that defines the `folders` array 
-(e.g., `folders=("path1" "path2")`), and adds the `new_path` to this array. The line will be modified to 
-include the new path, and all other lines in the file will remain unchanged. The modified file is written 
+This function reads the specified file line-by-line, looks for the line that defines the `folders` array
+(e.g., `folders=("path1" "path2")`), and adds the `new_path` to this array. The line will be modified to
+include the new path, and all other lines in the file will remain unchanged. The modified file is written
 back to the original file.
 """
 function add_path_to_folders(file::String, new_path::String)
     lines = readlines(file)
-    
+
     target_pattern = r"""folders=\((.*)\)"""
-    
+
     open(file, "w") do f
         for line in lines
             if occursin(target_pattern, line)
                 # Extract the existing paths
                 captures = match(target_pattern, line).captures
                 existing_paths = captures[1]
-                
+
                 # Add the new path to the list of existing paths
                 new_folders_line = "folders=(" * existing_paths * " \"$new_path\")"
-                
+
                 write(f, new_folders_line * "\n")
             else
                 write(f, line * "\n")
@@ -126,7 +126,7 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
     min = trunc(Int, modf(time)[1]*60)
     sec = trunc(Int, modf(modf(time)[1]*60)[1]*60)
     time_str = lpad(hrs, 2, "0")*":"*lpad(sec, 2, "0")*":"*lpad(sec, 2, "0")
-    
+
     open(out, "w") do outfile
         print(outfile, """
         #!/bin/bash
@@ -188,22 +188,22 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
         # start the jobs inside the correct directory
         # as per default initial directory is the directory
         # from where the job was submitted
-        
+
         #========================================#
         # 3. Integrity check
         #========================================#
-        
+
         echo "Starting at `date`"
         echo "Running on hosts: \$SLURM_NODELIST"
         echo "Running on \$SLURM_NNODES nodes."
         echo "Running on \$SLURM_NPROCS processors."
         echo "Work directory is `pwd`"
         echo "VASP binary at " \$vasp_exe
-        
+
         echo
         echo "Starting VASP run at" `date`
         echo
-        
+
         #========================================#
         # 4. Parallel execution
         #========================================#
