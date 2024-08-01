@@ -7,7 +7,9 @@ Read the configurations in the `xdatcar` file and store them in an `Xdatcar` obj
 - `xdatcar::AbstractString`: The path to the XDATCAR file.
 
 # Returns
-- `Xdatcar`: An `Xdatcar` object containing the lattice vectors and configurations.
+- `lattice::Array{Float64, 3}`: A 3x3 array representing the lattice vectors.
+- `configs::Array{Float64, 3}`: A 3D array of shape (3, Nion, Nconfig), where each 3xNion slice represents the atomic positions in a configuration.
+
 """
 function read_xdatcar(xdatcar="XDATCAR")
     lines = open_and_read(xdatcar)
