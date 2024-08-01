@@ -6,6 +6,7 @@ include("io/read_utils.jl")
 # input
 include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/input/poscar.jl"); include("io/input/xdatcar.jl")
 include("io/input/incar.jl"); include("io/input/incar_tags.jl"); include("io/input/incar_blocks.jl");include("io/input/outcar.jl")
+include("io/input/w90_hr.jl")
 
 # output
 include("io/output/incar.jl"); include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl"); 
@@ -14,6 +15,7 @@ include("io/output/kpoints.jl")
 # calculations
 include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl"); include("calculations/lattice/supercell.jl")
 include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
+include("calculations/wannier90/hamiltonian.jl")
 
 # plotting
 include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl")
