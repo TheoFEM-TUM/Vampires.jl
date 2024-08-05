@@ -12,8 +12,14 @@ function convergence_create_subdirectories(param, param_range; path="./", verbos
     for value in param_range
         folder = param*"_"*value
         mkpath(path*folder)
-        copy_vasp_input(path, folder, ignore=["INCAR"])
-        set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+        if param == "kgrid"
+            N = parse(Int64, value)
+            write_kpoints(N, out=path*folder*"/KPOINTS")
+            copy_vasp_input(path, folder, ignore=["KPOINTS"])
+        else
+            copy_vasp_input(path, folder, ignore=["INCAR"])
+            set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+        end
     end
 end
 

@@ -23,6 +23,7 @@ function write_kpoints(Ns::AbstractArray; gamma_centered=true, out="KPOINTS")
     end
 end
 
+write_kpoints(N::Int64; gamma_centered=true, out="KPOINTS") = write_kpoints([N, N, N], gamma_centered=gamma_centered, out=out)
 """
     write_kpoints(kspacing::Float64, poscar_path::String="POSCAR"; gamma_centered::Bool=true, out::String="KPOINTS")
 
