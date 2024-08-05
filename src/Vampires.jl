@@ -4,12 +4,12 @@ using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
 
 include("io/read_utils.jl")
 # input
-include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/input/poscar.jl"); include("io/input/xdatcar.jl")
-include("io/input/incar.jl"); include("io/input/incar_tags.jl"); include("io/input/incar_blocks.jl");include("io/input/outcar.jl")
-include("io/input/w90_hr.jl")
+include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
+include("io/incar/incar_line.jl"); include("io/incar/incar_kw.jl"): include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl");include("io/outcar.jl")
+include("io/w90_hr.jl")
 
 # output
-include("io/output/incar.jl"); include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl"); 
+include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl"); 
 include("io/output/kpoints.jl")
 
 # calculations
