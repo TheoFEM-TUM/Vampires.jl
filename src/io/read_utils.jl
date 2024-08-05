@@ -51,6 +51,7 @@ split_line(line; char=" ") = filter(!isempty, split(line, char))
 
 """
     parse_lines_as_array(line; i1, i2, type)
+
 Parse `lines` as a 2d array of `type` starting from index `i1` ending at `i2` in
 each line.
 """
@@ -65,6 +66,7 @@ end
 
 """
     next_line_with(keywords, lines)
+    
 Find the next line in lines that contains a set of keywords.
 """
 function next_line_with(keywords::AbstractArray, lines)
