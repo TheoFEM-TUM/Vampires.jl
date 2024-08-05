@@ -115,6 +115,10 @@ function parse_commandline()
             help = "general task dependent number parameter"
             arg_type = String
             default = "0"
+        "--m"
+            help = "general task dependent method parameter"
+            arg_type = String
+            default = "none"
         "--incar"
             help = "set the name of the INCAR file"
             arg_type = String
