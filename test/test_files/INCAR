@@ -17,7 +17,7 @@
  TEEND = 100             !final temperature in K (default =TEBEG)
  NSW = 8000              !maximum number of ionic steps
  POTIM = 8               !MD time step in fs
-  
+
  IBRION = 0              !update ion positions, 0 => molecular dynamics
  SMASS = 4               !controls velocities during MD, 4 => canonic ensemble with Nose algorithm
  ISIF = 2                !calculate stress tensor, 2 => only ion positions are allowed to change

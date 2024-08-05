@@ -70,7 +70,7 @@ function read_xdatcar_npt(xdatcar)
        for i in axes(configs, 2)
            config = @view configs[:, i, k]
            config .= parse.(Float64, lines[ind+i])
-       end 
+       end
     end
     return lattice, configs
 end
