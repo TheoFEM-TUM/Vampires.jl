@@ -34,7 +34,7 @@ end
 @testset "StrongScaling" begin
     kpar_range = [1, 2, 4]
     ncore_nsim_range = [8, 4, 2]
-    for keyword in ["CPU", "GPU"]
+    for keyword in ["cpu", "gpu"]
         strong_scaling_create_subdirectories(kpar_range, ncore_nsim_range; path=path, verbose=false, keyword=keyword, time=1, avail_gpus_per_node=4, avail_cpus_per_node=2)
 
         for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
@@ -44,9 +44,9 @@ end
             incar_ = read_incar(path*folder*"/INCAR")
             @test get_value_for_keyword("KPAR", incar_) == string(kpar)
 
-            if keyword == "CPU"
+            if keyword == "cpu"
                 @test get_value_for_keyword("NCORE", incar_) == string(ncore_nsim)
-            elseif keyword == "GPU"
+            elseif keyword == "gpu"
                 @test get_value_for_keyword("NSIM", incar_) == string(ncore_nsim)
             end
 
@@ -54,4 +54,39 @@ end
         end
     end
 end
+
+@testset "WeakScaling" begin
+    kpar_range = [1, 2, 4]
+    ncore_nsim_range = [8, 4, 2]
+    super_cell_vector = [2, 2, 2]
+    keyword = "cpu"
+
+    # Create subdirectories and prepare input files for weak scaling
+    weak_scaling_create_subdirectories(kpar_range, ncore_nsim_range; super_cell_vector=super_cell_vector, path=path, verbose=false, keyword=keyword, time=1, avail_cpus_per_node=2, avail_gpus_per_node=4, module_path="", module_list="", vasp_exe="vasp_exe", partition="batch", omp_num_threads=0, mail="", script_filename="batch_jobscript")
+
+    for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
+        folder = path * "weak_scaling_$(i)_" * keyword
+        @test "INCAR" in readdir(folder) && "KPOINTS" in readdir(folder) && "POSCAR" in readdir(folder) && "POTCAR" in readdir(folder)
+
+        incar = read_incar(folder*"/INCAR")
+        @test get_value_for_keyword("KPAR", incar) == string(kpar)
+
+        if keyword == "cpu"
+            @test get_value_for_keyword("NCORE", incar) == string(ncore_nsim)
+        elseif keyword == "gpu"
+            @test get_value_for_keyword("NSIM", incar) == string(ncore_nsim)
+        end
+        poscar = read_poscar(folder*"/POSCAR")
+        poscar_primitive = read_poscar(folder*"/POSCAR_primitive")
+        if i == 1
+            @test size(poscar.rs_atom)[2] == size(poscar_primitive.rs_atom)[2]
+        else
+            @test size(poscar.rs_atom)[2] == prod(super_cell_vector.*(i-1))*size(poscar_primitive.rs_atom)[2]
+        end
+
+        # Clean up
+        rm(folder, recursive=true)
+    end
+end
+
 

@@ -1,20 +1,20 @@
 """
     transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
 
-Create a supercell by multiplying the primitive cell specified in the `poscar` object by the scaling factors 
-provided in the `Ns` vector. The resulting supercell will have the atomic positions and types adjusted 
+Create a supercell by multiplying the primitive cell specified in the `poscar` object by the scaling factors
+provided in the `Ns` vector. The resulting supercell will have the atomic positions and types adjusted
 accordingly.
 
 # Arguments
-- `poscar::Poscar`: The primitive cell represented as a `Poscar` object. This object should contain the 
+- `poscar::Poscar`: The primitive cell represented as a `Poscar` object. This object should contain the
   lattice vectors, atomic positions (in fractional coordinates), and atomic types.
-- `Ns::Vector{Int64}`: A vector of three integers specifying the scaling factors along the a, b, and c 
+- `Ns::Vector{Int64}`: A vector of three integers specifying the scaling factors along the a, b, and c
   lattice directions, respectively.
-- `digits::Int` (optional): The number of digits to round the fractional coordinates of the atoms in the 
+- `digits::Int` (optional): The number of digits to round the fractional coordinates of the atoms in the
   resulting supercell. Default is 10.
 
 # Returns
-- `Poscar`: A new `Poscar` object representing the supercell. This includes the scaled lattice vectors, 
+- `Poscar`: A new `Poscar` object representing the supercell. This includes the scaled lattice vectors,
   updated atomic positions (in fractional coordinates), and atomic types.
 """
 function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)

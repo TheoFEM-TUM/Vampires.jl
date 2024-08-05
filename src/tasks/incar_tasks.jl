@@ -66,7 +66,7 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:create}}, args)
             set_keyword!(keyword, get_default_for_keyword(keyword), incar, block_label=args["block"])
         end
     elseif length(args["block"]) > 0
-        add_incar_block!(split_line(args["block"], char=','), incar) 
+        add_incar_block!(split_line(args["block"], char=','), incar)
     end
     write_incar(incar, args["p"]*args["incar"])
 end

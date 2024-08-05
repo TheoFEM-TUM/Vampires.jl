@@ -169,6 +169,30 @@ function get_value_for_keyword(keyword, blocks; block_label="")
 end
 
 """
+    keyword_exists(keyword, blocks, block_label)
+"""
+function keyword_exists(keyword, blocks; block_label="")
+    if haskey(blocks, block_label)
+        block_lines = blocks[block_label]
+        for line in block_lines
+            if line.keyword == keyword
+                return true
+            end
+        end
+    else
+        for (block_label, block_lines) in blocks
+            for line in block_lines
+                if line.keyword == keyword
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+
+"""
     set_keyword!(keyword, value, blocks; comment)
 
 Sets the `keyword` to `value` in `blocks` with `comment`.

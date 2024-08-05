@@ -107,8 +107,8 @@ strong_scaling_create_subdirectories(
     cpus_per_node=2
 )
 """
-function strong_scaling_create_subdirectories(kpar_range::AbstractArray{Int},
-                                              ncore_nsim_range::AbstractArray{Int};
+function strong_scaling_create_subdirectories(kpar_range::AbstractArray,
+                                              ncore_nsim_range::AbstractArray;
                                               path::String = "",
                                               verbose::Bool = true,
                                               keyword::String = "",
@@ -122,11 +122,12 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray{Int},
                                               omp_num_threads::Int = 0,
                                               mail::String = "",
                                               script_filename::String = "batch_jobscript",
+                                              sub_directory_name::String = "strong_scaling"
                                              )
-    if keyword ∉ ["CPU", "GPU"]; throw("Scaling tests for $keyword are not supported"); end
+    if keyword ∉ ["cpu", "gpu"]; throw("Scaling tests for $keyword are not supported"); end
     @assert length(kpar_range) == length(ncore_nsim_range)
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
-        folder = "strong_scaling_$(i)_"*keyword
+        folder = "$(sub_directory_name)_$(i)_"*keyword
         mkpath(path*folder)
         for file in ["KPOINTS", "POTCAR", "POSCAR"]
             if !isfile(path*file)
@@ -135,14 +136,14 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray{Int},
             cp(path*file, path*folder*"/$file", force=true)
         end
         set_keyword_in_incar!("KPAR", string(kpar), path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
-        if keyword == "CPU"
+        if keyword == "cpu"
             # if omp_num_threads is default, set to 1 for correct scaling tests
             omp_num_threads = omp_num_threads == 0 ? 1 : omp_num_threads
             set_keyword_in_incar!("NCORE", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose)
             write_slurm_script(path*folder;  module_path=module_path, module_list=module_list, vasp_exe=vasp_exe,
                                time=time, nodes=ceil(Int, kpar / avail_cpus_per_node), ntasks=kpar*24,
                                num_gpu=0, omp_num_threads=omp_num_threads, partition=partition, mail=mail, script_filename=script_filename)
-        elseif keyword == "GPU"
+        elseif keyword == "gpu"
             # if omp_num_threads is default, set to 20 * number of avail gpus per node (vasp recommendation)
             omp_num_threads = omp_num_threads == 0 ? 20 * avail_cpus_per_node : omp_num_threads
             set_keyword_in_incar!("NSIM", string(ncore_nsim), path*folder*"/INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
@@ -150,6 +151,115 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray{Int},
                                time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks=kpar, num_gpu=kpar,
                                omp_num_threads=omp_num_threads, partition=partition,
                                mail=mail, script_filename=script_filename)
+        end
+    end
+end
+
+
+"""
+    weak_scaling_create_subdirectories(kpar_range::AbstractArray,
+                                       ncore_nsim_range::AbstractArray;
+                                       super_cell_vector::Vector{Int64} = [2,2,2],
+                                       path::String = "./",
+                                       verbose::Bool = true,
+                                       keyword::String = "",
+                                       time::Int = 1,
+                                       avail_cpus_per_node::Int = 2,
+                                       avail_gpus_per_node::Int = 4,
+                                       module_path::String = "",
+                                       module_list::String = "",
+                                       vasp_exe::String = "vasp_exe",
+                                       partition::String = "batch",
+                                       omp_num_threads::Int = 0,
+                                       mail::String = "",
+                                       script_filename::String = "batch_jobscript")
+
+Create subdirectories and prepare input files for weak scaling tests for VASP simulations.
+
+# Arguments
+- `kpar_range::AbstractArray`: An array of KPAR values to be tested.
+- `ncore_nsim_range::AbstractArray`: A corresponding array of NCORE (for CPU) or NSIM (for GPU) values to be tested.
+- `super_cell_vector::Vector{Int64} = [2,2,2]`: The vector defining the supercell size for scaling - scaled by a factor of n for the nth test.
+- `path::String = "./"`: The base directory where the input files (`KPOINTS`, `POTCAR`, `POSCAR`) are located.
+- `verbose::Bool = true`: If `true`, enables verbose output for the function calls.
+- `keyword::String = ""`: Specifies `cpu` or `gpu`
+- `time::Int = 1`: The wall time limit for the SLURM job scripts (in hours).
+- `avail_cpus_per_node::Int = 2`: The number of CPUs available per compute node.
+- `avail_gpus_per_node::Int = 4`: The number of GPUs available per compute node.
+- `module_path::String = ""`: Path to the module file.
+- `module_list::String = ""`: List of modules to load.
+- `vasp_exe::String = "vasp_exe"`: The VASP executable to be used.
+- `partition::String = "batch"`: The SLURM partition to submit jobs to.
+- `omp_num_threads::Int = 0`: Number of OpenMP threads.
+- `mail::String = ""`: Email address for SLURM notifications.
+- `script_filename::String = "batch_jobscript"`: The filename for the SLURM batch job script.
+
+# Description
+This function performs the following steps for each combination of KPAR and NCORE/NSIM values:
+1. Calls `strong_scaling_create_subdirectories` to create a strong scaling hierarchy.
+2. Modifies the `POSCAR` file according to the scaling parameter.
+3. Checks if `KSPACING` is set in the `INCAR` file and prints a message if not.
+
+For each combination of KPAR and NCORE/NSIM, it adjusts the supercell vector and transforms the primitive cell accordingly.
+
+# Throws
+- `SystemError`: If the required input files (`KPOINTS`, `POTCAR`, `POSCAR`) are not found in the base path.
+
+# Example
+```julia
+weak_scaling_create_subdirectories(
+    kpar_range=[1, 2, 4],
+    ncore_nsim_range=[8, 4, 2],
+    super_cell_vector=[2, 2, 2],
+    path="./",
+    verbose=true,
+    keyword="",
+    time=1,
+    avail_cpus_per_node=2,
+    avail_gpus_per_node=4,
+    module_path="",
+    module_list="",
+    vasp_exe="vasp_exe",
+    partition="batch",
+    omp_num_threads=0,
+    mail="",
+    script_filename="batch_jobscript"
+)
+"""
+function weak_scaling_create_subdirectories(kpar_range::AbstractArray,
+                                              ncore_nsim_range::AbstractArray;
+                                              super_cell_vector::Vector{Int64} = [2,2,2],
+                                              path::String = "./",
+                                              verbose::Bool = true,
+                                              keyword::String = "",
+                                              time::Int = 1,
+                                              avail_cpus_per_node::Int = 2,
+                                              avail_gpus_per_node::Int = 4,
+                                              module_path::String = "",
+                                              module_list::String = "",
+                                              vasp_exe::String = "vasp_exe",
+                                              partition::String = "batch",
+                                              omp_num_threads::Int = 0,
+                                              mail::String = "",
+                                              script_filename::String = "batch_jobscript")
+    sub_directory_name = "weak_scaling"
+    # create a strong scaling hierarchy
+    strong_scaling_create_subdirectories(kpar_range, ncore_nsim_range; path=path, verbose=verbose, keyword=keyword, time=time,
+                                             avail_cpus_per_node=avail_cpus_per_node, avail_gpus_per_node=avail_gpus_per_node,
+                                             module_path=module_path, module_list=module_list, vasp_exe=vasp_exe, partition=partition,
+                                             omp_num_threads=omp_num_threads, mail=mail, script_filename=script_filename, sub_directory_name=sub_directory_name)
+    # modify POSCAR according to scaling parameter
+    for (i, _) in enumerate(kpar_range)
+        folder = "$(sub_directory_name)_$(i)_"*keyword
+        poscar = read_poscar(path*folder*"/POSCAR")
+        mv(path*folder*"/POSCAR", path*folder*"/POSCAR_primitive")
+        scv = i == 1 ? [1,1,1] : (i-1).*super_cell_vector
+        poscar = transform_primitive_cell(poscar, scv; digits=10)
+        write_poscar(poscar; filename=path*folder*"/POSCAR")
+        # check if KSPACING is SET otherwise print message
+        incar = read_incar(path*folder*"/INCAR")
+        if !keyword_exists("KSPACING", incar)
+            println("KSPACING is not set. If you use a regular KPOINT file, please adjust it yourself. It is recommend to use KSPACING.")
         end
     end
 end

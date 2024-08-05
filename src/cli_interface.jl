@@ -163,6 +163,10 @@ function parse_commandline()
             help = "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)"
             arg_type = String
             default = "none"
+        "--super_cell_vector"
+            help = "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
+            arg_type = String
+            default = "none"
     end
     args :: Dict{String, Union{String, Bool}} = parse_args(s)
     return args
