@@ -6,7 +6,7 @@ supercell
 """
 
 
-function run_task(::Type{Val{:supercell}}, ::Type{Val{:create}}, args)
+function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
     poscar = read_poscar(args["p"]*args["poscar"])
     N = occursin(',', args["N"]) ? split_line(args["N"], char=',') : args["N"]
     N = parse.(Int64, N)
