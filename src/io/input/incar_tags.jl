@@ -44,7 +44,14 @@ INCAR_COMMENTS = Dict{String, String}(
     "NELM" => "sets the maximum number of electronic SC (self-consistency) steps",
     "NELMIN" => "specifies the minimum number of electronic self-consistency steps",
     "LORBIT" => "selects a projection method onto local quantum numbers and writes PROCAR/PROOUT file",
-    "LSORBIT" => "switch on spin-orbit coupling"
+    "LSORBIT" => "switch on spin-orbit coupling",
+    "NUM_WANN" => "controls the number of Wannier orbitals to be constructed",
+    "LWANNIER90" => "switches on the interface between VASP and WANNIER90",
+    "LWANNIER_RUN" => "executes wannier_setup and subsequently runs WANNIER90 in library mode",
+    "LWRITE_UNK" => "decides whether the cell-periodic part of the relevant Bloch functions is written",
+    "LWRITE_MMN_AMN" => "write the wannier90.mmn and wannier90.amn files",
+    "LWRITE_SPN" => "Write wannier90.spn file for noncollinear calculations",
+    "WANNIER90_WIN" => "sets the content of the wannier90.win file"
 )
 
 VASP_DEFAULTS = Dict{String, String}(
@@ -81,7 +88,14 @@ VASP_DEFAULTS = Dict{String, String}(
     "NELM" => "60",
     "NELMIN" => "2",
     "LORBIT" => "0",
-    "LSORBIT" => "False"
+    "LSORBIT" => "False",
+    "NUM_WANN" => "0",
+    "LWANNIER90" => "False",
+    "LWANNIER_RUN" => "True",
+    "LWRITE_UNK" => "False",
+    "LWRITE_MMN_AMN" => "True",
+    "LWRITE_SPN" => "False",
+    "WANNIER90_WIN" => "\"\""
 )
 
 BLOCK_KEYWORDS = Dict{String, Vector{String}}(
@@ -89,5 +103,6 @@ BLOCK_KEYWORDS = Dict{String, Vector{String}}(
     "MolecularDynamics" => ["IBRION", "ISIF", "TEBEG", "TEEND", "POTIM", "NSW", "SMASS"],
     "ElectronicConvergence" => ["ISMEAR", "SIGMA", "EDIFF", "NELMIN", "NELM", "PREC"],
     "Output" => ["NWRITE", "LCHARG", "LWAVE", "LORBIT"],
-    "Setup" => ["ISTART", "ICHARG"]
+    "Setup" => ["ISTART", "ICHARG"],
+    "Wannier90" => ["NUM_WANN", "LWANNIER_RUN", "LWANNIER90", "LWRITE_UNK", "LWRITE_MMN_AMN", "LWRITE_SPN"],
 )
