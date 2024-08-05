@@ -1,0 +1,78 @@
+#!/bin/bash
+#========================================#
+# batch script for VASP
+#========================================#
+# Batch setup -> system reads # s batch
+###
+#SBATCH --nodes=2
+#SBATCH --time=01:00:00
+#SBATCH --partition=batch
+#SBATCH --ntasks=96
+#SBATCH --ntasks-per-core=1
+#SBATCH --partition=batch
+#SBATCH --error=ERROR.%j
+#SBATCH --mail-user=user.name@mail.com
+#SBATCH --mail-type=START,FAIL,END
+#========================================#
+# module setup for VASP
+#========================================#
+module use /path/to/gpu_modules/
+module load m
+module load o
+module load d
+module load u
+module load l
+module load e
+module load 1
+module load ,
+module load m
+module load o
+module load d
+module load u
+module load l
+module load e
+module load 2
+# ALL RUNS IN $WORK !
+# ... better
+# start the jobs inside the correct directory
+# as per default initial directory is the directory
+# from where the job was submitted
+
+#========================================#
+# 3. Integrity check
+#========================================#
+
+echo "Starting at `date`"
+echo "Running on hosts: $SLURM_NODELIST"
+echo "Running on $SLURM_NNODES nodes."
+echo "Running on $SLURM_NPROCS processors."
+echo "Work directory is `pwd`"
+echo "VASP binary at " $vasp_exe
+
+echo
+echo "Starting VASP run at" `date`
+echo
+
+#========================================#
+# 4. Parallel execution
+#========================================#
+export OMP_NUM_THREADS=1
+# make sure that MKL does not overwrite your OMP configuration
+export MKL_NUM_THREADS=1
+#========================================#
+# 5. Systam info
+#========================================#
+hostname > host.info
+grep 'Linux' /etc/issue >> host.info
+grep 'model name' /proc/cpuinfo |cut -d: -f2 |uniq -c >> host.info
+grep 'cpu M' /proc/cpuinfo >> host.info
+grep 'MemTotal' /proc/meminfo >> host.info
+free -g >> host.info
+ulimit -a >> host.info
+echo $SLURM_NODELIST >> host.info
+echo The VASP version is ${vasp_exe} >> host.info
+
+#========================================#
+# 5. VASP run
+#========================================#
+srun ${vasp_exe} > vasp.log
