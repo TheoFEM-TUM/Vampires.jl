@@ -14,7 +14,7 @@ function convergence_create_subdirectories(param, param_range; path="./", verbos
         mkpath(path*folder)
         if param == "kgrid"
             N = parse(Int64, value)
-            gamma_centered = lowercase(method[1]) == "m" ? false : true
+            gamma_centered = lowercase(method[1]) == 'm' ? false : true
             write_kpoints(N, gamma_centered=gamma_centered, out=path*folder*"/KPOINTS")
             copy_vasp_input(path, folder, ignore=["KPOINTS"])
         else

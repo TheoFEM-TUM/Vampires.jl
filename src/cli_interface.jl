@@ -115,7 +115,7 @@ function parse_commandline()
             help = "general task dependent number parameter"
             arg_type = String
             default = "0"
-        "--m"
+        "--method"
             help = "general task dependent method parameter"
             arg_type = String
             default = "none"
