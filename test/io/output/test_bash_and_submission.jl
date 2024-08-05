@@ -16,7 +16,7 @@ end
                        mail="user@example.com", script_filename="test_jobscript.sh")
 
     script_content = read_slurm_script(script_path)
-    
+
     # Test SBATCH directives
     @test extract_sbatch_directive(script_content, "nodes") == "2"
     @test extract_sbatch_directive(script_content, "ntasks") == "96"
@@ -24,7 +24,7 @@ end
     @test extract_sbatch_directive(script_content, "gres") == "gpu:4"
     @test extract_sbatch_directive(script_content, "time") == "02:00:00"
     @test extract_sbatch_directive(script_content, "mail-user") == "user@example.com"
-    
+
     # Test module loading
     @test occursin("module use /path/to/modules", script_content)
     @test occursin("module load module1", script_content)
@@ -33,5 +33,5 @@ end
     # Test VASP execution command
     @test occursin("orterun --map-by ppr:4:node --bind-to core -np 4 \${vasp_std} > vasp.log", script_content)
 
-    # rm(script_path)
+    rm(script_path)
 end
