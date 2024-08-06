@@ -32,8 +32,9 @@ include("tasks/kpoint_tasks.jl")
 include("cli_interface.jl")
 
 export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar
-export Incar, set_key!, remove_key!, read_incar, write_incar
-export change_incar!, read_value_from_outcar
+export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
+export add_incar_block!, rm_incar_block!
+export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
 export plot_bandstructure, plot_value_convergence
 
