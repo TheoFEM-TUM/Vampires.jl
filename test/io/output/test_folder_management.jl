@@ -7,7 +7,7 @@ path = test_file_path*"param_test/"
     for (folder, value) in zip(keyword * "_" .* values, values)
         @test "INCAR" in readdir(path*folder) && "KPOINTS" in readdir(path*folder) && "POSCAR" in readdir(path*folder) && "POTCAR" in readdir(path*folder)
         incar_ = read_incar(path*folder*"/INCAR")
-        @test get_value_for_keyword(keyword, incar_) == value
+        @test findvalue(incar_, keyword) == value
         rm(path*folder, recursive=true)
     end
 end
@@ -15,12 +15,12 @@ end
 @testset "NSCF" begin
     nscf_create_subdirectories(path, "KPOINTS,KPOINTS_bands", verbose=false)
     scf_incar = read_incar(path*"scf/INCAR")
-    @test get_value_for_keyword("ISTART", scf_incar) == "0"
-    @test get_value_for_keyword("LCHARG", scf_incar) == "True"
+    @test findvalue(scf_incar, "ISTART") == "0"
+    @test findvalue(scf_incar, "LCHARG") == "True"
 
     nscf_incar = read_incar(path*"nscf/INCAR")
-    @test get_value_for_keyword("ICHARG", nscf_incar) == "11"
-    @test get_value_for_keyword("LCHARG", nscf_incar) == "False"
+    @test findvalue(nscf_incar, "ICHARG") == "11"
+    @test findvalue(nscf_incar, "LCHARG") == "False"
 
     @test Vampires.open_and_read(path*"scf/POSCAR") == Vampires.open_and_read(path*"nscf/POSCAR")
     @test Vampires.open_and_read(path*"scf/POTCAR") == Vampires.open_and_read(path*"nscf/POTCAR")
