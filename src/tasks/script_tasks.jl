@@ -4,7 +4,9 @@ list of available tasks:
 run_script
     prepare: creates a bash script that runs vasp in a specific folder
 slurm_script
-    prepare: creates a slurm submission script based on the specified parallelization parameters
+    prepare: creates a slurm submission script based on the extemded configuration file
+    parallelization parameters are set to the default - individual tuning necessary
+    #TODO: make this dependent on NCORE and KPAR and find best slurm configuration
 """
 
 function run_task(::Type{Val{:run_script}}, ::Type{Val{:prepare}}, args)
