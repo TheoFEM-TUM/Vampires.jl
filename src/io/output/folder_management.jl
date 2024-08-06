@@ -8,12 +8,12 @@ Creates subdirectories for a parameter convergence study and copies necessary VA
 - `param_range::AbstractVector`: A range or array of parameter values to be used for the subdirectories.
 - `path::String`: The base path where the subdirectories will be created. Defaults to `"./"`.
 """
-function convergence_create_subdirectories(param, param_range; path="./", verbose=true)
+function convergence_create_subdirectories(param, param_range; path="./", verbose=false)
     for value in param_range
         folder = param*"_"*value
         mkpath(path*folder)
         copy_vasp_input(path, folder, ignore=["INCAR"])
-        set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+        set_key_in_incar(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
     end
 end
 
@@ -27,7 +27,7 @@ and adjusting INCAR settings.
 - `path::String`: The directory where the VASP input files are located.
 - `kpoint_files::String`: A string containing two KPOINTS filenames for the "scf" and "nscf" calculations respectively.
 """
-function nscf_create_subdirectories(path, kpoints; verbose=true)
+function nscf_create_subdirectories(path, kpoints; verbose=false)
     for folder in ["scf", "nscf"]
         mkdir(path*folder)
         copy_vasp_input(path, folder, ignore=["KPOINTS"])
@@ -35,13 +35,13 @@ function nscf_create_subdirectories(path, kpoints; verbose=true)
     kpoint_files = split_line(kpoints, char=',')
     cp(path*kpoint_files[1], path*"scf/KPOINTS"); cp(path*kpoint_files[2], path*"nscf/KPOINTS") # TODO: write kpoint file with from kpath argument?
 
-    remove_keyword_from_incar!("LCHARG", path*"scf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("ISTART", "0", path*"scf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("LCHARG", "True", path*"scf/INCAR", verbose=verbose)
+    remove_key_from_incar("LCHARG", path*"scf/INCAR", verbose=verbose)
+    set_key_in_incar("ISTART", "0", path*"scf/INCAR", verbose=verbose)
+    set_key_in_incar("LCHARG", "True", path*"scf/INCAR", verbose=verbose)
 
-    remove_keyword_from_incar!("ISTART", path*"nscf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("ICHARG", "11", path*"nscf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("LCHARG", "False", path*"nscf/INCAR", verbose=verbose)
+    remove_key_from_incar("ISTART", path*"nscf/INCAR", verbose=verbose)
+    set_key_in_incar("ICHARG", "11", path*"nscf/INCAR", verbose=verbose)
+    set_key_in_incar("LCHARG", "False", path*"nscf/INCAR", verbose=verbose)
 end
 
 """
