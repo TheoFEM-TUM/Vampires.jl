@@ -3,9 +3,11 @@ module Vampires
 using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
 
 include("io/read_utils.jl")
+
 # input
 include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
-include("io/incar/incar_line.jl"); include("io/incar/incar_kw.jl"): include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl");include("io/outcar.jl")
+include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
+include("io/outcar.jl")
 include("io/w90_hr.jl")
 
 # output
@@ -29,8 +31,9 @@ include("tasks/kpoint_tasks.jl")
 
 include("cli_interface.jl")
 
-export read_eigenval, read_doscar, read_incar, set_keyword!, write_incar, Poscar, read_poscar, write_poscar, read_xdatcar
-export get_value_for_keyword, change_incar!, read_value_from_outcar, add_incar_block!, rm_incar_block!, remove_keyword!
+export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar
+export Incar, set_key!, remove_key!, read_incar, write_incar
+export change_incar!, read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
 export plot_bandstructure, plot_value_convergence
 
