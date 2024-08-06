@@ -59,7 +59,9 @@ any_task
 ```
 strong_scaling
     cpu: create a folder structure with slurm files to analyze CPU scaling in VASP
+        example: `strong_scaling cpu --N 1 --ncore 24,24,24,24 --kpar 1,2,3,4 --p ./ --ext_par_file ./extended_parameter_file --block batch_file_cpu`
     gpu: create a folder structure with slurm files to analyze GPU scaling in VASP
+        example: `strong_scaling gpu --N 1 --nsim 24,24,24,24 --kpar 1,2,3,4 --p ./ --ext_par_file ./extended_parameter_file --block batch_file_gpu`
 
 weak_scaling
     cpu: create a folder structure with slurm files to analyze weak CPU scaling in VASP
