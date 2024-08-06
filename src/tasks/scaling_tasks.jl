@@ -26,7 +26,7 @@ function run_task(task::Union{Type{Val{:strong_scaling}}, Type{Val{:weak_scaling
     time = args["N"] == "none" ? extended_args["time"] : args["N"]
     time = parse(Int, time)
     module_path = extended_args["module_path"]
-    module_list = extended_args["module_list"]
+    module_list = split(extended_args["module_list"], ',')
     partition = extended_args["partition"]
     avail_cpus_per_node = haskey(extended_args, "avail_cpus_per_node") ? parse(Int, extended_args["avail_cpus_per_node"]) : 2
     # default has to be 1 to avoid division by zero error
