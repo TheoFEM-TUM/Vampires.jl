@@ -50,6 +50,22 @@ Splits a line of text into individual words, removing any extra spaces.
 split_line(line; char=" ") = filter(!isempty, split(line, char))
 
 """
+    parse_line(line; char=" ", type::Type=Int64) -> Vector{Int64}
+
+Splits a line of text into individual elements based on a specified delimiter and parses them into the specified type, removing any extra spaces or empty elements.
+
+# Arguments
+- `line`: A string representing the line of text to be split.
+- `char=" "`: A character or string representing the delimiter to split the line by. Defaults to a space.
+- `type::Type=Int64`: The type to parse each split element into. Defaults to `Int64`.
+
+# Returns
+- `Vector{type::Type}`: An array of parsed elements from the input line, excluding any empty elements.
+"""
+parse_line(line; char=" ", type::Type=Int64) = filter(!isempty, tryparse.(type, split(line, char)))
+
+
+"""
     parse_lines_as_array(line; i1, i2, type)
 
 Parse `lines` as a 2d array of `type` starting from index `i1` ending at `i2` in
@@ -66,7 +82,7 @@ end
 
 """
     next_line_with(keywords, lines)
-    
+
 Find the next line in lines that contains a set of keywords.
 """
 function next_line_with(keywords::AbstractArray, lines)

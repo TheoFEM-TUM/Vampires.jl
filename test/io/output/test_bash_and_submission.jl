@@ -34,4 +34,14 @@ end
     @test occursin("orterun --map-by ppr:4:node --bind-to core -np 4 \${vasp_std} > vasp.log", script_content)
 
     rm(script_path)
+
+    write_slurm_script(test_file_path; module_path="/path/to/modules", module_list=["module1", "module2"], vasp_exe="vasp_std",
+    time=2, nodes=2, ntasks=96, ntasks_per_core=2, omp_num_threads=0, num_gpu=4, partition="batch",
+    mail="user@example.com", script_filename="test_jobscript.sh")
+
+    script_content = read_slurm_script(script_path)
+    @test !occursin("--ntasks-per-core", script_content)
+
+    rm(script_path)
+
 end

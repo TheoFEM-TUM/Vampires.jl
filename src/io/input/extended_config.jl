@@ -19,14 +19,14 @@ The function performs the following steps:
 4. Within each section, extracts key-value pairs and stores them in a nested dictionary structure.
 
 """
-function read_config(filename::String)::Dict{String, Dict{String, String}}
+function read_config(filename::String)::OrderedDict{String, OrderedDict{String, String}}
     # read the input file
     input_text = open_and_read(filename)
     # Split the input text into lines
     lines = split_lines(input_text, char=r", |, |,| ")
 
     # Initialize variables
-    config_dict = Dict{String, Dict{String, String}}()
+    config_dict = OrderedDict{String, OrderedDict{String, String}}()
     current_section = ""
 
     # Iterate over each line
@@ -36,7 +36,7 @@ function read_config(filename::String)::Dict{String, Dict{String, String}}
         if line[1] == "begin"
             # Extract section name
             current_section = line[2]
-            config_dict[current_section] = Dict{String, String}()
+            config_dict[current_section] = OrderedDict{String, String}()
         elseif line[1] == "end"
             current_section = ""
         elseif !isempty(current_section) && !isempty(line)
