@@ -18,3 +18,24 @@ sc_poscar = transform_primitive_cell(poscar, Ns)
     @test sc_poscar.atom_names == poscar.atom_names
     @test get_volume(sc_poscar.lattice) ≈ get_volume(poscar.lattice) * prod(Ns)
 end
+
+path = test_file_path*"param_test/"
+N = 10; Nmin = 5
+supercell_create_subdirectories(path, test_file_path*"XDATCAR_gaas", test_file_path*"SC_POSCAR", N, method="random", Nmin=Nmin)
+_, configs = read_xdatcar(test_file_path*"XDATCAR_gaas")
+@testset "Supercell snapshots" begin
+    inds = read_from_file(path*"config_inds.dat", type=Int64)
+    @test length(inds) == N
+    for i in 1:N, file in ["POSCAR", "POTCAR", "KPOINTS", "INCAR"]
+        @test file ∈ readdir(path*"snap_$i")
+    end
+    for i in 1:N
+        poscar = read_poscar(path*"snap_$i/POSCAR")
+        @test poscar.rs_atom == configs[:, :, inds[i]]
+    end
+    @test minimum(inds) > Nmin
+end
+rm(path*"config_inds.dat")
+for i in 1:N
+    rm(path*"snap_$i", recursive=true)
+end
