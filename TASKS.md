@@ -50,12 +50,6 @@ plot
 ```
 
 ```
-prepare
-    run_script: creates a bash script that runs vasp in a specific folder
-    slurm_script: creates a slurm submission script based on the specified parallelization parameters
-```
-
-```
 ### recursive wrapper for all tasks:
 any_task
     any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
@@ -70,5 +64,12 @@ strong_scaling
 weak_scaling
     cpu: create a folder structure with slurm files to analyze weak CPU scaling in VASP
     gpu: create a folder structure with slurm files to analyze weak GPU scaling in VASP
+```
+
+```
+run_script
+    prepare: creates a bash script that runs vasp in a specific folder
+slurm_script
+    prepare: creates a slurm submission script based on the specified parallelization parameters
 ```
 
