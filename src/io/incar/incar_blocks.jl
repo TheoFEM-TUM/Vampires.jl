@@ -18,7 +18,7 @@ function add_incar_block!(incar::Incar, block_label::AbstractString; verbose=tru
         try findvalue(incar, key)
             nothing
         catch e
-            value = get_default_for_keyword(keyword)
+            value = get_default_for_keyword(key)
             set_key!(incar, key, value, block_label=block_label, verbose=verbose)
         end
     end
@@ -43,7 +43,12 @@ If the block label does not exist, a message will be printed indicating that the
 """
 function rm_incar_block!(incar::Incar, block_label::String)
     if haskey(incar, block_label)
-        delete!(incar, block_label)
+        block_label, isW90 = findkey(incar, key)
+        if isW90
+            delete!(incar.w90, block_label)
+        else
+            delete!(incar.vasp, block_label)
+        end
     else
         println("INCAR has no block $block_label.")
     end
