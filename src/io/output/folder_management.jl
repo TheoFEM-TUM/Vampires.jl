@@ -89,8 +89,10 @@ Copy specific VASP input files ("KPOINTS", "POTCAR", "POSCAR", "INCAR") from the
 - `folder::String`: The target subdirectory within `path` where the files will be copied.
 - `ignore::Vector{String}`: An optional list of filenames to ignore during the copy process.
 """
-function copy_vasp_input(path, folder; ignore=String[])
-    for file in ["KPOINTS", "POTCAR", "POSCAR", "INCAR"]
+function copy_vasp_input(path, folder; ignore=String[], include=String[])
+    files = ["KPOINTS", "POTCAR", "POSCAR", "INCAR"]
+    filter!(file->file in ignore, files); append!(files, include)
+    for file in files
         if !isfile(path*file) && file ∉ ignore
             @info "$file file was not found in current path ($path)."
         elseif isfile(path*file) && file ∉ ignore
