@@ -51,6 +51,7 @@ values = ["1e-6", "10", "True", "1"]
     set_key!(incar, "LPLANE", "False", block_label="Parallelization", verbose=false)
     @test findvalue(incar, "LPLANE") == "False"
     @test Vampires.findkey(incar, "LPLANE")[1] == "Parallelization"
+    @test haskey(incar.vasp["MD settings"], "LPLANE") == false
 
     # Test adding a new key to a new block
     set_key!(incar, "KSPACING", "0.5", block_label="K-Convergence", verbose=false)
