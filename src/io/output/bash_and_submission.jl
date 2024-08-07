@@ -77,7 +77,7 @@ end
 
 
 """
-    write_slurm_script(path; module_path="", module_list=[], vasp_exe="vasp_exe", time=1, nodes=1, ntasks=48, 
+    write_slurm_script(path; module_path="", module_list=[], vasp_exe="vasp_std", time=1, nodes=1, ntasks=48, 
                        ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
 
 Generate a SLURM batch script for running VASP on an HPC system, optimized for JUWELS, but may require adjustments for other HPC systems.
@@ -86,7 +86,7 @@ Generate a SLURM batch script for running VASP on an HPC system, optimized for J
 - `path::String`: The directory where the SLURM script will be created.
 - `module_path::String=""`: Path to the module files if needed.
 - `module_list::Vector{String}=[]`: List of modules to load.
-- `vasp_exe::String="vasp_exe"`: The VASP executable to run.
+- `vasp_exe::String="vasp_std"`: The VASP executable to run.
 - `time::Int=1`: The wall time limit for the SLURM job script (in hours).
 - `nodes::Int=1`: The number of nodes to allocate.
 - `ntasks::Int=48`: The total number of tasks.
