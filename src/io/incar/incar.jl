@@ -11,9 +11,9 @@ The keys are category names (strings), and the values are ordered dictionaries o
 - `w90::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing Wannier90 input parameters. 
 The keys are category names (strings), and the values are ordered dictionaries of parameters within each category.
 """
-mutable struct Incar
-    vasp :: OrderedDict{String, OrderedDict{String, IncarValue}}
-    w90 :: OrderedDict{String, OrderedDict{String, IncarValue}}
+mutable struct Incar{S1,S2,S3,S4<:AbstractString, IV1,IV2<:IncarValue}
+    vasp :: OrderedDict{S1, OrderedDict{S3, IV1}}
+    w90 :: OrderedDict{S2, OrderedDict{S4, IV2}}
 end
 
 get_empty_incar() = Incar(OrderedDict{String, OrderedDict{String, IncarValue}}(), OrderedDict{String, OrderedDict{String, IncarValue}}())
@@ -31,7 +31,7 @@ Reads an INCAR file and returns an `Incar` object containing the parsed paramete
 
 - `Incar`: An `Incar` object populated with the parameters from the INCAR file.
 """
-function read_incar(file::String)
+function read_incar(file::AbstractString)
     lines = open_and_read(file)
     
     # Begin a new line at each semicolon
@@ -78,7 +78,7 @@ Checks if a specified key exists in the `Incar` object.
 
 - `Bool`: Returns `true` if the key is found in either the `vasp` or `w90` dictionaries of the `Incar` object, otherwise returns `false`.
 """
-function Base.haskey(incar::Incar, key::String)
+function Base.haskey(incar::Incar, key::AbstractString)
     for block_dict in [incar.vasp, incar.w90], block_label in keys(block_dict)
         if haskey(block_dict[block_label], key); return true; end
     end
@@ -99,7 +99,7 @@ Finds the block label in which a specified key exists within the `Incar` object.
 
 - `Tuple{Union{Nothing, String}, Bool}`: A tuple where the first element is either the block label containing the key or `nothing` if the key is not found. The second element is a boolean indicating whether the key was found in the `w90` dictionary (`true`) or the `vasp` dictionary (`false`).
 """
-function findkey(incar::Incar, key)
+function findkey(incar::Incar, key::AbstractString)
     block_label = findfirst(dict->haskey(dict, key), incar.vasp)
     if isnothing(block_label)
         return findfirst(dict->haskey(dict, key), incar.w90), true
@@ -121,7 +121,7 @@ If the key is not found, an error is thrown.
 # Returns
 - Returns the value associated with the specified `key`. If the key exists, the function will return the value from the appropriate block (`w90` or `vasp`) depending on the format.
 """
-function find_value_and_comment(incar::Incar, key)
+function find_value_and_comment(incar::Incar, key::AbstractString)
     if haskey(incar, key)
         block_label, isW90 = findkey(incar, key)
         if isW90
@@ -151,10 +151,14 @@ and updates the relevant section based on the key.
 - `verbose::Bool`: Optional. If `true`, the function prints the changed line to the standard output. Defaults to `true`.
 - `isW90::Bool`: Optional. If `true`, the function assumes the key belongs to Wannier90 input. If `false`, it infers the type based on the key.
 """
-function set_key!(incar::Incar, key, value; comment=get_comment(key), block_label="", verbose=true, isW90=false)
+function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comment=get_comment(key), block_label="", verbose=true, isW90=false)
     if isW90 == false; isW90 = iswannier90key(key) ? true : false; end
     if haskey(incar, key)
-        block_label, isW90 = findkey(incar, key)
+        if block_label == ""
+            block_label, isW90 = findkey(incar, key)
+        else
+            _, isW90 = findkey(incar, key)
+        end
         old_comment = findcomment(incar, key)
         comment = old_comment == "" ? comment : old_comment
         if isW90
@@ -163,6 +167,7 @@ function set_key!(incar::Incar, key, value; comment=get_comment(key), block_labe
             incar.vasp[block_label][key] = IncarValue(value, comment)
         end
     else
+        block_label = block_label == "" ? get_block_label_for_keyword(key) : block_label
         if !isW90
             if haskey(incar.vasp, block_label)
                 incar.vasp[block_label][key] = IncarValue(value, comment)

@@ -8,9 +8,9 @@ A mutable struct representing a parameter value and its associated comment in an
 - `value::String`: The value of the parameter.
 - `comment::String`: A comment or description associated with the parameter value.
 """
-mutable struct IncarValue
-    value :: String
-    comment :: String
+mutable struct IncarValue{S1,S2<:AbstractString}
+    value :: S1
+    comment :: S2
 end
 
 """
