@@ -8,7 +8,7 @@ A structure to represent the data contained in a VASP POSCAR file.
 - `lattice::Array{Float64, 2}`: A 3x3 array representing the lattice vectors.
 - `atom_names::Array{AbstractString, 1}`: An array of atom names.
 - `atom_numbers::Array{Int64, 1}`: An array of the number of each type of atom.
-- `Rs::Array{Float64, 2}`: A 3xNion array of atomic positions.
+- `rs_atom::Array{Float64, 2}`: A 3xNion array of atomic positions.
 - `atom_types::Array{String, 1}`: An array of atom types corresponding to each atom position.
 """
 struct Poscar
