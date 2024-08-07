@@ -8,12 +8,19 @@ Creates subdirectories for a parameter convergence study and copies necessary VA
 - `param_range::AbstractVector`: A range or array of parameter values to be used for the subdirectories.
 - `path::String`: The base path where the subdirectories will be created. Defaults to `"./"`.
 """
-function convergence_create_subdirectories(param, param_range; path="./", verbose=true)
+function convergence_create_subdirectories(param, param_range; path="./", verbose=true, method="none")
     for value in param_range
         folder = param*"_"*value
         mkpath(path*folder)
-        copy_vasp_input(path, folder, ignore=["INCAR"])
-        set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+        if param == "kgrid"
+            N = parse(Int64, value)
+            gamma_centered = lowercase(method[1]) == 'm' ? false : true
+            write_kpoints(N, gamma_centered=gamma_centered, out=path*folder*"/KPOINTS")
+            copy_vasp_input(path, folder, ignore=["KPOINTS"])
+        else
+            copy_vasp_input(path, folder, ignore=["INCAR"])
+            set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+        end
     end
 end
 
