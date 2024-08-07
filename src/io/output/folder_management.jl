@@ -8,7 +8,7 @@ Creates subdirectories for a parameter convergence study and copies necessary VA
 - `param_range::AbstractVector`: A range or array of parameter values to be used for the subdirectories.
 - `path::String`: The base path where the subdirectories will be created. Defaults to `"./"`.
 """
-function convergence_create_subdirectories(param, param_range; path="./", verbose=true, method="none")
+function convergence_create_subdirectories(param, param_range; path="./", verbose=false, method="none")
     for value in param_range
         folder = param*"_"*value
         mkpath(path*folder)
@@ -19,7 +19,7 @@ function convergence_create_subdirectories(param, param_range; path="./", verbos
             copy_vasp_input(path, folder, ignore=["KPOINTS"])
         else
             copy_vasp_input(path, folder, ignore=["INCAR"])
-            set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+            set_key_in_incar(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         end
     end
 end
@@ -34,23 +34,22 @@ and adjusting INCAR settings.
 - `path::String`: The directory where the VASP input files are located.
 - `kpoint_files::String`: A string containing two KPOINTS filenames for the "scf" and "nscf" calculations respectively.
 """
-function nscf_create_subdirectories(path, kpoints, incar; verbose=true)
+function nscf_create_subdirectories(path, kpoints, incar; verbose=false)
     folders = ["scf", "nscf"]
     kpoint_files = split_line(kpoints, char=','); if length(kpoint_files) == 1; append!(kpoint_files, kpoint_files); end
     incar_files = split_line(incar, char=','); if length(incar_files) == 1; append!(incar_files, incar_files); end
-    
     for (k, folder) in enumerate(folders)
         mkdir(path*folder)
         copy_vasp_input(path, folder, ignore=["KPOINTS", "INCAR"], include=[kpoint_files[k]=>"KPOINTS", incar_files[k]=>"INCAR"])
     end
 
-    remove_keyword_from_incar!("LCHARG", path*"scf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("ISTART", "0", path*"scf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("LCHARG", "True", path*"scf/INCAR", verbose=verbose)
+    remove_key_from_incar("LCHARG", path*"scf/INCAR", verbose=verbose)
+    set_key_in_incar("ISTART", "0", path*"scf/INCAR", verbose=verbose)
+    set_key_in_incar("LCHARG", "True", path*"scf/INCAR", verbose=verbose)
 
-    remove_keyword_from_incar!("ISTART", path*"nscf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("ICHARG", "11", path*"nscf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("LCHARG", "False", path*"nscf/INCAR", verbose=verbose)
+    remove_key_from_incar("ISTART", path*"nscf/INCAR", verbose=verbose)
+    set_key_in_incar("ICHARG", "11", path*"nscf/INCAR", verbose=verbose)
+    set_key_in_incar("LCHARG", "False", path*"nscf/INCAR", verbose=verbose)
 end
 
 """
@@ -94,8 +93,8 @@ Copy specific VASP input files ("KPOINTS", "POTCAR", "POSCAR", "INCAR") from the
 function copy_vasp_input(path, folder; ignore=String[], include=Pair{String, String}[])
     files = ["KPOINTS", "POTCAR", "POSCAR", "INCAR"]
     filter!(file->file ∉ ignore, files)
-    infiles = append!(files, [a for (a, _) in include])
-    outfiles = append!(files, [b for (_, b) in include])
+    infiles = vcat(files, [a for (a, _) in include])
+    outfiles = vcat(files, [b for (_, b) in include])
     for (infile, outfile) in zip(infiles, outfiles)
         if !isfile(path*infile)
             @info "$infile file was not found in current path ($path)."
