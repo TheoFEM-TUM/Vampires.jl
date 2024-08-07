@@ -13,7 +13,6 @@
 
 !MD settings
  TEBEG = 100             !initial temperature in K
- TEEND = 100             !final temperature in K (default =TEBEG)
  NSW = 8000              !maximum number of ionic steps
  POTIM = 8               !MD time step in fs
   

@@ -34,8 +34,36 @@ values = ["1e-6", "10", "True", "1"]
         set_key!(incar, keyword, value, verbose=false)
         @test findvalue(incar, keyword) == value
     end
+    
     # Test that a custom commend is not overwritten
     @test Vampires.findcomment(incar, "POTIM") == "MD time step in fs"
+
+    # Test that an exsting key is overwritten in the same block
+    @test Vampires.findkey(incar, "POTIM")[1] == "MD settings"
+
+    # Test adding a new key
+    set_key!(incar, "TEEND", "100", verbose=false)
+    @test findvalue(incar, "TEEND") == "100"
+    @test Vampires.findkey(incar, "TEEND")[1] == "MolecularDynamics"
+    @test Vampires.findcomment(incar, "TEEND") == Vampires.get_comment("TEEND")
+
+    # Test adding an existing key to a different block
+    set_key!(incar, "LPLANE", "False", block_label="Parallelization", verbose=false)
+    @test findvalue(incar, "LPLANE") == "False"
+    @test Vampires.findkey(incar, "LPLANE")[1] == "Parallelization"
+
+    # Test adding a new key to a new block
+    set_key!(incar, "KSPACING", "0.5", block_label="K-Convergence", verbose=false)
+    @test findvalue(incar, "KSPACING") == "0.5"
+    @test Vampires.findkey(incar, "KSPACING")[1] == "K-Convergence"
+    @test Vampires.findcomment(incar, "KSPACING") == Vampires.get_comment("KSPACING")
+    
+    # Test adding a non-existing key
+    set_key!(incar, "MYTAG", "NO", verbose=false)
+    @test findvalue(incar, "MYTAG") == "NO"
+    @test Vampires.findkey(incar, "MYTAG")[1] == "Unknown"
+    @test Vampires.findcomment(incar, "MYTAG") == Vampires.get_comment("MYTAG")
+
     write_incar(incar, test_file_path*"INCAR_prime")
     incar_prime = read_incar(test_file_path*"INCAR_prime")
     for (keyword, value) in zip(keywords, values)
