@@ -31,7 +31,7 @@ end
     @test occursin("module load module2", script_content)
 
     # Test VASP execution command
-    @test occursin("orterun --map-by ppr:4:node --bind-to core -np 4 \${vasp_std} > vasp.log", script_content)
+    @test occursin("orterun --map-by ppr:4:node --bind-to core -np 4 vasp_std > vasp.log", script_content)
 
     rm(script_path)
 

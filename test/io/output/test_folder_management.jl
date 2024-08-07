@@ -62,7 +62,9 @@ end
     keyword = "cpu"
 
     # Create subdirectories and prepare input files for weak scaling
-    weak_scaling_create_subdirectories(kpar_range, ncore_nsim_range; super_cell_vector=super_cell_vector, path=path, verbose=false, keyword=keyword, time=1, avail_cpus_per_node=2, avail_gpus_per_node=4, module_path="", module_list="", vasp_exe="vasp_exe", partition="batch", omp_num_threads=0, mail="", script_filename="batch_jobscript")
+    weak_scaling_create_subdirectories(kpar_range, ncore_nsim_range; super_cell_vector=super_cell_vector, path=path, verbose=false, keyword=keyword, time=1,
+                                       avail_cpus_per_node=2, avail_gpus_per_node=4, module_path="", module_list=[], vasp_exe="vasp_std",
+                                       partition="batch", omp_num_threads=0, mail="", script_filename="batch_jobscript")
 
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
         folder = path * "weak_scaling_$(i)_" * keyword
