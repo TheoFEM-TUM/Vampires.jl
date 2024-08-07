@@ -9,6 +9,9 @@ incar = read_incar(test_file_path*"INCAR")
     @test findvalue(incar, "ISIF") == "2"
     @test findvalue(incar, "LPLANE") == "True"
     @test findvalue(incar, "LSCALAPACK") == ".FALSE."
+
+    # Test that a tag without a comment receives default comment
+    @test Vampires.findcomment(incar, "ISMEAR") == Vampires.INCAR_COMMENTS["ISMEAR"]
 end
 
 write_incar(incar, test_file_path*"INCAR_new")
@@ -31,6 +34,8 @@ values = ["1e-6", "10", "True", "1"]
         set_key!(incar, keyword, value, verbose=false)
         @test findvalue(incar, keyword) == value
     end
+    # Test that a custom commend is not overwritten
+    @test Vampires.findcomment(incar, "POTIM") == "MD time step in fs"
     write_incar(incar, test_file_path*"INCAR_prime")
     incar_prime = read_incar(test_file_path*"INCAR_prime")
     for (keyword, value) in zip(keywords, values)
