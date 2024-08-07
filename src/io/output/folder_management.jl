@@ -34,13 +34,15 @@ and adjusting INCAR settings.
 - `path::String`: The directory where the VASP input files are located.
 - `kpoint_files::String`: A string containing two KPOINTS filenames for the "scf" and "nscf" calculations respectively.
 """
-function nscf_create_subdirectories(path, kpoints; verbose=true)
-    for folder in ["scf", "nscf"]
+function nscf_create_subdirectories(path, kpoints, incar; verbose=true)
+    folders = ["scf", "nscf"]
+    kpoint_files = split_line(kpoints, char=','); if length(kpoint_files) == 1; append!(kpoint_files, kpoint_files); end
+    incar_files = split_line(incar, char=','); if length(incar_files) == 1; append!(incar_files, incar_files); end
+    
+    for (k, folder) in enumerate(folders)
         mkdir(path*folder)
-        copy_vasp_input(path, folder, ignore=["KPOINTS"])
+        copy_vasp_input(path, folder, ignore=["KPOINTS", "INCAR"], include=[kpoint_files[k]=>"KPOINTS", incar_files[k]=>"INCAR"])
     end
-    kpoint_files = split_line(kpoints, char=',')
-    cp(path*kpoint_files[1], path*"scf/KPOINTS"); cp(path*kpoint_files[2], path*"nscf/KPOINTS") # TODO: write kpoint file with from kpath argument?
 
     remove_keyword_from_incar!("LCHARG", path*"scf/INCAR", verbose=verbose)
     set_keyword_in_incar!("ISTART", "0", path*"scf/INCAR", verbose=verbose)
@@ -89,14 +91,16 @@ Copy specific VASP input files ("KPOINTS", "POTCAR", "POSCAR", "INCAR") from the
 - `folder::String`: The target subdirectory within `path` where the files will be copied.
 - `ignore::Vector{String}`: An optional list of filenames to ignore during the copy process.
 """
-function copy_vasp_input(path, folder; ignore=String[], include=String[])
+function copy_vasp_input(path, folder; ignore=String[], include=Pair{String, String}[])
     files = ["KPOINTS", "POTCAR", "POSCAR", "INCAR"]
-    filter!(file->file in ignore, files); append!(files, include)
-    for file in files
-        if !isfile(path*file) && file ∉ ignore
-            @info "$file file was not found in current path ($path)."
-        elseif isfile(path*file) && file ∉ ignore
-            cp(path*file, path*folder*"/$file", force=true)
+    filter!(file->file ∉ ignore, files)
+    infiles = append!(files, [a for (a, _) in include])
+    outfiles = append!(files, [b for (_, b) in include])
+    for (infile, outfile) in zip(infiles, outfiles)
+        if !isfile(path*infile)
+            @info "$infile file was not found in current path ($path)."
+        elseif isfile(path*infile)
+            cp(path*infile, path*folder*"/$outfile", force=true)
         end
     end
 end

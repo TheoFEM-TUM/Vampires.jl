@@ -38,7 +38,7 @@ end
 end
 
 @testset "NSCF" begin
-    nscf_create_subdirectories(path, "KPOINTS,KPOINTS_bands", verbose=false)
+    nscf_create_subdirectories(path, "KPOINTS,KPOINTS_bands", "INCAR", verbose=false)
     scf_incar = read_incar(path*"scf/INCAR")
     @test get_value_for_keyword("ISTART", scf_incar) == "0"
     @test get_value_for_keyword("LCHARG", scf_incar) == "True"
