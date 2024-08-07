@@ -51,10 +51,10 @@ function get_block_label_for_keyword(keyword)
     for (block_label, block_keywords) in BLOCK_KEYWORDS, block_keyword in block_keywords
         if keyword == block_keyword; return block_label; end
     end
-    return "Unkown"
+    return "Unknown"
 end
 
-INCAR_COMMENTS = Dict{String, String}(
+const INCAR_COMMENTS = Dict{String, String}(
     "ENCUT" => "specifies the energy cutoff for the plane-wave basis set in eV",
     "KPAR" => "determines the number of k-points that are to be treated in parallel",
     "NCORE" => "determines the number of compute cores that work on an individual orbital",
@@ -99,7 +99,7 @@ INCAR_COMMENTS = Dict{String, String}(
     "WANNIER90_WIN" => "sets the content of the wannier90.win file"
 )
 
-VASP_DEFAULTS = Dict{String, String}(
+const VASP_DEFAULTS = Dict{String, String}(
     "ENCUT" => "250",
     "KPAR" => "1",
     "NCORE" => "1",
@@ -144,7 +144,7 @@ VASP_DEFAULTS = Dict{String, String}(
     "WANNIER90_WIN" => "\"\""
 )
 
-WANNIER90_COMMETS = Dict{String, String}(
+const WANNIER90_COMMENTS = Dict{String, String}(
     "num_wann" => "defines number of Wannier functions",
     "num_iter" => "sets number of iterations for the minimization of Omega",
     "conv_window" => "sets number of iterations over which convergence of Omega is assessed",
@@ -160,11 +160,11 @@ WANNIER90_COMMETS = Dict{String, String}(
     "spinors" => "assumes that each WF corresponds to singularly occupied spinor state",
 )
 
-WANNIER90_DEFAULTS = Dict{String, String}(
+const WANNIER90_DEFAULTS = Dict{String, String}(
 
 )
 
-BLOCK_KEYWORDS = Dict{String, Vector{String}}(
+const BLOCK_KEYWORDS = Dict{String, Vector{String}}(
     "Parallelization" => ["NCORE", "KPAR"],
     "MolecularDynamics" => ["IBRION", "ISIF", "TEBEG", "TEEND", "POTIM", "NSW", "SMASS"],
     "ElectronicConvergence" => ["ISMEAR", "SIGMA", "EDIFF", "NELMIN", "NELM", "PREC"],
