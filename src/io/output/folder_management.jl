@@ -52,9 +52,37 @@ function nscf_create_subdirectories(path, kpoints; verbose=true)
 end
 
 """
+    supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
+
+Create subdirectories for supercell configurations extracted from an XDATCAR file.
+
+# Arguments
+- `path::String`: The directory path where subdirectories will be created.
+- `xdatcar_path::String`: The file path to the XDATCAR file containing atomic configurations.
+- `poscar_path::String`: The file path to the POSCAR file containing lattice information and atomic positions.
+- `N::Int`: The number of configurations to extract and create subdirectories for.
+- `method::String="random"`: The method for selecting configurations. "random" selects configurations randomly,
+  while "equal" selects them evenly spaced along the XDATCAR trajectory.
+- `Nmin::Int=1`: The minimum index of configurations to consider. Defaults to 1.
+"""
+function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
+    poscar = read_poscar(poscar_path)
+    lattice, configs = read_xdatcar(xdatcar_path)
+    Nmax = size(configs, 3)
+    inds = lowercase(method[1]) == 'e' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
+    write_to_file(inds, path*"config_inds")
+    for (k, ind) in enumerate(inds)
+        mkdir(path*"snap_$k")
+        new_poscar = Poscar(1, lattice, poscar.atom_names, poscar.atom_numbers, configs[:, :, ind], poscar.atom_types)
+        write_poscar(new_poscar, filename=path*"snap_$k/POSCAR")
+        copy_vasp_input(path, "snap_$k", ignore=["POSCAR"])
+    end
+end
+
+"""
     copy_vasp_input(path::String, folder::String; ignore::Vector{String}=String[])
 
-Copy specific VASP input files ("KPOINTS", "POTCAR", "POSCAR") from the directory (`path`) to a subdirectory (`folder`).
+Copy specific VASP input files ("KPOINTS", "POTCAR", "POSCAR", "INCAR") from the directory (`path`) to a subdirectory (`folder`).
 
 # Arguments
 - `path::String`: The directory where the VASP input files are located.
