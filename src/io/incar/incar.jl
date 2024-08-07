@@ -16,6 +16,27 @@ mutable struct Incar{S1,S2,S3,S4<:AbstractString, IV1,IV2<:IncarValue}
     w90 :: OrderedDict{S2, OrderedDict{S4, IV2}}
 end
 
+"""
+    set_key!(incar::Incar, key::AbstractString, incar_value::IncarValue, block_label::AbstractString, isW90::Bool)
+
+Set a key-value pair in the specified block of an `Incar` object, either in the VASP or WANNIER90 dictionary.
+
+# Arguments
+- `incar::Incar`: The `Incar` object to be modified.
+- `key::AbstractString`: The key to be set.
+- `incar_value::IncarValue`: The value to be associated with the key.
+- `block_label::AbstractString`: The label of the block in which to set the key-value pair.
+- `isW90::Bool`: A boolean flag indicating whether to set the key in the WANNIER90 (`true`) or VASP (`false`) dictionary.
+"""
+function set_key!(incar::Incar, key::AbstractString, incar_value::IncarValue, block_label::AbstractString, isW90::Bool)
+    key_dict = isW90 ? incar.w90 : incar.vasp
+    if haskey(key_dict, block_label)
+        key_dict[block_label][key] = incar_value
+    else
+        key_dict[block_label] = OrderedDict{String, IncarValue}(key=>incar_value)
+    end
+end
+
 get_empty_incar() = Incar(OrderedDict{String, OrderedDict{String, IncarValue}}(), OrderedDict{String, OrderedDict{String, IncarValue}}())
 
 """
@@ -153,35 +174,18 @@ and updates the relevant section based on the key.
 """
 function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comment=get_comment(key), block_label="", verbose=true, isW90=false)
     if isW90 == false; isW90 = iswannier90key(key) ? true : false; end
+
     if haskey(incar, key)
-        if block_label == ""
-            block_label, isW90 = findkey(incar, key)
-        else
-            _, isW90 = findkey(incar, key)
-        end
         old_comment = findcomment(incar, key)
         comment = old_comment == "" ? comment : old_comment
-        if isW90
-            incar.w90[block_label][key] = IncarValue(value, comment)
-        else
-            incar.vasp[block_label][key] = IncarValue(value, comment)
-        end
+        block_label = block_label == "" ? findkey(incar, key)[1] : block_label
+        remove_key!(incar, key, verbose=false)
     else
         block_label = block_label == "" ? get_block_label_for_keyword(key) : block_label
-        if !isW90
-            if haskey(incar.vasp, block_label)
-                incar.vasp[block_label][key] = IncarValue(value, comment)
-            else
-                incar.vasp[block_label] = OrderedDict{String, IncarValue}(key=>IncarValue(value, comment))
-            end
-        else
-            if haskey(incar.w90, block_label)
-                incar.w90[block_label][key] = IncarValue(value, comment)
-            else
-                incar.w90[block_label] = OrderedDict{String, IncarValue}(key=>IncarValue(value, comment))
-            end
-        end
     end
+
+    set_key!(incar, key, IncarValue(value, comment), block_label, isW90)
+
     if verbose
         print("Changed line: ")
         write_line(key, find_value_and_comment(incar, key), stdout)
@@ -203,7 +207,7 @@ function remove_key!(incar::Incar, key::AbstractString; verbose=true)
         else
             delete!(incar.vasp[block_label], key)
         end
-        if verbose && length(key_line) > 0
+        if verbose
             print("Removed line: ")
             write_line(key, incar_value, stdout)
         end
