@@ -129,12 +129,7 @@ function strong_scaling_create_subdirectories(kpar_range::AbstractArray,
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
         folder = "$(sub_directory_name)_$(i)_"*keyword
         mkpath(path*folder)
-        for file in ["KPOINTS", "POTCAR", "POSCAR"]
-            if !isfile(path*file)
-                throw("Please supply a basic $file for your job in the base path ($path)")
-            end
-            cp(path*file, path*folder*"/$file", force=true)
-        end
+        copy_vasp_input(path, folder)
         set_keyword_in_incar!("KPAR", string(kpar), path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         if keyword == "cpu"
             # if omp_num_threads is default, set to 1 for correct scaling tests
