@@ -120,7 +120,7 @@ write_slurm_script(
     script_filename="my_slurm_script.sh"
 )
 """
-function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vasp_exe", time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
+function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vasp_std", time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
     out = path*"/"*script_filename
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
@@ -225,7 +225,7 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
         end
         print(outfile, """
         #========================================#
-        # 5. Systam info
+        # 5. System info
         #========================================#
         hostname > host.info
         grep 'Linux' /etc/issue >> host.info
@@ -235,7 +235,7 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
         free -g >> host.info
         ulimit -a >> host.info
         echo \$SLURM_NODELIST >> host.info
-        echo The VASP version is \${$vasp_exe} >> host.info
+        echo The VASP version is $vasp_exe >> host.info
 
         #========================================#
         # 5. VASP run
@@ -243,11 +243,11 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
         """)
         if num_gpu == 0
             print(outfile, """
-            srun \${$vasp_exe} > vasp.log
+            srun $vasp_exe > vasp.log
             """)
         else
             print(outfile, """
-            orterun --map-by ppr:$num_gpu:node --bind-to core -np $num_gpu \${$vasp_exe} > vasp.log
+            orterun --map-by ppr:$num_gpu:node --bind-to core -np $num_gpu $vasp_exe > vasp.log
             """)
         end
     end
