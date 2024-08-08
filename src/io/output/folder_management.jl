@@ -64,14 +64,14 @@ Create subdirectories for supercell configurations extracted from an XDATCAR fil
 - `poscar_path::String`: The file path to the POSCAR file containing lattice information and atomic positions.
 - `N::Int`: The number of configurations to extract and create subdirectories for.
 - `method::String="random"`: The method for selecting configurations. "random" selects configurations randomly,
-  while "equal" selects them evenly spaced along the XDATCAR trajectory.
+  while "uniform" selects them evenly spaced along the XDATCAR trajectory.
 - `Nmin::Int=1`: The minimum index of configurations to consider. Defaults to 1.
 """
 function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
     poscar = read_poscar(poscar_path)
     lattice, configs = read_xdatcar(xdatcar_path)
     Nmax = size(configs, 3)
-    inds = lowercase(method[1]) == 'e' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
+    inds = lowercase(method[1]) == 'u' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
     write_to_file(inds, path*"config_inds")
     for (k, ind) in enumerate(inds)
         mkdir(path*"snap_$k")
