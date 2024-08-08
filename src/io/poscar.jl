@@ -51,7 +51,7 @@ function read_poscar(poscar)
     end
 
     # Atom names and numbers
-    if length(atom_names) ≠ length(atom_numbers)
+    if length(lines[6]) ≠ length(lines[7])
         throw("Length of atom_names and atom_numbers not equal, check your POSCAR!")
     end
     atom_names = lines[6]
