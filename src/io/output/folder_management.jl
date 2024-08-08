@@ -1,14 +1,16 @@
 """
-    convergence_create_subdirectories(param, param_range; path="./")
+    convergence_create_subdirectories(param::AbstractString, param_range::AbstractArray; path::AbstractString="./", verbose::Bool=false, method::AbstractString="none")
 
-Creates subdirectories for a parameter convergence study and copies necessary VASP input files into each subdirectory.
+Create subdirectories for convergence testing by varying a specified parameter and copying the necessary VASP input files.
 
 # Arguments
-- `param::String`: The parameter to be varied for the convergence study.
-- `param_range::AbstractVector`: A range or array of parameter values to be used for the subdirectories.
-- `path::String`: The base path where the subdirectories will be created. Defaults to `"./"`.
+- `param::AbstractString`: The parameter to vary for convergence testing (e.g., "ENCUT", "kgrid").
+- `param_range::AbstractArray`: An array of values for the specified parameter.
+- `path::AbstractString`: The base path where the subdirectories will be created. Default is `"./"`.
+- `verbose::Bool`: A boolean flag indicating whether to print detailed information during execution. Default is `false`.
+- `method::AbstractString`: The method to use for k-point grid generation. Can be `"none"`, `"gamma"`, or `"monkhorst"`. Default is `"none"`.
 """
-function convergence_create_subdirectories(param, param_range; path="./", verbose=true, method="none")
+function convergence_create_subdirectories(param, param_range; path="./", verbose=false, method="none")
     for value in param_range
         folder = param*"_"*value
         mkpath(path*folder)
@@ -19,7 +21,7 @@ function convergence_create_subdirectories(param, param_range; path="./", verbos
             copy_vasp_input(path, folder, ignore=["KPOINTS"])
         else
             copy_vasp_input(path, folder, ignore=["INCAR"])
-            set_keyword_in_incar!(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+            set_key_in_incar(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
         end
     end
 end
@@ -34,7 +36,7 @@ and adjusting INCAR settings.
 - `path::String`: The directory where the VASP input files are located.
 - `kpoint_files::String`: A string containing two KPOINTS filenames for the "scf" and "nscf" calculations respectively.
 """
-function nscf_create_subdirectories(path, kpoints; verbose=true)
+function nscf_create_subdirectories(path, kpoints; verbose=false)
     for folder in ["scf", "nscf"]
         mkdir(path*folder)
         copy_vasp_input(path, folder, ignore=["KPOINTS"])
@@ -42,13 +44,13 @@ function nscf_create_subdirectories(path, kpoints; verbose=true)
     kpoint_files = split_line(kpoints, char=',')
     cp(path*kpoint_files[1], path*"scf/KPOINTS"); cp(path*kpoint_files[2], path*"nscf/KPOINTS") # TODO: write kpoint file with from kpath argument?
 
-    remove_keyword_from_incar!("LCHARG", path*"scf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("ISTART", "0", path*"scf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("LCHARG", "True", path*"scf/INCAR", verbose=verbose)
+    remove_key_from_incar("LCHARG", path*"scf/INCAR", verbose=verbose)
+    set_key_in_incar("ISTART", "0", path*"scf/INCAR", verbose=verbose)
+    set_key_in_incar("LCHARG", "True", path*"scf/INCAR", verbose=verbose)
 
-    remove_keyword_from_incar!("ISTART", path*"nscf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("ICHARG", "11", path*"nscf/INCAR", verbose=verbose)
-    set_keyword_in_incar!("LCHARG", "False", path*"nscf/INCAR", verbose=verbose)
+    remove_key_from_incar("ISTART", path*"nscf/INCAR", verbose=verbose)
+    set_key_in_incar("ICHARG", "11", path*"nscf/INCAR", verbose=verbose)
+    set_key_in_incar("LCHARG", "False", path*"nscf/INCAR", verbose=verbose)
 end
 
 """
