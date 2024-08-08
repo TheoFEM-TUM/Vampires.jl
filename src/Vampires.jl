@@ -1,15 +1,17 @@
 module Vampires
 
-using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra
+using OrderedCollections, ArgParse, Plots, BenchmarkTools, CSV, LinearAlgebra, StatsBase
 
 include("io/read_utils.jl")
+
 # input
-include("io/input/eigenval.jl"); include("io/input/doscar.jl"); include("io/input/poscar.jl"); include("io/input/xdatcar.jl")
-include("io/input/incar.jl"); include("io/input/incar_tags.jl"); include("io/input/incar_blocks.jl");include("io/input/outcar.jl")
-include("io/input/w90_hr.jl")
+include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
+include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
+include("io/outcar.jl")
+include("io/w90_hr.jl")
 
 # output
-include("io/output/incar.jl"); include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl"); 
+include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl"); 
 include("io/output/kpoints.jl")
 
 # calculations
@@ -29,12 +31,14 @@ include("tasks/kpoint_tasks.jl")
 
 include("cli_interface.jl")
 
-export read_eigenval, read_doscar, read_incar, set_keyword!, write_incar, Poscar, read_poscar, write_poscar, read_xdatcar
-export get_value_for_keyword, change_incar!, read_value_from_outcar, add_incar_block!, rm_incar_block!, remove_keyword!
+export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar
+export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
+export add_incar_block!, rm_incar_block!
+export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
 export plot_bandstructure, plot_value_convergence
 
-export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders
+export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy
 export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell
 export compute_dos, convert_kspacing_to_kgrid
