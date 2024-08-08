@@ -16,9 +16,8 @@ makedocs(
         "Manual" => [
             "man/install.md",
             "man/cli_interface.md",
-            "tasks.md",
-            "man/examples.md"
+            "man/examples.md",
+            "man/library.md"
         ],
-        "tasks.md"
     ]
 )
