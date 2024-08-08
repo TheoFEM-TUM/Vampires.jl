@@ -1,12 +1,14 @@
 """
-    convergence_create_subdirectories(param, param_range; path="./")
+    convergence_create_subdirectories(param::AbstractString, param_range::AbstractArray; path::AbstractString="./", verbose::Bool=false, method::AbstractString="none")
 
-Creates subdirectories for a parameter convergence study and copies necessary VASP input files into each subdirectory.
+Create subdirectories for convergence testing by varying a specified parameter and copying the necessary VASP input files.
 
 # Arguments
-- `param::String`: The parameter to be varied for the convergence study.
-- `param_range::AbstractVector`: A range or array of parameter values to be used for the subdirectories.
-- `path::String`: The base path where the subdirectories will be created. Defaults to `"./"`.
+- `param::AbstractString`: The parameter to vary for convergence testing (e.g., "ENCUT", "kgrid").
+- `param_range::AbstractArray`: An array of values for the specified parameter.
+- `path::AbstractString`: The base path where the subdirectories will be created. Default is `"./"`.
+- `verbose::Bool`: A boolean flag indicating whether to print detailed information during execution. Default is `false`.
+- `method::AbstractString`: The method to use for k-point grid generation. Can be `"none"`, `"gamma"`, or `"monkhorst"`. Default is `"none"`.
 """
 function convergence_create_subdirectories(param, param_range; path="./", verbose=false, method="none")
     for value in param_range
