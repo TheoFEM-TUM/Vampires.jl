@@ -29,7 +29,9 @@ The function assumes that the `task` function accepts the `subtask` function and
 """
 function run_task_recursive(task, subtask, args)
     base_path = args["p"]
-    for folder in readfolders(base_path)
+    recursive_path = args["recp"]
+    folders = filter(x -> occursin(Regex(recursive_path), x), readfolders(base_path))
+    for folder in folders
         args["p"] = joinpath(base_path, folder * "/")
         values = run_task(task, subtask, args)
         if typeof(values) <: AbstractVector

@@ -91,6 +91,10 @@ function parse_commandline()
         "-v"
             help = "if true, Vampires are verbose."
             action = :store_true
+        "--recp"
+            help = "regular expression that filters the subdirectories used during a recursive task"
+            arg_type = String
+            default = ""
         "--par"
             help = "define a parameter that is to be adapted"
             arg_type = String
