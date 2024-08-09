@@ -6,13 +6,13 @@ include("io/test_read_utils.jl")
 
 @testset "io" begin
     include("io/test_incar_line.jl")
-    include("io/input/test_incar.jl")
-    include("io/input/test_eigenval.jl")
-    include("io/input/test_doscar.jl")
-    include("io/input/test_poscar.jl")
-    include("io/input/test_xdatcar.jl")
-    include("io/input/test_outcar.jl")
-    include("io/input/test_extended_config.jl")
+    include("io/test_incar.jl")
+    include("io/test_eigenval.jl")
+    include("io/test_doscar.jl")
+    include("io/test_poscar.jl")
+    include("io/test_xdatcar.jl")
+    include("io/test_outcar.jl")
+    include("io/test_extended_config.jl")
 end
 
 @testset "io/output" begin
