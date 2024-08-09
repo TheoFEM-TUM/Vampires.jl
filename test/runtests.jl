@@ -4,12 +4,13 @@ global test_file_path = string(@__DIR__) * "/test_files/"
 
 include("io/test_read_utils.jl")
 
-@testset "io/input" begin
+@testset "io" begin
+    include("io/test_incar_line.jl")
+    include("io/input/test_incar.jl")
     include("io/input/test_eigenval.jl")
     include("io/input/test_doscar.jl")
     include("io/input/test_poscar.jl")
     include("io/input/test_xdatcar.jl")
-    include("io/input/test_incar.jl")
     include("io/input/test_outcar.jl")
     include("io/input/test_extended_config.jl")
 end

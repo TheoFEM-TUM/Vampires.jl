@@ -24,7 +24,7 @@ Create directories for parameter testing and copy necessary files into each dire
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
     if length(args["par"]) > 0 
-        set_keyword_in_incar!(split_line(args["par"], char=','), split_line(args["val"], char=','), args["p"]*args["incar"], out=args["p"]*args["incar"], block_label=args["block"])
+        set_key_in_incar(split_line(args["par"], char=','), split_line(args["val"], char=','), args["p"]*args["incar"], out=args["p"]*args["incar"], block_label=args["block"])
     elseif length(args["block"]) > 0
         add_block_to_incar!(split_line(args["block"], char=','), args["p"]*args["incar"])
     end
@@ -36,7 +36,7 @@ run_task(::Type{Val{:addincar}}, subtask, args) = run_task(Val{Symbol("incar")},
 
 function run_task(::Type{Val{:rm}}, ::Type{Val{:incar}}, args)
     if length(args["par"]) > 0 
-        remove_keyword_from_incar!(args["par"], args["p"]*args["incar"], out=args["p"]*args["incar"])
+        remove_key_from_incar(args["par"], args["p"]*args["incar"], out=args["p"]*args["incar"])
     elseif length(args["block"]) > 0
         remove_block_from_incar!(args["block"], args["p"]*args["incar"])
     end
@@ -53,17 +53,17 @@ run_task(::Type{Val{:whatis}}, subtask, args) = run_task(Val{Symbol("incar")}, V
 
 function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
     incar = read_incar(args["p"]*args["incar"])
-    for keyword in split_line(args["par"], char=',')
-        value = get_value_for_keyword(keyword, incar)
-        println("The value of $keyword is: $value")
+    for key in split_line(args["par"], char=',')
+        value = find_value(incar, key).value
+        println("The value of $key is: $value")
     end
 end
 
 function run_task(::Type{Val{:incar}}, ::Type{Val{:create}}, args)
     incar = OrderedDict{String, Vector{IncarLine}}()
     if length(args["par"]) > 0
-        for keyword in split_line(args["par"], char=',')
-            set_keyword!(keyword, get_default_for_keyword(keyword), incar, block_label=args["block"])
+        for key in split_line(args["par"], char=',')
+            set_key!(incar, key, get_default_for_keyword(key), block_label=args["block"])
         end
     elseif length(args["block"]) > 0
         add_incar_block!(split_line(args["block"], char=','), incar)

@@ -8,7 +8,7 @@ A structure to represent the data contained in a VASP POSCAR file.
 - `lattice::Array{Float64, 2}`: A 3x3 array representing the lattice vectors.
 - `atom_names::Array{AbstractString, 1}`: An array of atom names.
 - `atom_numbers::Array{Int64, 1}`: An array of the number of each type of atom.
-- `Rs::Array{Float64, 2}`: A 3xNion array of atomic positions.
+- `rs_atom::Array{Float64, 2}`: A 3xNion array of atomic positions.
 - `atom_types::Array{String, 1}`: An array of atom types corresponding to each atom position.
 """
 struct Poscar
@@ -51,10 +51,12 @@ function read_poscar(poscar)
     end
 
     # Atom names and numbers
+    if length(lines[6]) ≠ length(lines[7])
+        throw("Length of atom_names and atom_numbers not equal, check your POSCAR!")
+    end
     atom_names = lines[6]
     atom_numbers = parse.(Int64, lines[7])
-    if !(length(atom_names) == length(atom_numbers))
-        @info "Length of atom_names and atom_numbers not equal!"; end
+    
     atom_types = String[]
     for (k, atom_number) in enumerate(atom_numbers), _ in 1:atom_number
         push!(atom_types, atom_names[k])

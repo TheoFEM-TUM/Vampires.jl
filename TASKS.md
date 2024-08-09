@@ -30,7 +30,8 @@ kpoints
 
 ```
 supercell
-    create: create a supercell POSCAR file from an existing POSCAR file
+    make: create a supercell POSCAR file from an existing POSCAR file
+    sample: create folders that each contains one snapshot from an XDATCAR file and other VASP input files
 ```
 
 ```
