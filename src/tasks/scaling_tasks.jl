@@ -13,7 +13,7 @@ weak_scaling
 """
 
 
-function run_task(task::Union{Type{Val{:strong_scaling}}, Type{Val{:weak_scaling}}}, subtask, args)
+function run_task(task::Union{Type{Val{:strong_scaling}}, Type{Val{:weak_scaling}}}, subtask::Union{Type{Val{:cpu}}, Type{Val{:gpu}}}, args)
     keyword = string(subtask.parameters[1])
     if args["ext_par_file"] == "none"; throw("Tasks preparing slurm scripts require a parameter file."); end
     extended_args = read_config(args["ext_par_file"])[args["block"]]

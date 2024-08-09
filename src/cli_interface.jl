@@ -36,7 +36,7 @@ exec_name bandgap --p=./path/to/files --eigenval=EIGENVAL
 function main()
     time = @elapsed begin
         @time args = parse_commandline()
-    
+
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
         subtask = Val{Symbol(args["subtask"])}
@@ -91,10 +91,6 @@ function parse_commandline()
         "-v"
             help = "if true, Vampires are verbose."
             action = :store_true
-        "--recp"
-            help = "regular expression that filters the subdirectories used to rua a recursive task"
-            arg_type = String
-            default = ""
         "--par"
             help = "define a parameter that is to be adapted"
             arg_type = String
@@ -111,6 +107,10 @@ function parse_commandline()
             help = "set the default path"
             arg_type = String
             default = "./"
+        "--recp"
+            help = "regular expression that filters the subdirectories used to run a recursive task"
+            arg_type = String
+            default = ""
         "--o"
             help = "set the output (file-) name"
             arg_type = String

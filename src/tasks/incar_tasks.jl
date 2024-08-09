@@ -6,7 +6,7 @@ incar
     rm: remove a certain tag or block from the INCAR file.
     read: read the value of a certain INCAR tag and print it
     create: create an INCAR file with certain tags or blocks in it
-    whatis: return the default comment for an INCAR tag. 
+    whatis: return the default comment for an INCAR tag.
 whatis
     return the default comment for an INCAR tag.
 """
@@ -23,7 +23,7 @@ Create directories for parameter testing and copy necessary files into each dire
 - `path::AbstractString="./"`: The base path where the directories and files are located. Default is the current directory.
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
-    if length(args["par"]) > 0 
+    if length(args["par"]) > 0
         set_key_in_incar(split_line(args["par"], char=','), split_line(args["val"], char=','), args["p"]*args["incar"], out=args["p"]*args["incar"], block_label=args["block"])
     elseif length(args["block"]) > 0
         add_block_to_incar!(split_line(args["block"], char=','), args["p"]*args["incar"])
@@ -35,7 +35,7 @@ run_task(::Type{Val{:incar}}, ::Type{Val{:add}}, args) = run_task(Val{Symbol("in
 run_task(::Type{Val{:addincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 
 function run_task(::Type{Val{:rm}}, ::Type{Val{:incar}}, args)
-    if length(args["par"]) > 0 
+    if length(args["par"]) > 0
         remove_key_from_incar(args["par"], args["p"]*args["incar"], out=args["p"]*args["incar"])
     elseif length(args["block"]) > 0
         remove_block_from_incar!(args["block"], args["p"]*args["incar"])
