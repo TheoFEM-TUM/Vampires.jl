@@ -82,7 +82,7 @@ function run_task(::Type{Val{:strong_scaling}}, ::Type{Val{:plot}}, args)
     if length(gpu_folders) > 0 && length(cpu_folders) > 0
         index = parse(Int, args["N"])
         index = index > 0 ? index : 2
-        plot_strong_scaling_bars(core_n, cpu_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n, type="gpu", title="Strong scaling VASP ", figure_filename="gpu_cpu_plot.png", index=index)
+        plot_strong_scaling_bars(core_n, cpu_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n, type="mixed", title="Strong scaling VASP ", figure_filename="gpu_cpu_plot.png", index=index)
     end
 
 end
