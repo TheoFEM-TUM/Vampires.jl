@@ -45,5 +45,5 @@ function plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_a
     core_n = vcat([core_n[end]], gpu_n)
     avg_time_scf_step_n = vcat([core_avg_time_scf_step_n[end]], gpu_avg_time_scf_step_n)
     xticks = vcat(["CPU"], string.(core_n[2:end]) .* " GPU" )
-    strong_scaling_bar_plot(core_n, avg_time_scf_step_n; type=type, title=title, figure_filename=figure_filename, xticks=xticks)
+    plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type=type, title=title, figure_filename=figure_filename, xticks=xticks)
 end
