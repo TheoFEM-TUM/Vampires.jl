@@ -14,7 +14,7 @@ Read values associated with a parameter from a file.
 - `param_values::Vector{type}`: A vector of values of the specified type associated with the parameter found in the file.
 
 # Description
-This function reads a file line-by-line and searches for lines containing the specified parameter `param`. 
+This function reads a file line-by-line and searches for lines containing the specified parameter `param`.
 It extracts the values associated with the parameter from each line, converts them to the specified `type`, and collects them in a vector.
 """
 function read_value_from_outcar(param, file; type=Float64, line_mode="first")::Vector

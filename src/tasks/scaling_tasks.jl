@@ -47,3 +47,40 @@ function run_task(task::Union{Type{Val{:strong_scaling}}, Type{Val{:weak_scaling
                                              omp_num_threads=omp_num_threads, mail=mail)
     end
 end
+
+
+function run_task(::Type{Val{:strong_scaling}}, ::Type{Val{:plot}}, args)
+    base_path = args["p"]
+    folders = filter(x -> occursin("strong_scaling", x), readfolders(base_path))
+    cpu_folders = sort(filter(x -> occursin("_core", x), folders))
+    gpu_folders = sort(filter(x -> occursin("_gpu", x), folders))
+    outcar_name = args["outcar"]
+    if length(cpu_folders) > 0
+        core_n = []
+        cpu_avg_time_scf_step_n = []
+        for folder in cpu_folders
+            outcar_path = base_path*folder*outcar_name
+            loops = read_value_from_outcar("LOOP", outcar_path; type=Float64, line_mode="first")
+            push!(cpu_avg_time_scf_step_n, mean(loops))
+            cores = parse(Int, split(folder, "_")[3])
+            push!(core_n, cores)
+        end
+        strong_scaling_bar_plot(core_n, cpu_avg_time_scf_step_n; type="cpu", title="Strong scaling VASP - CPU", figure_filename="pcpu_lot.png")
+    end
+    if length(gpu_folders) > 0
+        gpu_n = []
+        gpu_avg_time_scf_step_n = []
+        for folder in gpu_folders
+            outcar_path = base_path*folder*outcar_name
+            loops = read_value_from_outcar("LOOP", outcar_path; type=Float64, line_mode="first")
+            push!(gpu_avg_time_scf_step_n, mean(loops))
+            gpus = parse(Int, split(folder, "_")[3])
+            push!(gpu_n, gpus)
+        end
+        strong_scaling_bar_plot(gpu_n, gpu_avg_time_scf_step_n, type="gpu", title="Strong scaling VASP - GPU", figure_filename="gpu_plot.png")
+    end
+    if length(gpu_folders) > 0 && length(cpu_folders) > 0
+        strong_scaling_bar_plot(core_n, cpu_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n, type="gpu", title="Strong scaling VASP ", figure_filename="gpu_cpu_plot.png")    
+    end
+
+end
