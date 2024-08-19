@@ -31,7 +31,7 @@ function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title
 
     # Add speedup text on top of each bar
     for (i, s) in enumerate(speedup)
-        annotate!(x_values[i], s, text("$(round(Int, s))x", :black, :bottom, 10))
+        annotate!(x_values[i], s, text("$(round(s, digits=1)) x", :black, :bottom, 10))
     end
 
     # Add plot title and customize ticks
