@@ -3,7 +3,7 @@ function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title
     speedup = avg_time_scf_step_n[1] ./ avg_time_scf_step_n
 
     # Set the color and x-axis label based on the type
-    bar_color = type == "gpu" ? RGB(0.0, 0.60, 0.50) : RGB(0.35, 0.70, 0.90)
+    bar_color = type == "gpu" ? RGB(0.0, 0.60, 0.50) : type=="mixed" ? vcat([RGB(0.35, 0.70, 0.90)], repeat([RGB(0.0, 0.60, 0.50)], length(speedup)-1)) : RGB(0.35, 0.70, 0.90)
     x_label = type == "gpu" ? "Number of GPUs" : type == "mixed" ? "" : "Number of Cores"
 
 
@@ -41,9 +41,9 @@ function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title
 end
 
 
-function plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n; type="mixed", title="Strong scaling VASP", figure_filename="plot.png")
-    core_n = vcat([core_n[end]], gpu_n)
-    avg_time_scf_step_n = vcat([core_avg_time_scf_step_n[end]], gpu_avg_time_scf_step_n)
+function plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n; type="mixed", title="Strong scaling VASP", figure_filename="plot.png", index=2)
+    core_n = vcat([core_n[index]], gpu_n)
+    avg_time_scf_step_n = vcat([core_avg_time_scf_step_n[index]], gpu_avg_time_scf_step_n)
     xticks = vcat(["CPU"], string.(core_n[2:end]) .* " GPU" )
     plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type=type, title=title, figure_filename=figure_filename, xticks=xticks)
 end
