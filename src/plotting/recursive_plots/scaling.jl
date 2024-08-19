@@ -38,7 +38,6 @@ function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title
     title!(title)
     ylims!(0, maximum(speedup) * 1.2)  # Adjust y-axis limits for better text visibility
     savefig(figure_filename)
-    display(p)
 end
 
 
