@@ -59,7 +59,7 @@ function run_task(::Type{Val{:strong_scaling}}, ::Type{Val{:plot}}, args)
         core_n = []
         cpu_avg_time_scf_step_n = []
         for folder in cpu_folders
-            outcar_path = base_path*folder*outcar_name
+            outcar_path = base_path*folder*"/"*outcar_name
             loops = read_value_from_outcar("LOOP", outcar_path; type=Float64, line_mode="first")
             push!(cpu_avg_time_scf_step_n, mean(loops))
             cores = parse(Int, split(folder, "_")[3])
@@ -71,7 +71,7 @@ function run_task(::Type{Val{:strong_scaling}}, ::Type{Val{:plot}}, args)
         gpu_n = []
         gpu_avg_time_scf_step_n = []
         for folder in gpu_folders
-            outcar_path = base_path*folder*outcar_name
+            outcar_path = base_path*folder*"/"*outcar_name
             loops = read_value_from_outcar("LOOP", outcar_path; type=Float64, line_mode="first")
             push!(gpu_avg_time_scf_step_n, mean(loops))
             gpus = parse(Int, split(folder, "_")[3])
@@ -80,7 +80,7 @@ function run_task(::Type{Val{:strong_scaling}}, ::Type{Val{:plot}}, args)
         strong_scaling_bar_plot(gpu_n, gpu_avg_time_scf_step_n, type="gpu", title="Strong scaling VASP - GPU", figure_filename="gpu_plot.png")
     end
     if length(gpu_folders) > 0 && length(cpu_folders) > 0
-        strong_scaling_bar_plot(core_n, cpu_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n, type="gpu", title="Strong scaling VASP ", figure_filename="gpu_cpu_plot.png")    
+        strong_scaling_bar_plot(core_n, cpu_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n, type="gpu", title="Strong scaling VASP ", figure_filename="gpu_cpu_plot.png")
     end
 
 end
