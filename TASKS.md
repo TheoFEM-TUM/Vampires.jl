@@ -18,7 +18,7 @@ incar
     rm: remove a certain tag or block from the INCAR file.
     read: read the value of a certain INCAR tag and print it
     create: create an INCAR file with certain tags or blocks in it
-    whatis: return the default comment for an INCAR tag. 
+    whatis: return the default comment for an INCAR tag.
 whatis
     return the default comment for an INCAR tag.
 ```
