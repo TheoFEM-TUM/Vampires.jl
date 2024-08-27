@@ -151,6 +151,10 @@ function parse_commandline()
             help = "set the name of the kpoints file"
             arg_type = String
             default = "KPOINTS"
+        "--exclude"
+            help = "task dependent exclude parameter"
+            arg_type = String
+            default = "none"
         "--vasp_exe"
             help = "set the name of the VASP executable"
             arg_type = String

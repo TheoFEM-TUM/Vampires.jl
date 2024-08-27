@@ -54,6 +54,9 @@ end
 function run_task(::Type{Val{:strong_scaling}}, ::Type{Val{:plot}}, args)
     base_path = args["p"]
     folders = filter(x -> occursin("strong_scaling", x), readfolders(base_path))
+    if args["exclude"] != "none"
+        folders = filter(x -> !occursin(args["exclude"], x), folders)
+    end
     cpu_folders = sort(filter(x -> occursin("_core", x), folders))
     gpu_folders = sort(filter(x -> occursin("_gpu", x), folders))
     outcar_name = args["outcar"]

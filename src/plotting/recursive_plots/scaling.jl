@@ -10,7 +10,7 @@ function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title
 
     # Add speedup text on top of each bar
     for (i, s) in enumerate(speedup)
-        annotate!(1:length(core_n)[i], s, text("$(round(s, digits=1)) x", :black, :bottom, 10))
+        annotate!(i, s, text("$(round(s, digits=1)) x", :black, :bottom, 10))
     end
     savefig(figure_filename)
 end
@@ -19,6 +19,6 @@ end
 function plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n; type="mixed", title="Strong scaling VASP", figure_filename="plot.png", index=2)
     core_n = vcat([core_n[index]], gpu_n)
     avg_time_scf_step_n = vcat([core_avg_time_scf_step_n[index]], gpu_avg_time_scf_step_n)
-    xticks = vcat(["CPU"], string.(core_n[2:end]) .* " GPU" )
+    xticks = type == "mixed" ? vcat(["CPU"], string.(core_n[2:end]) .* " GPU" ) : string.(core_n)
     plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type=type, title=title, figure_filename=figure_filename, xticks=xticks)
 end
