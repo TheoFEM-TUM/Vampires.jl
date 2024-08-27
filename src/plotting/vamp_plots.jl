@@ -1,4 +1,4 @@
-function plot_bars(xval, yval, xlab, ylab, bar_color, ymin, ymax)
+function plot_bars(xval, yval, xlab, ylab, xticks, bar_color, ymin, ymax; title="")
 
   # Adjust x values for equidistant bars
   xval_equi = 1:length(xval)
@@ -23,7 +23,7 @@ function plot_bars(xval, yval, xlab, ylab, bar_color, ymin, ymax)
   )
 
   # Add plot title and customize ticks
-  title!(title)
+  if title != ""; title!(title); end
   ylims!(ymin, ymax)  # Adjust y-axis limits for better text visibility
 
   return p
