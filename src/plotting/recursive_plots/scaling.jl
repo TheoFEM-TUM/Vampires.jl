@@ -6,7 +6,7 @@ function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title
     bar_color = type == "gpu" ? vamp_colors["Bluish Green"] : type=="mixed" ? vcat([vamp_colors["Sky Blue"]], repeat([vamp_colors["Bluish Green"]], length(speedup)-1)) : vamp_colors["Sky Blue"]
     xlab = type == "gpu" ? "Number of GPUs" : type == "mixed" ? "" : "Number of Cores"
 
-    p = plot_bars(core_n, speedup, xlab, ylab, bar_color, 0, maximum(speedup) * 1.2)
+    p = plot_bars(core_n, speedup, xlab, "Speedup", bar_color, 0, maximum(speedup) * 1.2)
 
     # Add speedup text on top of each bar
     for (i, s) in enumerate(speedup)
