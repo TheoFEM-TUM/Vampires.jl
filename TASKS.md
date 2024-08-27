@@ -64,7 +64,7 @@ strong_scaling
     gpu: create a folder structure with slurm files to analyze GPU scaling in VASP
         example: `strong_scaling gpu --N 1 --nsim 24,24,24,24 --kpar 1,2,3,4 --p ./ --ext_par_file ./extended_parameter_file --block batch_file_gpu`
     plot: collects and plots the scaling task output in the current directory and subdirectories; the option `--N` selects the n-th CPU scaling tasks that is compared to the GPU runs in a seperate plot
-        example: `strong scaling plot --N 2`
+        example: `strong_scaling plot --N 2`
 
 weak_scaling
     cpu: create a folder structure with slurm files to analyze weak CPU scaling in VASP
