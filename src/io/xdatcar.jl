@@ -1,7 +1,7 @@
 """
     read_xdatcar(xdatcar::AbstractString) -> Xdatcar
 
-Read the configurations in the `xdatcar` file and store them in an `Xdatcar` object.
+Read the configurations in the `xdatcar` file and return the lattice vectors and configurations.
 
 # Arguments
 - `xdatcar::AbstractString`: The path to the XDATCAR file.
@@ -46,7 +46,7 @@ end
 """
     read_xdatcar_npt(xdatcar::AbstractString) -> Tuple{Array{Float64, 3}, Array{Float64, 3}}
 
-Read the configurations in the `xdatcar` file and return the lattice vectors and configurations.
+Read the configurations in the `xdatcar` file from an NPT simulation (lattice vectors change) and return the lattice vectors and configurations.
 
 # Arguments
 - `xdatcar::AbstractString`: The path to the XDATCAR file.
