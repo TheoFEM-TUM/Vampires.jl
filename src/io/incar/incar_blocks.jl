@@ -46,8 +46,8 @@ Remove a block of settings from an INCAR object.
 - `block_label::String`: The label identifying the block of settings to be removed.
 """
 function rm_incar_block!(incar::Incar, block_label::String)
-    if haskey(incar, block_label)
-        block_label, isW90 = findkey(incar, key)
+    incar_hasblock, isW90 = hasblock(incar, block_label)
+    if incar_hasblock
         if isW90
             delete!(incar.w90, block_label)
         else

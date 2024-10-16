@@ -91,12 +91,10 @@ end
 Checks if a specified key exists in the `Incar` object.
 
 # Arguments
-
 - `incar::Incar`: An `Incar` object containing `vasp` and `w90` dictionaries.
 - `key::String`: The key to search for within the `vasp` and `w90` dictionaries of the `Incar` object.
 
 # Returns
-
 - `Bool`: Returns `true` if the key is found in either the `vasp` or `w90` dictionaries of the `Incar` object, otherwise returns `false`.
 """
 function Base.haskey(incar::Incar, key::AbstractString)
@@ -107,17 +105,39 @@ function Base.haskey(incar::Incar, key::AbstractString)
 end
 
 """
+    hasblock(incar::Incar, block_label) -> (Bool, Bool)
+
+Check whether a specific block is present in the given `Incar` structure.
+
+# Arguments
+- `incar::Incar`: The `Incar` object, which contains fields `vasp` and `w90` representing different configurations.
+- `block_label`: A string or symbol representing the label of the block to be checked.
+
+# Returns
+- A tuple `(Bool, Bool)` where:
+    - The first value is `true` if the block is found in either the `vasp` or `w90` fields of `Incar`.
+    - The second value is `true` if the block is found specifically in the `w90` field, and `false` if it's found only in `vasp`.
+"""
+function hasblock(incar::Incar, block_label)
+    if haskey(incar.vasp, block_label)
+        return true, false
+    elseif haskey(incar.w90, block_label)
+        return true, true
+    else
+        return false, false
+    end
+end
+
+"""
     findkey(incar::Incar, key) -> Tuple{Union{Nothing, String}, Bool}
 
 Finds the block label in which a specified key exists within the `Incar` object.
 
 # Arguments
-
 - `incar::Incar`: An `Incar` object containing `vasp` and `w90` dictionaries.
 - `key::String`: The key to search for within the `vasp` and `w90` dictionaries of the `Incar` object.
 
 # Returns
-
 - `Tuple{Union{Nothing, String}, Bool}`: A tuple where the first element is either the block label containing the key or `nothing` if the key is not found. The second element is a boolean indicating whether the key was found in the `w90` dictionary (`true`) or the `vasp` dictionary (`false`).
 """
 function findkey(incar::Incar, key::AbstractString)
