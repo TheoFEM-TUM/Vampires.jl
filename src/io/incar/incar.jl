@@ -115,14 +115,14 @@ Check whether a specific block is present in the given `Incar` structure.
 
 # Returns
 - A tuple `(Bool, Bool)` where:
-    - The first value is `true` if the block is found in either the `vasp` or `w90` fields of `Incar`.
-    - The second value is `true` if the block is found specifically in the `w90` field, and `false` if it's found only in `vasp`.
+    - The first value is `true` if the block is found in the `vasp` fields of `Incar`.
+    - The second value is `true` if the block is found in the `w90` field.
 """
 function hasblock(incar::Incar, block_label)
     if haskey(incar.vasp, block_label)
         return true, false
     elseif haskey(incar.w90, block_label)
-        return true, true
+        return false, true
     else
         return false, false
     end
