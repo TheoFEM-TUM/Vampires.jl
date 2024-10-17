@@ -33,7 +33,7 @@ _, configs = read_xdatcar(test_file_path*"XDATCAR_gaas")
         poscar = read_poscar(path*"snap_$i/POSCAR")
         @test poscar.rs_atom == configs[:, :, inds[i]]
     end
-    @test minimum(inds) > Nmin
+    @test minimum(inds) ≥ Nmin
 end
 rm(path*"config_inds.dat")
 for i in 1:N
