@@ -147,6 +147,10 @@ function parse_commandline()
             help = "set the name of the kpoints file"
             arg_type = String
             default = "KPOINTS"
+        "--w90_hr"
+            help = "set the name of the *_hr.dat file"
+            arg_type = String
+            default = "wannier90_hr.dat"
         "--vasp_exe"
             help = "set the name of the VASP executable"
             arg_type = String

@@ -28,6 +28,7 @@ include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/calculation_task.jl"); include("tasks/plot_task.jl"); include("tasks/convergence_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/run_script.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl")
+include("tasks/w90_tasks.jl")
 
 include("cli_interface.jl")
 
