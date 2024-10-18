@@ -7,7 +7,7 @@ calculation
 
 ```
 convergence
-    create: creates the folder structure where the specified parameter is changed in the different subdirectories
+    make: creates the folder structure where the specified parameter is changed in the different subdirectories
     read: reads a specific output (e.g., energy) from a convergence test
     plot: plots a specific output (e.g., TOTEN) vs folder seed (e.g., ENCUT)
 ```
