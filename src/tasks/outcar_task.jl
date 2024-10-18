@@ -10,8 +10,25 @@ outcar
 reads last value in OUTCAR of parameter for each directory
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
-    values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
-    return values
+    param = args["par"]
+    output_filename = args["o"]
+
+    if occursin("h5", output_filename) && param == "eigenvalues"
+        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
+        write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
+        println("Data for $param was saved to $output_filename.")
+    elseif occursin("h5", output_filename) && param == "forces"
+        positions, forces = read_forces_from_outcar(args["p"]*args["outcar"])
+        write_data_to_hdf5(output_filename, ["positions", "forces"], [positions, forces])
+        println("Data for $param was saved to $output_filename.")
+    else
+        values = read_value_from_outcar(param, args["p"]*args["outcar"])
+        value = strip(string(values), ['[', ']'])
+        if !args["r"]
+            println("The value(s) for $param is $value")
+        end
+        return values
+    end
 end
 
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
