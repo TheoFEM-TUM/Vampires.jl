@@ -68,3 +68,8 @@ run_script
     make: creates a bash script that runs vasp in a specific folder
 ```
 
+```
+w90_hr
+    read: read the W90 Hamiltonian from the *_hr.dat file
+```
+
