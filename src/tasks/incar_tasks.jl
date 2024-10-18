@@ -181,7 +181,7 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
     if length(args["par"]) > 0 
         set_key_in_incar(split_line(args["par"], char=','), split_line(args["val"], char=','), args["p"]*args["incar"], out=args["p"]*args["incar"], block_label=args["block"])
     elseif length(args["block"]) > 0
-        add_block_to_incar!(split_line(args["block"], char=','), args["p"]*args["incar"])
+        add_block_to_incar(split_line(args["block"], char=','), args["p"]*args["incar"])
     end
 end
 run_task(::Type{Val{:setincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
