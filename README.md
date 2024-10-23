@@ -10,7 +10,10 @@
 ## How to install `Vampires.jl` in Julia
 
 * First, you need to install Julia itself from the [Julia homepage](https://julialang.org/downloads/)
-* Next, clone the git repository to your computer
+* Next, clone the git repository to your computer. For this, you need to be added as developer by one of the admins. The `git_clone_link` can be found by clicking the green `<> Code` box in the top right corner on the repos main page.
+```bash
+git clone <git_clone_link>
+```
 * Then, run the install packages script form the main package folder
 ```bash
 path=<path_to_your_bashrc> && julia vampires_install.jl --bashrc $path && source $path
