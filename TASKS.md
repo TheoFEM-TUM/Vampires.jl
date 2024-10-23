@@ -19,7 +19,7 @@ rm
     incar: remove a certain tag or block from the INCAR file.
 read
     incar: read the value of a certain INCAR tag and print it
-create
+make
     incar: create an INCAR file with certain tags or blocks in it
 whatis
     return the default comment for an INCAR tag.
@@ -44,6 +44,7 @@ nscf
 ```
 outcar
     read: read a certain value from the outcar file
+    plot: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders.
 ```
 
 ```
