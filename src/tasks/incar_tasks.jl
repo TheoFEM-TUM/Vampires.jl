@@ -7,7 +7,7 @@ rm
     incar: remove a certain tag or block from the INCAR file.
 read
     incar: read the value of a certain INCAR tag and print it
-create
+make
     incar: create an INCAR file with certain tags or blocks in it
 whatis
     return the default comment for an INCAR tag.
@@ -104,7 +104,6 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
         println("The value of $key is: $value")
     end
 end
-
 
 """
     vamp incar whatis --par <key>

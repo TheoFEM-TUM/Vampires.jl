@@ -8,6 +8,15 @@ convergence
 """
 # TODO: unify this with time series and ionic relaxation
 
+
+"""
+# CLI Commands to do convergence testing
+
+Available commands:
+* `vamp convergence make`: Create the folder structure for convergence testing.
+"""
+run_task(::Type{Val{:convergence}}, subtask, args) = nothing
+
 """
     vamp [-r] convergence make --par <parameter> --val <range> [--method <method>] [--p <path>]
 
@@ -29,6 +38,7 @@ vamp convergence make --par kgrid --val 2,3,4 --method mp
 
 # Example 3: Generate subdirectories for a logarithmic convergence test for LREAL with values True and False in a specified folder.
 vamp convergence make --par LREAL --val True,False --path lreal_tests
+```
 """
 function run_task(::Type{Val{:convergence}}, ::Type{Val{:make}}, args)
     param = args["par"]

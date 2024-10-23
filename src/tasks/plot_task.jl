@@ -6,6 +6,8 @@ plot
     dos: plots the density of states
 """
 
+
+#TODO: Unify this with file methods, i.e., vamp eigenval plot
 function run_task(::Type{Val{:bands}}, ::Type{Val{:plot}}, args)
     output_filename = args["o"]
     input_filename = args["p"] * args["eigenval"]

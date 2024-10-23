@@ -7,6 +7,17 @@ supercell
 """
 
 
+
+"""
+# CLI Commands to work with the supercells
+The following command can be used to create or work with supercells (i.e., POSCAR and XDATCAR files).
+
+Available commands:
+* `vamp supercell make`: Create an supercell POSCAR from a primitive cell poscar.
+* `vamp incar sample`: Sample configurations from an XDATCAR file and store them in individual POSCARs.
+"""
+run_task(::Type{Val{:supercell}}, subtask, args) = nothing
+
 """
     vamp supercell make --N <scaling_factors> [--poscar <file>] [--o <output_file>] [--p <path>]
 

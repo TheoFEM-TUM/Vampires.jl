@@ -6,6 +6,15 @@ nscf
 """
 
 
+
+"""
+# CLI Commands to work with the non self-consistent calculations
+
+Available commands:
+* `vamp nscf make`: Create folder structure for nscf calculations.
+"""
+run_task(::Type{Val{:nscf}}, subtask, args) = nothing
+
 """
     vamp nscf make --kpoints <kpoints_file> [--p <path>] [--vasp_exe <vasp_executable>]
 
