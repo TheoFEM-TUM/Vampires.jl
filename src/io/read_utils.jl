@@ -208,7 +208,7 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractArray{T, 3}) wher
             delete_object(file, data_key)                    
             file[data_key] = new_data_value
         else
-            new_data_value = zeros(eltype(data_values), current_size[1], current_size[2], current_size[3], current_size[4]+1)
+            new_data_value = zeros(eltype(data_value), current_size[1], current_size[2], current_size[3], current_size[4]+1)
             copyto!(new_data_value[:, :, :, 1:end-1], file[data_key])
             new_data_value[:, :, :, end] .= data_value
             delete_object(file, data_key) 
