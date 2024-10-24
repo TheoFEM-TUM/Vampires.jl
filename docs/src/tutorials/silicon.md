@@ -1,5 +1,5 @@
 # Convergence tests for silicon
-In this tutorial, you will learn the basics of performing convergence tests for the simple but relevant material silicon.
+In this tutorial, you will learn the basics of performing convergence tests for the simple but relevant material silicon. You can easily transfer the workflow to any material that you are interested in.
 
 ## Input files
 
@@ -72,4 +72,37 @@ vamp -r outcar plot --par TOTEN --o total_energy_vs_cut_off
 Next, we will do the same for the KSPACING parameter. Start at a value of 0.5 and decrease it gradually using the same commands as for ENCUT. Note how the calculation becomes more expensive as you decrease KSPACING.
 ```bash
 vamp -r outcar plot --par LOOP+ --o run_time_vs_cut_off
+```
+
+# Silicon bandstructure
+
+To calculate the bandstructure of silicon, you will need to perform to two DFT calculations. A self-consistent one to obtain a converged charge density and a non self-consistent one using the previously calculated charge density to only compute energy eigenvalues along a certain path through the Brillouin zone.
+
+This path is also defined in a `KPOINTS_bands` file:
+```
+kpoints for bandstructure L-G-X-U K-G
+ 20
+line
+reciprocal
+  0.50000  0.50000  0.50000    1
+  0.00000  0.00000  0.00000    1
+
+  0.00000  0.00000  0.00000    1
+  0.00000  0.50000  0.50000    1
+
+  0.00000  0.50000  0.50000    1
+  0.25000  0.62500  0.62500    1
+
+  0.37500  0.7500   0.37500    1
+  0.00000  0.00000  0.00000    1
+```
+
+Using the converged `KPOINTS` file from before, the `INCAR`, `POSCAR` and `POTCAR` file, we can easily set-up the folder structure with
+```bash
+vamp nscf make --kpoints KPOINTS,KPOINTS_bands
+```
+
+Let's visualize the results! You can plot the bandstructure with
+```bash 
+vamp eigenval plot --eigenval nscf/EIGENVAL
 ```

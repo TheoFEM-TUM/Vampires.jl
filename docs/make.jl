@@ -20,7 +20,7 @@ makedocs(
             "man/library.md"
         ],
         "Tutorials" => [
-            "tutorials/si_conv.md"
+            "tutorials/silicon.md"
         ],
     ]
 )
