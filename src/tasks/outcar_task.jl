@@ -110,8 +110,17 @@ vamp outcar plot --par temperature --p /path/to/ --outcar OUTCAR
 vamp -r outcar plot --par TOTEN
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
-    values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
-    plot(values)
+    output_filename = args["o"]
+    if args["par"] == "bandgap"
+        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
+        ΔEs = [get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)]
+        plot(ΔEs)
+        savefig(output_filename)
+    else
+        values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
+        plot(values)
+        savefig(output_filename)
+    end
 end
 
 function run_task_recursive(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
@@ -119,11 +128,12 @@ function run_task_recursive(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
     x_values = Float64[]
     base_path = args["p"]
     x_par_name = ""
+    param = args["par"]
     for (i, folder) in enumerate(readfolders(base_path))
         if i == 1; x_par_name = split(folder, "_")[1]; end
         args["p"] = joinpath(base_path, folder * "/")
         push!(x_values, parse(Float64, split(folder, "_")[2]))
-        y_value = read_value_from_outcar(args["par"], args["p"]*args["outcar"])[end]
+        y_value = read_value_from_outcar(param, args["p"]*args["outcar"])[end]
         push!(y_values, y_value)
     end
     inds = sortperm(x_values)

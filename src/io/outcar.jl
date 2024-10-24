@@ -28,15 +28,21 @@ function read_value_from_outcar(param, file; type=Float64, line_mode="first")::V
             for special_char in [':', '=']
                 line_ = replace(line_, special_char => ' ')
             end
-            line_after_param = split_line(line_, char=param)[2]
+            
+            # Split the line at param
+            line_split = split_line(line_, char=param)
 
-            line_elements_of_type = filter(x->x≠nothing, tryparse.(type, split_line(line_after_param)))
+             # only consider occurences where param is not at the end of the line
+            if length(line_split) > 1
+                line_after_param = split_line(line_, char=param)[2]
+
+                line_elements_of_type = filter(x->x≠nothing, tryparse.(type, split_line(line_after_param)))
             
-            
-            if line_mode == "first"
-                push!(param_values, line_elements_of_type[1])
-            elseif line_mode == "last"
-                push!(param_values, line_elements_of_type[end])
+                if line_mode == "first" && length(line_elements_of_type) > 0
+                    push!(param_values, line_elements_of_type[1])
+                elseif line_mode == "last" && length(line_elements_of_type) > 0
+                    push!(param_values, line_elements_of_type[end])
+                end
             end
         end
     end
