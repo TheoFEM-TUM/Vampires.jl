@@ -110,15 +110,17 @@ vamp outcar plot --par temperature --p /path/to/ --outcar OUTCAR
 vamp -r outcar plot --par TOTEN
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
+    param = args["par"]
     output_filename = args["o"]
-    if args["par"] == "bandgap"
+    outcar_plot = plot(title="$param plot", xlabel="Iteration", ylabel="$param", legend=false)
+    if param == "bandgap"
         kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
         ΔEs = [get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)]
-        plot(ΔEs)
+        plot!(outcar_plot, ΔEs)
         savefig(output_filename)
     else
-        values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
-        plot(values)
+        values = read_value_from_outcar(param, args["p"]*args["outcar"])
+        plot!(outcar_plot, values)
         savefig(output_filename)
     end
 end
