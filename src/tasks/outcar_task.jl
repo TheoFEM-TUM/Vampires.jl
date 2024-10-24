@@ -46,6 +46,9 @@ vamp outcar read --par NIONS
 
 # Example 4: Read a specific parameter (e.g., LOOP+) from the OUTCAR files in all subfolders.
 vamp -r outcar read --par LOOP+
+
+# Example 5: Read the bandgap from the OUTCAR file.
+vamp outcar read --par bandgap
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
     param = args["par"]
@@ -59,11 +62,24 @@ function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
         positions, forces = read_forces_from_outcar(args["p"]*args["outcar"])
         write_data_to_hdf5(output_filename, ["positions", "forces"], [positions, forces])
         println("Data for $param was saved to $output_filename.")
+    elseif param == "bandgap"
+        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
+        ΔEs = [get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)]
+        if occursin("h5", output_filename)
+            write_data_to_hdf5(output_filename, ["bandgap"], [ΔEs])
+        else
+            for (n, ΔE) in enumerate(ΔEs)
+                println("The bandgap for configuration $n is: $ΔE eV.")
+            end
+        end
     else
         values = read_value_from_outcar(param, args["p"]*args["outcar"])
         value = strip(string(values), ['[', ']'])
         if !args["r"]
             println("The value(s) for $param is $value")
+        end
+        if occursin("h5", output_filename)
+            write_data_to_hdf5(output_filename, [param], [values])
         end
         return values
     end
