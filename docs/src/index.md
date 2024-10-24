@@ -9,7 +9,8 @@
 ```@contents
 Pages = [
     "man/install.md",
-    "man/cli_interface.md"
+    "man/cli_interface.md",
+    "man/library.md
 ]
 Depth = 1
 ```

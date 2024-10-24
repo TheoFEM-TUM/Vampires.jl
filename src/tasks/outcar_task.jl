@@ -3,12 +3,21 @@ list of available tasks:
 
 outcar
     read: read a certain value from the outcar file
+    plot: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders.
 """
 
 
+
 """
-reads last value in OUTCAR of parameter for each directory
+# CLI Commands to work with the OUTCAR file
+The following command can be used to analyze or plot values from an OUTCAR file.
+
+Available commands:
+* `vamp outcar read`: read a certain value from the outcar file.
+* `vamp outcar plot`: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders..
 """
+run_task(::Type{Val{:outcar}}, subtask, args) = nothing
+
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
     values = read_value_from_outcar(args["par"], args["p"]*args["outcar"])
     return values

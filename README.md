@@ -10,29 +10,51 @@
 ## How to install `Vampires.jl` in Julia
 
 * First, you need to install Julia itself from the [Julia homepage](https://julialang.org/downloads/)
-* Next, clone the git repository to your computer
+* Next, clone the git repository to your computer. For this, you need to be added as developer by one of the admins. The `git_clone_link` can be found by clicking the green `<> Code` box in the top right corner on the repos main page.
+```bash
+git clone <git_clone_link>
+```
 * Then, run the install packages script form the main package folder
 ```bash
 path=<path_to_your_bashrc> && julia vampires_install.jl --bashrc $path && source $path
 ```
 You can then call the `Vampires` CLI interface using `vamp`.
 
-## CLI interface
+## Documentation
 
-* Change a specific parameter in the INCAR file: e.g., change the energy cutoff to 350 eV
+Since `Vampires.jl` is not (yet) a registered Julia package, the documentation is not publicly hosted. Nevertheless, you can build and open it yourself in firefox by calling
+
 ```bash
-vamp modify incar --par ENCUT --val 350
+julia vampires_docs.jl
 ```
 
-* Create a set of folders changing only one parameter: e.g., energy cutoff convergence testing
+## Example Usage
+
+Below are several examples demonstrating how to use `Vampires.jl` in practice. Each command begins with the main executable (`vamp` by default), followed by two positional arguments: `task` and `subtask` (the latter is sometimes optional). The `task` typically represents a category or file type (e.g., `incar`, `outcar`), while the `subtask` is an action verb (e.g., `make`, `read`, `plot`) describing the operation to be performed. After these positional arguments, various keyword arguments can be added to specify the exact operation the user wants to perform.
+
+Firstly, `Vampires.jl` supports various ways to modify an `INCAR` file. To create a new incar file with tags `ENCUT` and `ISMEAR`
 ```bash
-vamp convergence create --par ENCUT --val 300,350,400
+vamp incar make --par ENCUT,ISMEAR
+```
+If the `val` argument is not provided, default values are used. A value can be modified with
+```bash
+vamp incar set --par ENCUT --val 400
+```
+Furthermore, `Vampires.jl` enables users to easily streamline workflows that would otherwise be tedious, such as convergence testing. For instance, generating the folder structure for a convergence test of the cut-off energy can be done with a simple command like:
+```bash
+vamp convergence make -par ENCUT --val 300,350,400
 ```
 
-* Or KSPACING
+This command creates three subfolders and copies all necessary input files into each one. Next, a bash script is needed to run VASP in each subfolder. The `-r` flag (recursive mode) instructs `Vampires.jl` to execute the specified task within each subfolder. Recursive mode is supported for various tasks, making it ideal for methods that require batch execution, like convergence tests.
 ```bash
-vamp convergence create --par KSPACING --val 0.5,0.4,0.3
+vamp -r run_script make --vasp_exe vasp_std
 ```
+Finally, once the calculations are complete, we can plot the results—such as the total energy versus the cut-off energy—providing a clear visualization of the convergence behavior.
+```bash
+vamp -r outcar plot --par TOTEN --o total_energy_vs_encut.png
+```
+
+For more detailed information, please refer to the official documentation.
 
 ## Using `Vampires.jl` in Python
 
@@ -52,46 +74,4 @@ Julia(compiled_modules=False)
 from julia import Vampires as vamp
 
 vamp.SOMEFUNCTION ...
-```
-
-## Parsing
-
-### Atomic configurations
-
-Read the POSCAR input file from VASP.
-
-```julia
-poscar_path = "path/to/POSCAR"
-
-poscar = read_poscar(poscar_path)
-```
-
-One can also read the atomic configuration from an MD run from the XDATCAR file.
-
-```julia
-
-xdatcar_path = "path/to/XDATCAR"
-xdatcar = read_xdatcar(xdatcar_path)
-
-```
-
-### DFT Eigenvalues
-
-Here's an example of how to read the EIGENVAL file from a VASP calculation and extract the k-points, energy bands and occupancies:
-
-```julia
-eigenval_path = "path/to/EIGENVAL"
-# Read the EIGENVAL file
-kpoints, E_bands, occs = read_eigenval(eigenval_path)
-```
-
-### DFT Density of States (DOS)
-
-To read the DOSCAR file and extract the density of states:
-
-```julia
-doscar_path = "path/to/DOSCAR"
-
-# Read the DOSCAR file
-dos, meta = read_doscar(doscar_path)
 ```
