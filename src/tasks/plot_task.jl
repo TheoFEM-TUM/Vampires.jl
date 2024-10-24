@@ -6,8 +6,6 @@ plot
     dos: plots the density of states
 """
 
-<<<<<<< HEAD
-=======
 
 #TODO: Unify this with file methods, i.e., vamp eigenval plot
 function run_task(::Type{Val{:bands}}, ::Type{Val{:plot}}, args)
@@ -17,7 +15,6 @@ function run_task(::Type{Val{:bands}}, ::Type{Val{:plot}}, args)
     plot_bandstructure(Es, kp, output_filename)    
 end
 
->>>>>>> main
 function run_task(::Type{Val{:dos}}, ::Type{Val{:plot}}, args)
     input_filename = args["p"] * args["doscar"]
     dos, _ = read_doscar(input_filename)
