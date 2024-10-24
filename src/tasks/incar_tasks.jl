@@ -218,11 +218,11 @@ vamp -r incar rm --par EDIFF
 # Aliases
 * `vamp rmincar`
 """
-function run_task(::Type{Val{:rm}}, ::Type{Val{:incar}}, args)
+function run_task(::Type{Val{:incar}}, ::Type{Val{:rm}}, args)
     if length(args["par"]) > 0 
         remove_key_from_incar(args["par"], args["p"]*args["incar"], out=args["p"]*args["incar"])
     elseif length(args["block"]) > 0
-        remove_block_from_incar!(args["block"], args["p"]*args["incar"])
+        remove_block_from_incar(args["block"], args["p"]*args["incar"])
     end
 end
 run_task(::Type{Val{:rmincar}}, subtask, args) = run_task(Val{Symbol("rm")}, Val{Symbol("incar")}, args)
