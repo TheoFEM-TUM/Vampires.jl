@@ -3,10 +3,13 @@ list of available tasks:
 
 outcar
     read: read a certain value from the outcar file
+    plot: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders.
 """
 
 
+
 """
+<<<<<<< HEAD
     vamp [-r] outcar read [--par <parameter>] [--p <path>] [--outcar <file>] [--o <output>]
 
 Read specific data from the OUTCAR file and optionally save the data to an HDF5 file.
@@ -35,7 +38,17 @@ vamp outcar read --par NIONS
 
 # Example 4: Read a specific parameter (e.g., LOOP+) from the OUTCAR files in all subfolders.
 vamp -r outcar read --par LOOP+
+=======
+# CLI Commands to work with the OUTCAR file
+The following command can be used to analyze or plot values from an OUTCAR file.
+
+Available commands:
+* `vamp outcar read`: read a certain value from the outcar file.
+* `vamp outcar plot`: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders..
+>>>>>>> main
 """
+run_task(::Type{Val{:outcar}}, subtask, args) = nothing
+
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
     param = args["par"]
     output_filename = args["o"]
