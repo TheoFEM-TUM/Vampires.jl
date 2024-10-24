@@ -53,7 +53,8 @@ function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
         if occursin("h5", output_filename)
             write_data_to_hdf5(output_filename, ["bandgap"], [ΔE])
         else
-            println("The bandgap is: $ΔE eV.")
+            if !args["r"]; println("The bandgap is: $ΔE eV."); end
+            return ΔE
         end
     elseif occursin("h5", output_filename)
         write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
