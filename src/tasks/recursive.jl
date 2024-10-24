@@ -30,7 +30,7 @@ The function assumes that the `task` function accepts the `subtask` function and
 function run_task_recursive(task, subtask, args)
     param = args["par"]
     base_path = args["p"]
-    values = map(readfolders()) do folder
+    values = map(readfolders(base_path)) do folder
         args["p"] = joinpath(base_path, folder * "/")
         value = run_task(task, subtask, args)
         if typeof(value) <: AbstractVector
@@ -54,4 +54,5 @@ function run_task_recursive(task, subtask, args)
         std_val = std(values)
         println("The mean value of $param is: $mean_val ± $std_val.")
     end
+    return values
 end

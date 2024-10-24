@@ -9,7 +9,6 @@ Read values associated with a parameter from a file.
 - `mode::AbstractString`: Determines whether to extract the "first" or "last" occurrence of the value in the line. Defaults to "first".
 - `type::Type`: The data type to which the values should be converted. Defaults to `Float64`.
 
-
 # Returns
 - `param_values::Vector{type}`: A vector of values of the specified type associated with the parameter found in the file.
 
