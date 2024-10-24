@@ -8,6 +8,12 @@ convergence
 ```
 
 ```
+doscar
+    read: read-in the doscar file
+    plot: plot the dos from the doscar file
+```
+
+```
 
 ```
 
@@ -44,12 +50,6 @@ nscf
 outcar
     read: read a certain value from the outcar file
     plot: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders.
-```
-
-```
-plot
-    bandstructure: plots the bandstructure
-    dos: plots the density of states
 ```
 
 ```
