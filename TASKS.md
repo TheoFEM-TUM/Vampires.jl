@@ -1,11 +1,6 @@
 # List of Available Tasks
 
 ```
-calculation
-    bandgap: returns the bandgap calculated from a eigenval file
-```
-
-```
 convergence
     make: creates the folder structure where the specified parameter is changed in the different subdirectories
     read: reads a specific output (e.g., energy) from a convergence test
