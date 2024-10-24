@@ -28,6 +28,34 @@ Since `Vampires.jl` is not (yet) a registered Julia package, the documentation i
 julia vampires_docs.jl
 ```
 
+## Example Usage
+
+Below are several examples demonstrating how to use `Vampires.jl` in practice. Each command begins with the main executable (`vamp` by default), followed by two positional arguments: `task` and `subtask` (the latter is sometimes optional). The `task` typically represents a category or file type (e.g., `incar`, `outcar`), while the `subtask` is an action verb (e.g., `make`, `read`, `plot`) describing the operation to be performed. After these positional arguments, various keyword arguments can be added to specify the exact operation the user wants to perform.
+
+Firstly, `Vampires.jl` supports various ways to modify an `INCAR` file. To create a new incar file with tags `ENCUT` and `ISMEAR`
+```bash
+vamp incar make --par ENCUT,ISMEAR
+```
+If the `val` argument is not provided, default values are used. A value can be modified with
+```bash
+vamp incar set --par ENCUT --val 400
+```
+Furthermore, `Vampires.jl` enables users to easily streamline workflows that would otherwise be tedious, such as convergence testing. For instance, generating the folder structure for a convergence test of the cut-off energy can be done with a simple command like:
+```bash
+vamp convergence make -par ENCUT --val 300,350,400
+```
+
+This command creates three subfolders and copies all necessary input files into each one. Next, a bash script is needed to run VASP in each subfolder. The `-r` flag (recursive mode) instructs `Vampires.jl` to execute the specified task within each subfolder. Recursive mode is supported for various tasks, making it ideal for methods that require batch execution, like convergence tests.
+```bash
+vamp -r run_script make --vasp_exe vasp_std
+```
+Finally, once the calculations are complete, we can plot the results—such as the total energy versus the cut-off energy—providing a clear visualization of the convergence behavior.
+```bash
+vamp -r outcar plot --par TOTEN --o total_energy_vs_encut.png
+```
+
+For more detailed information, please refer to the official documentation.
+
 ## Using `Vampires.jl` in Python
 
 Install `PyJulia` package
