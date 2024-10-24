@@ -15,6 +15,9 @@ doscar
 
 ```
 
+eigenval:
+    read: read the data from the eigenval file.
+    plot: plot the bandstructure from the eigenval file.
 ```
 
 ```
