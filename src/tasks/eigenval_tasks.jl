@@ -4,12 +4,15 @@ list of available tasks:
 
 """
 
-function run_task(::Type{Val{:eigenval}}, ::Type{Val{:plot}}, args)
-    output_filename = args["o"]
-    input_filename = args["p"] * args["eigenval"]
-    kp, Es, _ = read_eigenval(input_filename)
-    plot_bandstructure(Es, kp, output_filename)
-end
+
+"""
+# CLI Commands to work with the EIGENVAL file
+
+Available commands:
+* `vamp eigenval read`: read the data from the eigenval file.
+* `vamp eigenval plot`: plot the bandstructure from the eigenval file.
+"""
+run_task(::Type{Val{:eigenval}}, subtask, args) = nothing
 
 """
     vamp [-r] eigenval read [--p <path>] [--eigenval <file>] [--o <output_file>]
@@ -54,4 +57,30 @@ function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
     else
         throw("Unknown output file format.")
     end
+end
+
+"""
+    vamp eigenval plot [--p <path>] [--eigenval <file>] [--o <output_filename>]
+
+Reads the eigenvalues from an EIGENVAL file and generates a plot of the electronic bandstructure.
+
+# Arguments
+- `p`: Path to the directory containing the EIGENVAL file.
+- `eigenval`: Name of the EIGENVAL file to read from.
+- `o`: Output filename for the plot (optional). If not specified, the plot is shown but not saved.
+
+# Behavior
+- Reads the eigenvalues and k-points from the specified EIGENVAL file.
+- Generates a plot of the electronic band structure.
+
+# Examples
+```bash
+# Example 1: Plot band structure from an EIGENVAL file and save to an image file.
+vamp eigenval plot --p /path/to/files --eigenval EIGENVAL --o bandstructure.png
+"""
+function run_task(::Type{Val{:eigenval}}, ::Type{Val{:plot}}, args)
+    output_filename = args["o"]
+    input_filename = args["p"] * args["eigenval"]
+    kp, Es, _ = read_eigenval(input_filename)
+    plot_bandstructure(Es, kp, output_filename)
 end
