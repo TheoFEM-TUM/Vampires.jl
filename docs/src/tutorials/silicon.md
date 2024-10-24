@@ -1,4 +1,4 @@
-# Convergence tests for silicon
+# Silicon
 In this tutorial, you will learn the basics of performing convergence tests for the simple but relevant material silicon. You can easily transfer the workflow to any material that you are interested in.
 
 ## Input files
