@@ -46,4 +46,21 @@ export compute_dos, convert_kspacing_to_kgrid
 
 export run_task, run_task_recursive
 
+
+# precompile
+using PrecompileTools: @compile_workload, @setup_workload
+
+@setup_workload begin
+    A = Float64[1 2 3; 4 5 6; 7 8 9]
+    v = Float64[1, 2, 3]
+    task = Val{:incar}
+    subtask = Val{:set}
+    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"")
+    @compile_workload begin
+        redirect_stdout(Base.DevNull()) do
+            parse_commandline()
+            run_task(task, subtask, args)
+        end
+    end
+end
 end # module
