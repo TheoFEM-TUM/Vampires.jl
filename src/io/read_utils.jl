@@ -127,6 +127,37 @@ function write_data_to_hdf5(output_filename, data_keys, data_values)
 end
 
 """
+    write_key_to_hdf5(file::HDF5.File, data_key::String, data_value::Number)
+
+Append or write a dataset in an HDF5 file with a new number.
+
+# Arguments
+- `file::HDF5.File`: An open HDF5 file where the data will be written.
+- `data_key::String`: The name (key) for the dataset in the HDF5 file.
+- `data_value::Number`: A number containing the new value to be written under the `data_key`.
+"""
+function write_key_to_hdf5(file, data_key, data_value::Number)
+    if haskey(file, data_key)
+        current_size = size(file[data_key])
+        if length(current_size) == 0
+            new_data_value = zeros(eltype(data_value), 2)
+            new_data_value[1] = read(file[data_key])
+            new_data_value[2] = data_value
+            delete_object(file, data_key)                    
+            file[data_key] = new_data_value
+        else
+            new_data_value = zeros(eltype(data_value), current_size[1]+1)
+            copyto!(new_data_value[1:end-1], file[data_key])
+            new_data_value[end] = data_value
+            delete_object(file, data_key) 
+            file[data_key] = new_data_value
+        end
+    else
+        file[data_key] = data_value
+    end
+end
+
+"""
     write_key_to_hdf5(file::HDF5.File, data_key::String, data_value::AbstractVector)
 
 Append or write a dataset in an HDF5 file with a new vector or matrices.
