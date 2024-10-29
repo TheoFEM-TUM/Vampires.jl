@@ -59,7 +59,6 @@ using PrecompileTools: @compile_workload, @setup_workload
     args_list = ARGS
     @compile_workload begin
         redirect_stdout(Base.DevNull()) do
-            parse_commandline(args_list)
             main(args_list)
             run_task(task, subtask, args)
         end
