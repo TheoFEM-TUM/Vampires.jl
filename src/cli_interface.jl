@@ -33,9 +33,9 @@ To run a task from the command line:
 exec_name bandgap --p=./path/to/files --eigenval=EIGENVAL
 
 """
-function main()
+function main(cli_args)
     time = @elapsed begin
-        @time args = parse_commandline()
+        @time args = parse_commandline(cli_args)
         
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
@@ -73,91 +73,42 @@ function main()
     if verbose; println("Time: $time s"); end
 end
 
-function parse_commandline()
-    s = ArgParseSettings()
-
-    @add_arg_table s begin
-        "task"
-            help = "positional argument 1: task defines which task is to be performed"
-            arg_type = String
-            default = "none"
-        "subtask"
-            help = "positional argument 2: some tasks require further specification"
-            arg_type = String
-            default = "none"
-        "-r"
-            help = "if true, task will be applied recursively to all folders"
-            action = :store_true
-        "-v"
-            help = "if true, Vampires are verbose."
-            action = :store_true
-        "--par"
-            help = "define a parameter that is to be adapted"
-            arg_type = String
-            default = ""
-        "--val"
-            help = "define the value of the parameter"
-            arg_type = String
-            default = ""
-        "--block"
-            help = "define the block that a parameter belongs to"
-            arg_type = String
-            default = ""
-        "--p"
-            help = "set the default path"
-            arg_type = String
-            default = "./"
-        "--o"
-            help = "set the output (file-) name"
-            arg_type = String
-            default = "none"
-        "--N"
-            help = "general task dependent number parameter"
-            arg_type = String
-            default = "0"
-        "--method"
-            help = "general task dependent method parameter"
-            arg_type = String
-            default = "none"
-        "--incar"
-            help = "set the name of the INCAR file"
-            arg_type = String
-            default = "INCAR"
-        "--eigenval"
-            help = "set the name of the EIGENVAL file"
-            arg_type = String
-            default = "EIGENVAL"
-        "--doscar"
-            help = "set the name of the DOSCAR file"
-            arg_type = String
-            default = "DOSCAR"
-        "--poscar"
-            help = "set the name of the POSCAR file"
-            arg_type = String
-            default = "POSCAR"
-        "--xdatcar"
-            help = "set the name of the XDATCAR file"
-            arg_type = String
-            default = "XDATCAR"
-        "--outcar"
-            help = "set the name of the OUTCAR file"
-            arg_type = String
-            default = "OUTCAR"
-        "--kpoints"
-            help = "set the name of the kpoints file"
-            arg_type = String
-            default = "KPOINTS"
-        "--w90_hr"
-            help = "set the name of the *_hr.dat file"
-            arg_type = String
-            default = "wannier90_hr.dat"
-        "--vasp_exe"
-            help = "set the name of the VASP executable"
-            arg_type = String
-            default = "vasp_std"
+function parse_commandline(args)
+    args_dict = Dict{String, Union{String, Bool}}(
+        "task" => "none",
+        "subtask" => "none",
+        "r" => false,
+        "v" => false,
+        "par"=>"",
+        "val"=>"",
+        "block"=>"",
+        "p"=>"./",
+        "o"=>"none",
+        "N"=>"0",
+        "method"=>"",
+        "incar"=>"INCAR",
+        "eigenval"=>"EIGENVAL",
+        "doscar"=>"DOSCAR",
+        "poscar"=>"POSCAR",
+        "xdatcar"=>"XDATCAR",
+        "outcar"=>"OUTCAR",
+        "kpoints"=>"KPOINTS",
+        "w90_hr"=>"wannier90_hr.dat",
+        "vasp_exe"=>"vasp_std"
+    )
+    num_pos = 0
+    for (k, arg) in enumerate(args)
+        if occursin("--", arg)
+            args_dict[arg[3:end]] = args[k+1]
+        elseif occursin("-", arg)
+            args_dict[arg[2:end]] = true
+        elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false)
+            num_pos += 1
+            if num_pos == 1; args_dict["task"] = arg; end
+            if num_pos == 2; args_dict["subtask"] = arg; end
+        end
     end
-    args :: Dict{String, Union{String, Bool}} = parse_args(s)
-    return args
+    return args_dict
 end
 
 run_task(task, subtask, args) = println("Task is none. Exiting ...")
