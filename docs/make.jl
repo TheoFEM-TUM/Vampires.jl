@@ -19,5 +19,8 @@ makedocs(
             "man/examples.md",
             "man/library.md"
         ],
+        "Tutorials" => [
+            "tutorials/silicon.md"
+        ],
     ]
 )
