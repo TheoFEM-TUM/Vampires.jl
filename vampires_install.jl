@@ -50,4 +50,6 @@ open(bashrc_path, "a") do bashrc_file
     println(bashrc_file, alias)
 end
 
+Pkg.test("Vampires")
+
 println("Vampires was configured successfully.")

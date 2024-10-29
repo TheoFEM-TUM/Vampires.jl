@@ -1,16 +1,7 @@
 # CLI interface
 
-* Change a specific parameter in the INCAR file: e.g., change the energy cutoff to 350 eV
-```bash
-vamp set incar --par ENCUT --val 350
-```
+Each command begins with the main executable (`vamp` by default), followed by two positional arguments: `task` and `subtask` (the latter is sometimes optional). The `task` typically represents a category or file type (e.g., `incar`, `outcar`), while the `subtask` is an action verb (e.g., `make`, `read`, `plot`) describing the operation to be performed. After these positional arguments, various keyword arguments can be added to specify the exact operation the user wants to perform.
 
-* Create a set of folders changing only one parameter: e.g., energy cutoff convergence testing
-```bash
-vamp convergence create --par ENCUT --val 300,350,400
-```
-
-* Or KSPACING
-```bash
-vamp convergence create --par KSPACING --val 0.5,0.4,0.3
+```@docs
+run_task
 ```

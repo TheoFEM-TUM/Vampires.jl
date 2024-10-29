@@ -155,10 +155,18 @@ function parse_commandline()
             help = "task dependent exclude parameter"
             arg_type = String
             default = "none"
+        "--w90_hr"
+            help = "set the name of the *_hr.dat file"
+            arg_type = String
+            default = "wannier90_hr.dat"
         "--vasp_exe"
             help = "set the name of the VASP executable"
             arg_type = String
             default = "vasp_std"
+        "--account"
+            help = "set the account name for job submission on slurm system"
+            arg_type = String
+            default = "none"
         "--ext_par_file"
             help = "Path to an extended parameter file that contains additional settings for the simulation."
             arg_type = String
