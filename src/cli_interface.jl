@@ -74,6 +74,7 @@ function main(cli_args)
 end
 
 function parse_commandline(args)
+    @show args
     args_dict = Dict{String, Union{String, Bool}}(
         "task" => "none",
         "subtask" => "none",
@@ -99,7 +100,15 @@ function parse_commandline(args)
     num_pos = 0
     for (k, arg) in enumerate(args)
         if occursin("--", arg)
-            args_dict[arg[3:end]] = args[k+1]
+            new_arg = args[k+1]
+            
+            j = 0
+            while args[k+1+j][end] == ','
+                new_arg *= args[k+2+j]
+                j += 1
+            end
+
+            args_dict[arg[3:end]] = new_arg
         elseif occursin("-", arg)
             args_dict[arg[2:end]] = true
         elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false)
