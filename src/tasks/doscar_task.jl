@@ -37,9 +37,7 @@ vamp doscar read --doscar DOSCAR --o output.h5
 function run_task(::Type{Val{:doscar}}, ::Type{Val{:read}}, args)
     output_filename = args["o"]
     dos, _ = read_doscar(args["doscar"])
-    if occursin("h5", output_filename)
-        write_data_to_hdf5(output_filename, ["energy", "dos", "idos"], [dos[:, 1], dos[:, 2], dos[:, 3]])
-    end
+    return ["energy", "dos", "idos"], [dos[:, 1], dos[:, 2], dos[:, 3]]
 end
 
 """

@@ -109,6 +109,15 @@ function read_from_file(filename; type=Float64)
 end
 
 """
+    to_scalar_if_single(x)::Vector
+
+Converts an AbstractVector to a single value if length is 1.
+"""
+function to_scalar_if_single(x::AbstractVector)
+    length(x) == 1 ? x[1] : x
+end
+
+"""
     write_data_to_hdf5(output_filename::String, data_keys::Vector{String}, data_values::Vector)
 
 Write multiple datasets to an HDF5 file, associating each dataset with a corresponding key.
@@ -147,7 +156,7 @@ function write_key_to_hdf5(file, data_key, data_value::Number)
             file[data_key] = new_data_value
         else
             new_data_value = zeros(eltype(data_value), current_size[1]+1)
-            copyto!(new_data_value[1:end-1], file[data_key])
+            new_data_value[1:end-1] .= read(file[data_key])
             new_data_value[end] = data_value
             delete_object(file, data_key) 
             file[data_key] = new_data_value
@@ -174,7 +183,7 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractVector)
             new_data_value = zeros(eltype(data_value), current_size[1], 2)
             copyto!(new_data_value[:, 1], file[data_key])
             new_data_value[:, 2] .= data_value
-            delete_object(file, data_key)                    
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         else
             new_data_value = zeros(eltype(data_value), current_size[1], current_size[2]+1)
