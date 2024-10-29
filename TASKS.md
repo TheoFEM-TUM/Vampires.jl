@@ -1,15 +1,23 @@
 # List of Available Tasks
 
 ```
-calculation
-    bandgap: returns the bandgap calculated from a eigenval file
-```
-
-```
 convergence
     make: creates the folder structure where the specified parameter is changed in the different subdirectories
     read: reads a specific output (e.g., energy) from a convergence test
     plot: plots a specific output (e.g., TOTEN) vs folder seed (e.g., ENCUT)
+```
+
+```
+doscar
+    read: read-in the doscar file
+    plot: plot the dos from the doscar file
+```
+
+```
+
+eigenval:
+    read: read the data from the eigenval file.
+    plot: plot the bandstructure from the eigenval file.
 ```
 
 ```
@@ -48,12 +56,6 @@ outcar
 ```
 
 ```
-plot
-    bandstructure: plots the bandstructure
-    dos: plots the density of states
-```
-
-```
 ### recursive wrapper for all tasks:
 any_task
     any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
@@ -63,5 +65,10 @@ any_task
 ```
 run_script
     make: creates a bash script that runs vasp in a specific folder
+```
+
+```
+w90_hr
+    read: read the W90 Hamiltonian from the *_hr.dat file
 ```
 

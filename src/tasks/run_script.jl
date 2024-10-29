@@ -40,3 +40,30 @@ vamp -r run_script make --vasp_exe vasp_ncl
 function run_task(::Type{Val{:run_script}}, ::Type{Val{:make}}, args)
     write_run_script(args["vasp_exe"], args["p"])
 end
+
+"""
+    vamp [-r] job submit [--account <account_name>]
+
+Submit all job files that contain the `.job` file ending.
+
+# Arguments
+- `r`: if set, submit all job files in all subfolders.
+- `account`: the account for which the job is submitted.
+
+# Examples
+```bash
+# Example 1: Submit all jobs for `MYACCOUNT`.
+vamp job submit --account MYACCOUNT
+
+# Example 2: Submit all jobs in all subfolders for `MYACCOUNT`
+vamp -r job submit --account MYACCOUNT
+```
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
+    account = args["account"]
+    for file in readdir(args["p"])
+        if occursin(".job", file)
+            run(`sbatch -A $account $file`)
+        end
+    end
+end
