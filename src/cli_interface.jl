@@ -151,6 +151,10 @@ function parse_commandline()
             help = "set the name of the VASP executable"
             arg_type = String
             default = "vasp_std"
+        "--account"
+            help = "set the account name for job submission on slurm system"
+            arg_type = String
+            default = "none"
     end
     args :: Dict{String, Union{String, Bool}} = parse_args(s)
     return args
