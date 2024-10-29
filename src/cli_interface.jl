@@ -35,7 +35,7 @@ exec_name bandgap --p=./path/to/files --eigenval=EIGENVAL
 """
 function main(cli_args)
     time = @elapsed begin
-        @time args = parse_commandline(cli_args)
+        args = parse_commandline(cli_args)
         
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
