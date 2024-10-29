@@ -23,17 +23,17 @@ Direct
   0.00  0.00  0.00
   0.25  0.25  0.25
 ```
-Get a POTCAR for silicon with (this only works on a supercomputer) 
+Get a POTCAR for silicon with (this only works on a supercomputer)
 ```bash
 vamp potcar make
 ```
 
 ## Converging important parameters
 
-To obtain meaningful results from your calculations, it is essential to ensure that the total energy is converged with respect to two key parameters: the cut-off energy (specified by `ENCUT` in the `INCAR`) for plane waves and the size of the k-point grid (the `KPOINTS` file). 
+To obtain meaningful results from your calculations, it is essential to ensure that the total energy is converged with respect to two key parameters: the cut-off energy (specified by `ENCUT` in the `INCAR`) for plane waves and the size of the k-point grid (the `KPOINTS` file).
 
-* The cut-off energy determines the maximum energy of plane waves included in the calculation, directly affecting the basis set size. A higher cut-off energy allows for a more accurate representation of the electronic states, but it also increases computational costs. 
-* Similarly, the k-point grid specifies how the Brillouin zone is sampled, which is critical for accurately describing periodic systems in reciprocal space. A finer k-point grid improves precision in the electronic properties but requires more computational resources. 
+* The cut-off energy determines the maximum energy of plane waves included in the calculation, directly affecting the basis set size. A higher cut-off energy allows for a more accurate representation of the electronic states, but it also increases computational costs.
+* Similarly, the k-point grid specifies how the Brillouin zone is sampled, which is critical for accurately describing periodic systems in reciprocal space. A finer k-point grid improves precision in the electronic properties but requires more computational resources.
 
 By systematically varying these parameters and analyzing the resulting total energy values, we will identigy the convergence thresholds necessary to achieve reliable and meaningful results.
 
@@ -47,7 +47,7 @@ Now, let's generate a basic INCAR file
 ```bash
 vamp incar make --par ENCUT,EDIFF,KSPACING,ISMEAR,SIGMA,ISTART
 ```
-Please familiarize yourself with every tag used by looking it up on the VASP wiki or via 
+Please familiarize yourself with every tag used by looking it up on the VASP wiki or via
 ```bash
 vamp incar whatis --par <INCAR_TAG>
 ```
@@ -76,7 +76,7 @@ vamp -r outcar plot --par LOOP+ --o run_time_vs_cut_off
 
 # Silicon bandstructure
 
-To calculate the bandstructure of silicon, you will need to perform to two DFT calculations. A self-consistent one to obtain a converged charge density and a non self-consistent one using the previously calculated charge density to only compute energy eigenvalues along a certain path through the Brillouin zone.
+To calculate the bandstructure of silicon, you will need to perform two DFT calculations. A self-consistent one to obtain a converged charge density and a non self-consistent one using the previously calculated charge density to only compute energy eigenvalues along a certain path through the Brillouin zone.
 
 This path is also defined in a `KPOINTS_bands` file:
 ```
@@ -103,6 +103,6 @@ vamp nscf make --kpoints KPOINTS,KPOINTS_bands
 ```
 
 Let's visualize the results! You can plot the bandstructure with
-```bash 
+```bash
 vamp eigenval plot --eigenval nscf/EIGENVAL
 ```
