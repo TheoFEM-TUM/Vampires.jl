@@ -52,6 +52,11 @@ outcar
 ```
 
 ```
+poscar
+    read: read the POSCAR file
+```
+
+```
 ### recursive wrapper for all tasks:
 any_task
     any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
@@ -61,6 +66,11 @@ any_task
 ```
 run_script
     make: creates a bash script that runs vasp in a specific folder
+```
+
+```
+"""
+list of available tasks
 ```
 
 ```

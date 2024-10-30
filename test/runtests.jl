@@ -1,4 +1,4 @@
-using Vampires, Test, LinearAlgebra
+using Vampires, Test, LinearAlgebra, HDF5
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
@@ -20,7 +20,9 @@ end
 
 @testset "tasks" begin
     include("tasks/test_cli.jl")
-    include("tasks/test_recursive.jl")
+    include("tasks/test_outcar_task.jl")
+    include("tasks/test_poscar_task.jl")
+    include("tasks/test_eigenval_task.jl")
 end
 
 @testset "calculations" begin

@@ -73,10 +73,10 @@ function main(cli_args)
             task_string = args["task"]
             subtask_string = args["subtask"]
             println("Running task $task_string $subtask_string ...")
-            if args["r"]
-                run_task_recursive(task, subtask, args)
-            else
-                run_task(task, subtask, args)
+            out = args["r"] ? run_task_recursive(task, subtask, args) : run_task(task, subtask, args)
+            if out ≠ nothing
+                keys, values = out
+                task_output(keys, values, args)
             end
         catch e
             if e == ArgumentError
@@ -104,7 +104,7 @@ function get_default_args()
         "p"=>"./",
         "o"=>"none",
         "N"=>"0",
-        "method"=>"",
+        "method"=>"none",
         "incar"=>"INCAR",
         "eigenval"=>"EIGENVAL",
         "doscar"=>"DOSCAR",
