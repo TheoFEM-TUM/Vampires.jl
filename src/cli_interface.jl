@@ -36,13 +36,13 @@ exec_name bandgap --p=./path/to/files --eigenval=EIGENVAL
 function main(cli_args)
     time = @elapsed begin
         args = parse_commandline(cli_args)
-        
+
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
         subtask = Val{Symbol(args["subtask"])}
         verbose = args["v"]
 
-        if verbose 
+        if verbose
             println("Parsed args:")
             for (arg,val) in args
                 println("  $arg  =>  $val")
@@ -50,11 +50,19 @@ function main(cli_args)
         end
 
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
-        
         if args["help"]
             if args["task"] == "none" && args["subtask"] == "none"
                 task_file = joinpath(@__DIR__, "..", "TASKS.md")
-                print(read(task_file, String))
+                tasks_md = read(task_file, String)
+                println("Welcome to")
+                println("")
+                println("__     ___    __  __ ____ ___ ____  _____")
+                println("\\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___")
+                println(" \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|")
+                println("  \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\")
+                println("   \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/")
+                println("")
+                print(replace(tasks_md, "```\n" => ""))
             else
                 println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
             end
@@ -70,7 +78,7 @@ function main(cli_args)
             else
                 run_task(task, subtask, args)
             end
-        catch e 
+        catch e
             if e == ArgumentError
                 @error "No task of name $task found."
             else
@@ -134,7 +142,6 @@ function parse_commandline(args)
             args_dict["help"] = true
         elseif occursin("--", arg)
             new_arg = (length(args) > k && !occursin("-", args[k+1])) ? args[k+1] : true
-            
             j = 0
             while k+j+1 < length(args) && args[k+1+j][end] == ','
                 new_arg *= args[k+2+j]
