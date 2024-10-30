@@ -73,8 +73,7 @@ function main(cli_args)
     if verbose; println("Time: $time s"); end
 end
 
-function parse_commandline(args)
-    @show args
+function get_default_args()
     args_dict = Dict{String, Union{String, Bool}}(
         "task" => "none",
         "subtask" => "none",
@@ -97,13 +96,34 @@ function parse_commandline(args)
         "w90_hr"=>"wannier90_hr.dat",
         "vasp_exe"=>"vasp_std"
     )
+    return args_dict
+end
+
+"""
+    parse_commandline(args::Vector{String}) -> Dict{String, Any}
+
+Parses command-line arguments from a vector of strings `args` and returns a dictionary of parsed arguments.
+
+# Arguments
+- `args`: A vector of command-line arguments passed as strings.
+
+# Behavior
+- Keyword arguments (`--option`): If an argument starts with `--`, it is treated as a key with an associated value in the following position. If a comma is found at the end of an argument, the following arguments are concatenated until no comma is found.
+- Flags (`-o`): If an argument starts with a single `-`, it is treated as a flag and is set to `true` (empty "--" arguments are also treated as flags).
+- Positional arguments: The first and second arguments that do not start with `--` or `-` are interpreted as `"task"` and `"subtask"` respectively.
+
+# Returns
+- `args_dict`: A dictionary containing parsed command-line arguments. Long options are stored as key-value pairs, flags are stored with a value of `true`, and the first two positional arguments are stored as `"task"` and `"subtask"`.
+"""
+function parse_commandline(args)
+    args_dict = get_default_args()
     num_pos = 0
     for (k, arg) in enumerate(args)
         if occursin("--", arg)
-            new_arg = args[k+1]
+            new_arg = (length(args) > k && !occursin("-", args[k+1])) ? args[k+1] : true
             
             j = 0
-            while args[k+1+j][end] == ','
+            while k+j+1 < length(args) && args[k+1+j][end] == ','
                 new_arg *= args[k+2+j]
                 j += 1
             end
