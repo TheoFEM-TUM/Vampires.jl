@@ -1,5 +1,5 @@
 @testset "OUTCAR tasks" begin
-    args = Vampires.parse_commandline()
+    args = Vampires.parse_commandline(ARGS)
     args["p"] = joinpath(@__DIR__, "test_files/")
     args["outcar"] = "OUTCAR_gaas"
     
