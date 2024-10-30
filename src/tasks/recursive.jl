@@ -29,12 +29,14 @@ The function assumes that the `task` function accepts the `subtask` function and
 """
 function run_task_recursive(task, subtask, args)
     base_path = args["p"]
-    output_pairs = map(readfolders(base_path)) do folder
+    keys = Vector{String}[]
+    values = map(readfolders(base_path)) do folder
         args["p"] = joinpath(base_path, folder * "/")
-        run_task(task, subtask, args)
+        key, value = run_task(task, subtask, args)
+        push!(keys, key)
+        value
     end
     args["p"] = base_path
-    keys = output_pairs[1][1]
-    values = [pair[2] for pair in output_pairs]
+    keys = keys[1]
     return keys, values
 end
