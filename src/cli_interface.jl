@@ -79,6 +79,7 @@ function get_default_args()
         "subtask" => "none",
         "r" => false,
         "v" => false,
+        "help" => false,
         "par"=>"",
         "val"=>"",
         "block"=>"",
@@ -119,7 +120,9 @@ function parse_commandline(args)
     args_dict = get_default_args()
     num_pos = 0
     for (k, arg) in enumerate(args)
-        if occursin("--", arg)
+        if arg == "-h" || arg == "--help"
+            args_dict["help"] = true
+        elseif occursin("--", arg)
             new_arg = (length(args) > k && !occursin("-", args[k+1])) ? args[k+1] : true
             
             j = 0
@@ -131,7 +134,7 @@ function parse_commandline(args)
             args_dict[arg[3:end]] = new_arg
         elseif occursin("-", arg)
             args_dict[arg[2:end]] = true
-        elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false)
+        elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false) || args[k-1] == "--help"
             num_pos += 1
             if num_pos == 1; args_dict["task"] = arg; end
             if num_pos == 2; args_dict["subtask"] = arg; end

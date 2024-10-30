@@ -40,4 +40,12 @@ import Vampires: parse_commandline
     # Test 10: Test keyword argument with comma but no following argument
     args10 = parse_commandline(["--val", "ENCUT,"])
     @test args10["val"] == "ENCUT,"
+
+    # Test 11: Test help flag in front of positional arguments
+    args11 = parse_commandline(["--help", "incar", "set"])
+    @test args11["help"] && args11["task"] == "incar" && args11["subtask"] == "set"
+
+    # Test 12: Test h flag instead of help
+    args12 = parse_commandline(["-h", "--par", "bandgap"])
+    @test args12["help"] && args12["par"] == "bandgap"
 end
