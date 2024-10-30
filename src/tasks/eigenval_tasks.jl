@@ -15,7 +15,7 @@ Available commands:
 * `vamp eigenval read`: read the data from the eigenval file.
 * `vamp eigenval plot`: plot the bandstructure from the eigenval file.
 """
-run_task(::Type{Val{:eigenval}}, subtask, args) = nothing
+run_task(::Type{Val{:eigenval}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp [-r] eigenval read [--p <path>] [--eigenval <file>] [--o <output_file>]

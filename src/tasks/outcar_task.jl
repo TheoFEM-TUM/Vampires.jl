@@ -15,7 +15,7 @@ Available commands:
 * `vamp outcar read`: read a certain value from the outcar file.
 * `vamp outcar plot`: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders..
 """
-run_task(::Type{Val{:outcar}}, subtask, args) = nothing
+run_task(::Type{Val{:outcar}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp [-r] outcar read [--par <parameter>] [--p <path>] [--outcar <file>] [--o <output>]

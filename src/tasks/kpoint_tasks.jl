@@ -14,7 +14,7 @@ The following command can be used to work with the KPOINTS file.
 Available commands:
 * `vamp kpoints make`: Create a KPOINTS file.
 """
-run_task(::Type{Val{:kpoints}}, subtask, args) = nothing
+run_task(::Type{Val{:kpoints}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp kpoints make [--par <parameter>] [--val <value>] [--N <N1,N2,N3>] [--poscar <file>] [--method <name>] [--o <file>]
