@@ -19,6 +19,7 @@ Read the POSCAR file and export its data.
 ```bash
 # Example 1: Read data from a POSCAR file and save it to a HDF5 file.
 vamp poscar read --poscar SOME_POSCAR --o poscar.h5
+```
 """
 function run_task(::Type{Val{:poscar}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["poscar"])

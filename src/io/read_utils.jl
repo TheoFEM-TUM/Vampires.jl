@@ -149,13 +149,13 @@ function write_key_to_hdf5(file, data_key, data_value::Number)
     if haskey(file, data_key)
         current_size = size(file[data_key])
         if length(current_size) == 0
-            new_data_value = zeros(eltype(data_value), 2)
+            new_data_value = Array{eltype(data_value)}(undef, 2)
             new_data_value[1] = read(file[data_key])
             new_data_value[2] = data_value
             delete_object(file, data_key)                    
             file[data_key] = new_data_value
         else
-            new_data_value = zeros(eltype(data_value), current_size[1]+1)
+            new_data_value = Array{eltype(data_value)}(undef, current_size[1]+1)
             new_data_value[1:end-1] .= read(file[data_key])
             new_data_value[end] = data_value
             delete_object(file, data_key) 
@@ -180,14 +180,14 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractVector)
     if haskey(file, data_key)
         current_size = size(file[data_key])
         if length(current_size) == 1
-            new_data_value = zeros(eltype(data_value), current_size[1], 2)
-            copyto!(new_data_value[:, 1], file[data_key])
+            new_data_value = Array{eltype(data_value)}(undef, current_size[1], 2)
+            new_data_value[:, 1] = read(file[data_key])
             new_data_value[:, 2] .= data_value
             delete_object(file, data_key)
             file[data_key] = new_data_value
         else
-            new_data_value = zeros(eltype(data_value), current_size[1], current_size[2]+1)
-            copyto!(new_data_value[:, 1:end-1], file[data_key])
+            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2]+1)
+            new_data_value[:, 1:end-1] = read(file[data_key])
             new_data_value[:, end] .= data_value
             delete_object(file, data_key) 
             file[data_key] = new_data_value
@@ -211,14 +211,14 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractMatrix)
     if haskey(file, data_key)
         current_size = size(file[data_key])
         if length(current_size) == 2
-            new_data_value = zeros(eltype(data_value), current_size[1], current_size[2], 2)
-            copyto!(new_data_value[:, :, 1], file[data_key])
+            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], 2)
+            new_data_value[:, :, 1] = read(file[data_key])
             new_data_value[:, :, 2] .= data_value
             delete_object(file, data_key)                    
             file[data_key] = new_data_value
         else
-            new_data_value = zeros(eltype(data_value), current_size[1], current_size[2], current_size[3]+1)
-            copyto!(new_data_value[:, :, 1:end-1], file[data_key])
+            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3]+1)
+            new_data_value[:, :, 1:end-1] = read(file[data_key])
             new_data_value[:, :, end] .= data_value
             delete_object(file, data_key) 
             file[data_key] = new_data_value
@@ -242,13 +242,14 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractArray{T, 3}) wher
     if haskey(file, data_key)
         current_size = size(file[data_key])
         if length(current_size) == 3
-            new_data_value = zeros(eltype(data_value), current_size[1], current_size[2], current_size[3], 2)
-            copyto!(new_data_value[:, :, :, 1], file[data_key])
+            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3], 2)
+            new_data_value[:, :, :, 1] = read(file[data_key])
             new_data_value[:, :, :, 2] .= data_value
             delete_object(file, data_key)                    
             file[data_key] = new_data_value
         else
-            new_data_value = zeros(eltype(data_value), current_size[1], current_size[2], current_size[3], current_size[4]+1)
+            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3], current_size[4]+1)
+            new_data_value[:, :, :, 1:end-1] = read(file[data_key])
             copyto!(new_data_value[:, :, :, 1:end-1], file[data_key])
             new_data_value[:, :, :, end] .= data_value
             delete_object(file, data_key) 

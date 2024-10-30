@@ -99,10 +99,11 @@ vamp incar read --par EDIFF --incar INCAR_relax
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
     incar = read_incar(args["p"]*args["incar"])
-    for key in split_line(args["par"], char=',')
-        value = findvalue(incar, key)
-        println("The value of $key is: $value")
+    keys = split_line(args["par"], char=',')
+    values = map(keys) do key
+        findvalue(incar, key)
     end
+    return keys, values
 end
 
 """

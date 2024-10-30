@@ -20,7 +20,8 @@ function task_output(keys, values, args)
     method = strip(method, '.')
     f = get_method(method)
     keys_out, values_out, errors = reduce_output(keys, values, f, method, broadcasted, recursive)
-    time = @elapsed if args["r"] && args["method"][end] == '.'
+    time = @elapsed if args["r"] && (args["method"][end] == '.' || method == "none")
+        @show errors
         for (value, error, folder) in zip(values_out, errors, readfolders(args["p"]))
             write_output(output_file, keys_out, value, error, folder=folder)
         end
@@ -51,7 +52,7 @@ Processes the `keys` and `values` according to the specified function `f` and th
 - `values_out`: A collection of outputs from applying `f` to each element in `values`, following broadcast or recursion rules as appropriate.
 - `errors`: A collection of error values returned by `f` for each processed `value` or sub-collection in `values`.
 """
-reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, recursive) = keys, values, zeros(length(keys))
+reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, recursive) = keys, values, [zeros(length(keys)) for _ in 1:length(values[1])]
 
 function reduce_output(keys, values, f, method, broadcasted, recursive)
     keys_out = eltype(keys)[]
