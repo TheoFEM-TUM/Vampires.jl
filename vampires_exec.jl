@@ -1,3 +1,3 @@
 using Vampires
 
-Vampires.main()
+Vampires.main(ARGS)

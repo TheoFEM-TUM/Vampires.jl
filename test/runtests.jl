@@ -21,6 +21,7 @@ end
 end
 
 @testset "tasks" begin
+    include("tasks/test_cli.jl")
     include("tasks/test_recursive.jl")
 end
 

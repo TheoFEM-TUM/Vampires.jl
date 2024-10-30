@@ -14,7 +14,7 @@ Available commands:
 * `vamp doscar read`: read the doscar file.
 * `vamp doscar plot`: plot the dos from the doscar file
 """
-run_task(::Type{Val{:doscar}}, subtask, args) = nothing
+run_task(::Type{Val{:doscar}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp doscar read [--doscar <file>] [--o <output_filename>]

@@ -1,6 +1,7 @@
 module Vampires
 
-using OrderedCollections, ArgParse, Plots, BenchmarkTools, LinearAlgebra, StatsBase, HDF5
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5
+import Documenter: @doc
 
 include("io/read_utils.jl")
 
@@ -64,9 +65,10 @@ using PrecompileTools: @compile_workload, @setup_workload
     task = Val{:incar}
     subtask = Val{:set}
     args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"")
+    args_list = ARGS
     @compile_workload begin
         redirect_stdout(Base.DevNull()) do
-            parse_commandline()
+            main(args_list)
             run_task(task, subtask, args)
         end
     end
