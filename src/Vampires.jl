@@ -1,6 +1,6 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, Documenter
 
 include("io/read_utils.jl")
 

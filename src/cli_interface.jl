@@ -51,6 +51,12 @@ function main(cli_args)
 
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
         
+        if args["help"]
+            println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+
+            return nothing
+        end
+
         try
             task_string = args["task"]
             subtask_string = args["subtask"]

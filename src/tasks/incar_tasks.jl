@@ -26,7 +26,7 @@ Available commands:
 * `vamp incar set`: Add/change values of INCAR tags.
 * `vamp incar rm`: Remove an INCAR tag.
 """
-run_task(::Type{Val{:incar}}, subtask, args) = nothing
+run_task(::Type{Val{:incar}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp [-r] incar make [--par <key(s)>] [--val <key(s)>] [--block <block_label>] [--p <path>] [--incar <file>]
