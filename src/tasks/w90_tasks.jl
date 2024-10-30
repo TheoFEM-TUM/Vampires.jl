@@ -46,3 +46,7 @@ function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
         throw("Unknown output file format.")
     end
 end
+
+function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:test}}, args)
+
+end
