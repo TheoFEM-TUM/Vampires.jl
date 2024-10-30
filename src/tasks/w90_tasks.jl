@@ -7,6 +7,14 @@ w90_hr
 
 
 """
+# CLI Commands to work with the Wannier90 hr file
+
+Available commands:
+* `vamp w90_hr read`: Read the Wannier90 `w90_hr.dat` file and export its data.
+"""
+run_task(::Type{Val{:w90_hr}}, ::Type{Val{:none}}, args) = nothing
+
+"""
     vamp [-r] w90_hr read [--w90_hr <file>] [--o <output_file>]
 
 Read the Wannier90 `w90_hr.dat` file and export its data in HDF5 format.

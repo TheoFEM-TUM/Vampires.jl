@@ -33,16 +33,16 @@ To run a task from the command line:
 exec_name bandgap --p=./path/to/files --eigenval=EIGENVAL
 
 """
-function main()
+function main(cli_args)
     time = @elapsed begin
-        @time args = parse_commandline()
-        
+        args = parse_commandline(cli_args)
+
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
         subtask = Val{Symbol(args["subtask"])}
         verbose = args["v"]
 
-        if verbose 
+        if verbose
             println("Parsed args:")
             for (arg,val) in args
                 println("  $arg  =>  $val")
@@ -50,7 +50,25 @@ function main()
         end
 
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
-        
+        if args["help"]
+            if args["task"] == "none" && args["subtask"] == "none"
+                task_file = joinpath(@__DIR__, "..", "TASKS.md")
+                tasks_md = read(task_file, String)
+                println("Welcome to")
+                println("")
+                println("__     ___    __  __ ____ ___ ____  _____")
+                println("\\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___")
+                println(" \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|")
+                println("  \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\")
+                println("   \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/")
+                println("")
+                print(replace(tasks_md, "```\n" => ""))
+            else
+                println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+            end
+            return nothing
+        end
+
         try
             task_string = args["task"]
             subtask_string = args["subtask"]
@@ -60,7 +78,7 @@ function main()
                 keys, values = out
                 task_output(keys, values, args)
             end
-        catch e 
+        catch e
             if e == ArgumentError
                 @error "No task of name $task found."
             else
@@ -73,91 +91,73 @@ function main()
     if verbose; println("Time: $time s"); end
 end
 
-function parse_commandline()
-    s = ArgParseSettings()
+function get_default_args()
+    args_dict = Dict{String, Union{String, Bool}}(
+        "task" => "none",
+        "subtask" => "none",
+        "r" => false,
+        "v" => false,
+        "help" => false,
+        "par"=>"",
+        "val"=>"",
+        "block"=>"",
+        "p"=>"./",
+        "o"=>"none",
+        "N"=>"0",
+        "method"=>"",
+        "incar"=>"INCAR",
+        "eigenval"=>"EIGENVAL",
+        "doscar"=>"DOSCAR",
+        "poscar"=>"POSCAR",
+        "xdatcar"=>"XDATCAR",
+        "outcar"=>"OUTCAR",
+        "kpoints"=>"KPOINTS",
+        "w90_hr"=>"wannier90_hr.dat",
+        "vasp_exe"=>"vasp_std"
+    )
+    return args_dict
+end
 
-    @add_arg_table s begin
-        "task"
-            help = "positional argument 1: task defines which task is to be performed"
-            arg_type = String
-            default = "none"
-        "subtask"
-            help = "positional argument 2: some tasks require further specification"
-            arg_type = String
-            default = "none"
-        "-r"
-            help = "if true, task will be applied recursively to all folders"
-            action = :store_true
-        "-v"
-            help = "if true, Vampires are verbose."
-            action = :store_true
-        "--par"
-            help = "define a parameter that is to be adapted"
-            arg_type = String
-            default = ""
-        "--val"
-            help = "define the value of the parameter"
-            arg_type = String
-            default = ""
-        "--block"
-            help = "define the block that a parameter belongs to"
-            arg_type = String
-            default = ""
-        "--p"
-            help = "set the default path"
-            arg_type = String
-            default = "./"
-        "--o"
-            help = "set the output (file-) name"
-            arg_type = String
-            default = "none"
-        "--N"
-            help = "general task dependent number parameter"
-            arg_type = String
-            default = "0"
-        "--method"
-            help = "general task dependent method parameter"
-            arg_type = String
-            default = "none"
-        "--incar"
-            help = "set the name of the INCAR file"
-            arg_type = String
-            default = "INCAR"
-        "--eigenval"
-            help = "set the name of the EIGENVAL file"
-            arg_type = String
-            default = "EIGENVAL"
-        "--doscar"
-            help = "set the name of the DOSCAR file"
-            arg_type = String
-            default = "DOSCAR"
-        "--poscar"
-            help = "set the name of the POSCAR file"
-            arg_type = String
-            default = "POSCAR"
-        "--xdatcar"
-            help = "set the name of the XDATCAR file"
-            arg_type = String
-            default = "XDATCAR"
-        "--outcar"
-            help = "set the name of the OUTCAR file"
-            arg_type = String
-            default = "OUTCAR"
-        "--kpoints"
-            help = "set the name of the kpoints file"
-            arg_type = String
-            default = "KPOINTS"
-        "--w90_hr"
-            help = "set the name of the *_hr.dat file"
-            arg_type = String
-            default = "wannier90_hr.dat"
-        "--vasp_exe"
-            help = "set the name of the VASP executable"
-            arg_type = String
-            default = "vasp_std"
+"""
+    parse_commandline(args::Vector{String}) -> Dict{String, Any}
+
+Parses command-line arguments from a vector of strings `args` and returns a dictionary of parsed arguments.
+
+# Arguments
+- `args`: A vector of command-line arguments passed as strings.
+
+# Behavior
+- Keyword arguments (`--option`): If an argument starts with `--`, it is treated as a key with an associated value in the following position. If a comma is found at the end of an argument, the following arguments are concatenated until no comma is found.
+- Flags (`-o`): If an argument starts with a single `-`, it is treated as a flag and is set to `true` (empty "--" arguments are also treated as flags).
+- Positional arguments: The first and second arguments that do not start with `--` or `-` are interpreted as `"task"` and `"subtask"` respectively.
+
+# Returns
+- `args_dict`: A dictionary containing parsed command-line arguments. Long options are stored as key-value pairs, flags are stored with a value of `true`, and the first two positional arguments are stored as `"task"` and `"subtask"`.
+"""
+function parse_commandline(args)
+    args_dict = get_default_args()
+    num_pos = 0
+    for (k, arg) in enumerate(args)
+        if arg == "-h" || arg == "--help"
+            args_dict["help"] = true
+        elseif occursin("--", arg)
+            new_arg = (length(args) > k && !occursin("-", args[k+1])) ? args[k+1] : true
+            j = 0
+            while k+j+1 < length(args) && args[k+1+j][end] == ','
+                new_arg *= args[k+2+j]
+                j += 1
+            end
+
+            args_dict[arg[3:end]] = new_arg
+        elseif occursin("-", arg)
+            args_dict[arg[2:end]] = true
+        elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false) || args[k-1] == "--help"
+            num_pos += 1
+            if num_pos == 1; args_dict["task"] = arg; end
+            if num_pos == 2; args_dict["subtask"] = arg; end
+        end
     end
-    args :: Dict{String, Union{String, Bool}} = parse_args(s)
-    return args
+    return args_dict
 end
 
 run_task(task, subtask, args) = println("Task is none. Exiting ...")

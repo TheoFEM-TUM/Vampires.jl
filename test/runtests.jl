@@ -19,6 +19,7 @@ end
 end
 
 @testset "tasks" begin
+    include("tasks/test_cli.jl")
     include("tasks/test_outcar_task.jl")
     include("tasks/test_poscar_task.jl")
 end
