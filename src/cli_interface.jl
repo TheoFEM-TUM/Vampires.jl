@@ -52,8 +52,12 @@ function main(cli_args)
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
         
         if args["help"]
-            println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
-
+            if args["task"] == "none" && args["subtask"] == "none"
+                task_file = joinpath(@__DIR__, "..", "TASKS.md")
+                print(read(task_file, String))
+            else
+                println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+            end
             return nothing
         end
 
