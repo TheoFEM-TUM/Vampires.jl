@@ -15,7 +15,7 @@ convergence
 Available commands:
 * `vamp convergence make`: Create the folder structure for convergence testing.
 """
-run_task(::Type{Val{:convergence}}, subtask, args) = nothing
+run_task(::Type{Val{:convergence}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp [-r] convergence make --par <parameter> --val <range> [--method <method>] [--p <path>]

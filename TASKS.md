@@ -21,16 +21,12 @@ eigenval:
 ```
 
 ```
-set/add
-    incar: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
-rm
-    incar: remove a certain tag or block from the INCAR file.
-read
-    incar: read the value of a certain INCAR tag and print it
-make
-    incar: create an INCAR file with certain tags or blocks in it
-whatis
-    return the default comment for an INCAR tag.
+incar
+    set/add: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
+    rm: remove a certain tag or block from the INCAR file.
+    read: read the value of a certain INCAR tag and print it
+    make: create an INCAR file with certain tags or blocks in it
+    whatis: return the default comment for an INCAR tag.
 ```
 
 ```

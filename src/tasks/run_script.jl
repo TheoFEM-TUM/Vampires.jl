@@ -12,7 +12,7 @@ run_script
 Available commands:
 * `vamp run_script make`: Create a bash script to perform VASP calculations.
 """
-run_task(::Type{Val{:run_script}}, subtask, args) = nothing
+run_task(::Type{Val{:run_script}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp [-r] run_script make [--vasp_exe <vasp_executable>] [--p <path>]
