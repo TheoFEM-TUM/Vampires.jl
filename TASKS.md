@@ -69,16 +69,8 @@ run_script
 ```
 
 ```
-Processes and outputs data from a `read` task based on a specified method, handling recursive operations, broadcasting, and error reporting.
-
-# Parameters
-- `keys`: A collection of keys associated with each entry in `values`.
-- `values`: A collection of values to process and output.
-- `args`: A dictionary of arguments with the following expected keys:
-  - `"o"`: The output file path where results will be written.
-  - `"method"`: A string specifying the processing method. If the last character is `"."`, broadcasting is applied to the method.
-  - `"r"`: A boolean flag indicating whether to apply recursive processing.
-  - `"v"`: A boolean flag to enable verbose output.
+"""
+list of available tasks
 ```
 
 ```
