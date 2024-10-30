@@ -18,7 +18,7 @@ include("io/output/kpoints.jl")
 # calculations
 include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl"); include("calculations/lattice/supercell.jl")
 include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
-include("calculations/wannier90/hamiltonian.jl")
+include("calculations/wannier90/hamiltonian.jl"); include("calculations/error_funcs.jl")
 
 # plotting
 include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl")

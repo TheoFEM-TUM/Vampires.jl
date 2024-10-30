@@ -39,9 +39,33 @@ vamp w90_hr read --w90_hr /path/to/w90_hr.dat --o /path/to/output.h5
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["w90_hr"])
     Hr, Rs, deg = read_hrdat(input_filename)
-    return ["Hr", "Rs", "degeneracies"], [Hr, Rs, deg]
+    if args["par"] == "eigenvalues"
+        ks = rand(3, 10) # TODO: fix this
+        Es, _ = get_wannier90_eigenvalues(Hr, Rs, deg, ks)
+        return ["eigenvalues"]
+    elseif args["par"] == "bandgap"
+        # TODO
+    else
+        return ["Hr", "Rs", "degeneracies"], [Hr, Rs, deg]
+    end
 end
 
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:test}}, args)
+    bandmin, bandmax = parse.(split_line(args["N"], char=','))
+    ks, Es_dft, _ = read_eigenval(joinpath(args["p"], args["eigenval"]))
+    Hr, Rs, deg = read_hrdat(joinpath(args["p"], args["w90_hr"]))
 
+    Es_dft = Es_dft[bandmin:bandmax, :]
+    Es_w90, _ = get_wannier90_eigenvalues(Hr, Rs, deg, ks)
+
+    method = args["method"]
+    error = 0
+    if method == "rmse"
+        error = RMSE(Es_dft, Es_w90)
+    elseif method == "mae"
+        error = MAE(Es_dft, Es_w90)
+    elseif method == "mse"
+        error = MSE(Es_dft, Es_w90)
+    end
+    return ["$method"*"_error"], [error]
 end
