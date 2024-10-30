@@ -22,6 +22,7 @@ end
     include("tasks/test_cli.jl")
     include("tasks/test_outcar_task.jl")
     include("tasks/test_poscar_task.jl")
+    include("tasks/test_eigenval_task.jl")
 end
 
 @testset "calculations" begin

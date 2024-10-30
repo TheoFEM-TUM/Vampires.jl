@@ -21,7 +21,6 @@ function task_output(keys, values, args)
     f = get_method(method)
     keys_out, values_out, errors = reduce_output(keys, values, f, method, broadcasted, recursive)
     time = @elapsed if args["r"] && (args["method"][end] == '.' || method == "none")
-        @show errors
         for (value, error, folder) in zip(values_out, errors, readfolders(args["p"]))
             write_output(output_file, keys_out, value, error, folder=folder)
         end

@@ -45,7 +45,7 @@ vamp eigenval read -r --eigenval EIGENVAL_custom --o eigenval.h5
 vamp eigenval read --par bandgap
 """
 function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
-    input_filename = args["p"] * args["eigenval"]
+    input_filename = joinpath(args["p"], args["eigenval"])
     kp, Es, occs = read_eigenval(input_filename)
     if args["par"] == "bandgap"
         ΔE = get_bandgap(Es, occs, printit=args["v"])

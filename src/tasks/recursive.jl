@@ -35,10 +35,6 @@ function run_task_recursive(task, subtask, args)
     end
     args["p"] = base_path
     keys = output_pairs[1][1]
-    for pair in output_pairs
-        @show pair[1]
-        @show pair[2][1]
-    end
     values = [pair[2] for pair in output_pairs]
     return keys, values
 end

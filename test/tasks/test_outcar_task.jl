@@ -45,6 +45,10 @@
     rm("forces.h5")
 
     args["method"] = "mean."
-    args["o"] = "none"
+    args["o"] = "mean.h5"
     Vampires.task_output(keys, values, args)
+
+    @test h5read("mean.h5", "mean_forces") == [0., 0., 0.]
+    @test h5read("mean.h5", "mean_positions") == [0.7062500000000002, 0.7062500000000002, 0.7062500000000002]
+    rm("mean.h5")
 end
