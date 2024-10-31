@@ -41,12 +41,21 @@ vamp -r run_script make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 ```
 """
 function run_task(::Type{Val{:run_script}}, ::Type{Val{:make}}, args)
-    cd = ""
-    if args["exclude"] ≠ ""
-        excluded_files = split_line(args["exclude"], char=',')
-        cb = "rm" * prod([" "*file for file in excluded_files])
-    end
+    cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
+end
+
+function run_task_recursive(::Type{Val{:run_script}}, ::Type{Val{:make}}, args)
+    base_path = args["p"]
+    cb = get_exclude_callback(args["exclude"])
+    nchunks = parse(Int64, args["npar"])
+    for (chunk_id, folders) in enumerate(chunks(readfolders(base_path), n=nchunks))
+        script_name = nchunks == 1 ? "run_script.sh" : "run_script_$chunk_id.sh"
+        for folder in folders
+            args["p"] = joinpath(base_path, folder)
+            write_run_script(args["exe"], args["p"], cb=cb, out=script_name)
+        end
+    end
 end
 
 """

@@ -37,6 +37,26 @@ function write_run_script(vasp_exe, path; out="run_job.sh", cb="none", run_out="
 end
 
 """
+    get_exclude_callback(excludes::String) -> String
+
+Generates a command string to remove specified files after a calculation. If the `excludes` argument is non-empty, this function builds a shell command to remove each file listed in `excludes`. File names in `excludes` should be comma-separated.
+
+# Arguments
+- `excludes`: A comma-separated string of file names to exclude (i.e., remove) after calculation.
+
+# Returns
+- A string representing the shell command to remove the specified files. Returns an empty string if `excludes` is empty.
+"""
+function get_exclude_callback(excludes)
+    cb = ""
+    if excludes ≠ ""
+        excluded_files = split_line(excludes, char=',')
+        cb = "rm" * prod([" "*file for file in excluded_files])
+    end
+    return cb
+end
+
+"""
     add_path_to_folders(file::String, new_path::String)
 
 Adds a new path to the `folders` line in a bash script file.
