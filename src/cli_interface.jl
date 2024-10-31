@@ -113,7 +113,14 @@ function get_default_args()
         "outcar"=>"OUTCAR",
         "kpoints"=>"KPOINTS",
         "w90_hr"=>"wannier90_hr.dat",
-        "vasp_exe"=>"vasp_std"
+        "vasp_exe"=>"vasp_std",
+        "exclude"=>"none",
+        "account"=>"none",
+        "ext_par_file"=>"none",
+        "ncore" =>"none",
+        "nsim" =>"none",
+        "kpar" =>"none",
+        "super_cell_vector" =>"none",
     )
     return args_dict
 end
