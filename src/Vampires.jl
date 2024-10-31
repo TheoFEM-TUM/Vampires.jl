@@ -8,7 +8,7 @@ include("io/read_utils.jl")
 # input
 include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
 include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
-include("io/outcar.jl")
+include("io/outcar.jl"); include("io/settings.jl")
 include("io/w90_hr.jl")
 
 # output
@@ -29,7 +29,7 @@ include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/run_script.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
-include("tasks/w90_tasks.jl")
+include("tasks/w90_tasks.jl"); include("tasks/settings_tasks.jl")
 
 include("cli_interface.jl")
 
