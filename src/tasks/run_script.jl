@@ -15,13 +15,14 @@ Available commands:
 run_task(::Type{Val{:run_script}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] run_script make [--vasp_exe <vasp_executable>] [--p <path>]
+    vamp [-r] run make [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
 
 Creates a run script that executes the VASP executable at the specified path.
 
 # Arguments
-- `vasp_exe`: The name of the VASP executable that will be used in the run script.
+- `exe`: The name of the VASP executable that will be used in the run script.
 - `p`: The path where the run script will be created. This is the directory in which the script will be saved.
+- `exclude`: File or list of files to be removed after each calculation.
 
 # Behavior
 - The function generates a script that runs the VASP executable specified by `vasp_exe`.
@@ -58,6 +59,39 @@ function run_task_recursive(::Type{Val{:run}}, ::Type{Val{:make}}, args)
     end
 end
 
+"""
+    vamp run job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>] 
+                      [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>] 
+
+Creates and submits a Slurm job script to run the specified executable with customized job settings.
+
+# Arguments
+- `exe`: The name of the executable or file to run.
+- `partition`: The Slurm partition to use for the job. Defaults to `"batch"`.
+- `nodes`: The number of nodes allocated for the job. Defaults to `1`.
+- `time`: The maximum runtime for the job, in hours. Defaults to `1`.
+- `mail`: An email address for job status notifications.
+- `module_list`: A comma-separated list of required modules for the job, loaded before execution.
+- `module_path`: A specific module path to load environment modules from.
+- `p`: The directory path where the Slurm script will be generated and saved.
+- `o`: The output filename prefix for the Slurm script(s).
+
+# Behavior
+- Generates a Slurm job script for each executable matching `exe` found in the specified directory.
+- If multiple executables match the pattern, unique job scripts are created for each with incremented names.
+- If `exe` is found directly, creates and writes a single job script to the path specified by `p`.
+
+# Examples
+```bash
+# Example 1: Create a job script using the `vasp_std` executable in the specified path.
+vamp run job make --exe vasp_std --p /path/to/dir
+
+# Example 2: Generate job scripts for each executable matching "run_file" in the directory, with custom parameters.
+vamp run job make --exe run_file --partition short --nodes 2 --time 4 --mail user@example.com --p /path/to/dir --o vasp_job
+
+# Example 3: Load specific modules and specify a module path before running `vasp_std`.
+vamp run job make --exe vasp_std --module_list module1,module2 --module_path /path/to/modules --p /path/to/dir
+"""
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     exe = args["exe"]
     partition = haskey(args, "partition") ? args["partition"] : "batch"
@@ -69,9 +103,8 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
 
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
-        exe_name = replace(exe, "*"=>"", ".sh"=>"")
         for file in readdir(args["p"])            
-            if occursin(exe_name, file)
+            if occursin(exe, file)
                 filename = args["o"] * "_$num_exe"
                 write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
                 num_exe += 1
