@@ -104,6 +104,7 @@ function get_default_args()
         "p"=>"./",
         "o"=>"none",
         "N"=>"0",
+        "npar"=>"1",
         "method"=>"",
         "exclude"=>"",
         "incar"=>"INCAR",
