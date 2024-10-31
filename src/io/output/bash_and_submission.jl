@@ -93,3 +93,183 @@ function add_path_to_folders(file::String, new_path::String)
         end
     end
 end
+
+"""
+    write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48, 
+                       ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
+
+Generate a SLURM batch script for running VASP on an HPC system, optimized for JUWELS, but may require adjustments for other HPC systems.
+
+# Arguments
+- `path::String`: The directory where the SLURM script will be created.
+- `module_path::String=""`: Path to the module files if needed.
+- `module_list::Vector{String}=[]`: List of modules to load.
+- `exe::String="vasp_std"`: The executable to run.
+- `time::Int=1`: The wall time limit for the SLURM job script (in hours).
+- `nodes::Int=1`: The number of nodes to allocate.
+- `ntasks::Int=48`: The total number of tasks.
+- `ntasks_per_core::Int=1`: Number of tasks per core.
+- `omp_num_threads::Int=24`: Number of OpenMP threads.
+- `num_gpu::Int=0`: The number of GPUs to allocate.
+- `partition::String="batch"`: The partition to submit the job to.
+- `mail::String=""`: Email address for job notifications.
+- `filename::String="job"`: The filename for the SLURM batch script.
+
+# Description
+This function generates a SLURM batch script tailored for running VASP simulations. It includes necessary batch setup configurations, module loading commands, and commands for running VASP either on CPU or GPU.
+
+The generated script is optimized for the JUWELS supercomputing system, and might require further adjustments to work on other HPC systems.
+
+# Example
+```julia
+write_slurm_script(
+    "/path/to/dir";
+    module_path="/path/to/modules",
+    module_list=["module1", "module2"],
+    vasp_exe="vasp_std",
+    time=2,
+    nodes=2,
+    ntasks=96,
+    ntasks_per_core=2,
+    omp_num_threads=12,
+    num_gpu=4,
+    partition="batch",
+    mail="user@example.com",
+    script_filename="my_slurm_script.sh"
+)
+"""
+function write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", filename="job")
+    out = filename*".job"
+    hrs = trunc(Int, time)
+    min = trunc(Int, modf(time)[1]*60)
+    sec = trunc(Int, modf(modf(time)[1]*60)[1]*60)
+    time_str = lpad(hrs, 2, "0")*":"*lpad(sec, 2, "0")*":"*lpad(sec, 2, "0")
+    open(out, "w") do outfile
+        print(outfile, """
+        #!/bin/bash
+        #========================================#
+        # batch script for VASP
+        #========================================#
+        # Batch setup -> system reads # s batch
+        ###
+        #SBATCH --nodes=$nodes
+        #SBATCH --time=$time_str
+        #SBATCH --partition=$partition
+        #SBATCH --ntasks=$ntasks
+        """)
+        if num_gpu > 0
+            print(outfile, """
+            #SBATCH --gres=gpu:$num_gpu
+            # this is required in VASP 6.4.1 - supports only one rank per GPU
+            #SBATCH --ntasks-per-node=$num_gpu
+            # GPU allocation (VASP specific; necessary?)
+            #SBATCH --gpus-per-task=1       # num GPUs per process
+            """)
+        elseif ntasks_per_core == 0
+            print(outfile, """
+            #SBATCH --partition=$partition
+            """)
+        else
+            print(outfile, """
+            #SBATCH --ntasks-per-core=$ntasks_per_core
+            #SBATCH --partition=$partition
+            """)
+        end
+        print(outfile, """
+        #SBATCH --error=ERROR.%j
+        """)
+        if length(mail) > 0
+            print(outfile, """
+            #SBATCH --mail-user=$mail
+            #SBATCH --mail-type=START,FAIL,END
+            """)
+        end
+        if length(module_path) > 0 || length(module_list) > 0
+            print(outfile, """
+            #========================================#
+            # module setup for VASP
+            #========================================#
+            """)
+        end
+        if length(module_path) > 0
+            print(outfile, """
+            module use $module_path
+            """)
+        end
+        if length(module_list) > 0
+            for mod in module_list
+                print(outfile, """
+                module load $mod
+                """)
+            end
+        end
+        print(outfile, """
+        # ALL RUNS IN \$WORK !
+        # ... better
+        # start the jobs inside the correct directory
+        # as per default initial directory is the directory
+        # from where the job was submitted
+
+        #========================================#
+        # 3. Integrity check
+        #========================================#
+
+        echo "Starting at `date`"
+        echo "Running on hosts: \$SLURM_NODELIST"
+        echo "Running on \$SLURM_NNODES nodes."
+        echo "Running on \$SLURM_NPROCS processors."
+        echo "Work directory is `pwd`"
+        echo "VASP binary at " \$exe
+
+        echo
+        echo "Starting VASP run at" `date`
+        echo
+
+        #========================================#
+        # 4. Parallel execution
+        #========================================#
+        export OMP_NUM_THREADS=$omp_num_threads
+        # make sure that MKL does not overwrite your OMP configuration
+        export MKL_NUM_THREADS=$omp_num_threads
+        """)
+        if num_gpu > 0
+            print(outfile, """
+            export MKL_THREADING_LAYER=INTEL
+            export OMP_PLACES=cores
+            export OMP_PROC_BIND=close
+            export OMP_STACKSIZE=512m
+            """)
+        end
+        print(outfile, """
+        #========================================#
+        # 5. System info
+        #========================================#
+        hostname > host.info
+        grep 'Linux' /etc/issue >> host.info
+        grep 'model name' /proc/cpuinfo |cut -d: -f2 |uniq -c >> host.info
+        grep 'cpu M' /proc/cpuinfo >> host.info
+        grep 'MemTotal' /proc/meminfo >> host.info
+        free -g >> host.info
+        ulimit -a >> host.info
+        echo \$SLURM_NODELIST >> host.info
+        echo The VASP version is $exe >> host.info
+
+        #========================================#
+        # 5. VASP run
+        #========================================#
+        """)
+        if num_gpu == 0 && occursin("vasp", exe)
+            print(outfile, """
+            srun $exe > vasp.log
+            """)
+        elseif num_gpu == 0 && occursin(".sh", exe)
+            print(outfile, """
+            srun bash $exe
+            """)
+        else
+            print(outfile, """
+            orterun --map-by ppr:$num_gpu:node --bind-to core -np $num_gpu $vasp_exe > vasp.log
+            """)
+        end
+    end
+end

@@ -40,12 +40,12 @@ vamp -r run_script make --exe vasp_ncl
 vamp -r run_script make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 ```
 """
-function run_task(::Type{Val{:run_script}}, ::Type{Val{:make}}, args)
+function run_task(::Type{Val{:run}}, ::Type{Val{:make}}, args)
     cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
 end
 
-function run_task_recursive(::Type{Val{:run_script}}, ::Type{Val{:make}}, args)
+function run_task_recursive(::Type{Val{:run}}, ::Type{Val{:make}}, args)
     base_path = args["p"]
     cb = get_exclude_callback(args["exclude"])
     nchunks = parse(Int64, args["npar"])
@@ -55,6 +55,30 @@ function run_task_recursive(::Type{Val{:run_script}}, ::Type{Val{:make}}, args)
             args["p"] = joinpath(base_path, folder)
             write_run_script(args["exe"], args["p"], cb=cb, out=script_name)
         end
+    end
+end
+
+function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
+    exe = args["exe"]
+    partition = haskey(args, "partition") ? args["partition"] : "batch"
+    nodes = haskey(args, "nodes") ? args["nodes"] : 1
+    time = haskey(args, "time") ? args["time"] : 1
+    mail = haskey(args, "mail") ? args["mail"] : ""
+    module_list = split_line(haskey(args, "module_list") ? args["module_list"] : "", char=',')
+    module_path = haskey(args, "module_path") ? args["module_path"] : ""
+
+    if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
+        num_exe = 1
+        exe_name = replace(exe, "*"=>"", ".sh"=>"")
+        for file in readdir(args["p"])            
+            if occursin(exe_name, file)
+                filename = args["o"] * "_$num_exe"
+                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
+                num_exe += 1
+            end
+        end
+    else
+        write_slurm_script(args["exe"], args["p"], filename=args["o"])
     end
 end
 
