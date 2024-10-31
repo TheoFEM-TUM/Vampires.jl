@@ -1,7 +1,7 @@
 """
 list of available tasks:
 
-run_script
+run
     make: creates a bash script that runs vasp in a specific folder
 """
 
@@ -12,7 +12,7 @@ run_script
 Available commands:
 * `vamp run_script make`: Create a bash script to perform VASP calculations.
 """
-run_task(::Type{Val{:run_script}}, ::Type{Val{:none}}, args) = nothing
+run_task(::Type{Val{:run}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp [-r] run make [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
