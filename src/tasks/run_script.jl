@@ -31,14 +31,22 @@ Creates a run script that executes the VASP executable at the specified path.
 # Examples
 ```bash
 # Example 1: Create a run script to run VASP in all subfolders using the standard vasp executable.
-vamp -r run_script make --vasp_exe vasp_std
+vamp -r run_script make --exe vasp_std
 
 # Example 2: Create a run script to run VASP in all subfolders using the non-collinear vasp executable.
-vamp -r run_script make --vasp_exe vasp_ncl
+vamp -r run_script make --exe vasp_ncl
+
+# Example 3: Use the `exclude` keyword to specify files to be removed from each subfolder after each calculation.
+vamp -r run_script make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 ```
 """
 function run_task(::Type{Val{:run_script}}, ::Type{Val{:make}}, args)
-    write_run_script(args["vasp_exe"], args["p"])
+    cd = ""
+    if args["exclude"] ≠ ""
+        excluded_files = split_line(args["exclude"], char=',')
+        cb = "rm" * prod([" "*file for file in excluded_files])
+    end
+    write_run_script(args["exe"], args["p"], cb=cb)
 end
 
 """

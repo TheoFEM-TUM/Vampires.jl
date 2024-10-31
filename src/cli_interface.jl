@@ -105,6 +105,7 @@ function get_default_args()
         "o"=>"none",
         "N"=>"0",
         "method"=>"",
+        "exclude"=>"",
         "incar"=>"INCAR",
         "eigenval"=>"EIGENVAL",
         "doscar"=>"DOSCAR",
