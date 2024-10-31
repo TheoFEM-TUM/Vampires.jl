@@ -115,6 +115,7 @@ function get_default_args()
         "w90_hr"=>"wannier90_hr.dat",
         "vasp_exe"=>"vasp_std"
     )
+    read_settings!(args_dict)
     return args_dict
 end
 
