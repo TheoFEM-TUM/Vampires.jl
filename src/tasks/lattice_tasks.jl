@@ -46,7 +46,7 @@ vamp supercell make --N 1,2,3 --poscar structure/POSCAR
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
-    poscar = read_poscar(args["p"]*args["poscar"])
+    poscar = read_poscar(joinpath(args["p"], args["poscar"]))
     N = occursin(',', args["N"]) ? split_line(args["N"], char=',') : args["N"]
     N = parse.(Int64, N)
     sc_poscar = transform_primitive_cell(poscar, N)
