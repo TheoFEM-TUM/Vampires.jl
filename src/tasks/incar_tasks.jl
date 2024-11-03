@@ -64,7 +64,7 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:make}}, args)
     elseif length(args["block"]) > 0
         add_incar_block!(split_line(args["block"], char=','), incar) 
     end
-    write_incar(incar, args["p"]*args["incar"])
+    write_incar(incar, joinpath(args["p"], args["incar"]))
 end
 
 """
