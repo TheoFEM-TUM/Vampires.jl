@@ -104,6 +104,7 @@ function get_default_args()
         "p"=>"./",
         "o"=>"none",
         "N"=>"0",
+        "tol"=>"0.1",
         "method"=>"none",
         "incar"=>"INCAR",
         "eigenval"=>"EIGENVAL",
