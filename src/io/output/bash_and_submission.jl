@@ -1,19 +1,15 @@
 """
-    write_run_script(vasp_exe, path; out="run_job.sh")
+    write_run_script(exe, path; out="run_job.sh")
 
-Writes a bash script to run VASP in specified folders. If the script already exists, it adds the new folder path to the `folders` array.
+Writes a bash script to run a command in specified folders. If the script already exists, it adds the new folder path to the `folders` array.
 
 # Arguments
-- `vasp_exe::String`: The command to execute the VASP program.
+- `exe::String`: The command to execute in each subfolder.
 - `path::String`: The path to add to the `folders` array in the script.
 - `out::String`: The output file name for the script. Defaults to `"run_job.sh"`.
 
-# Description
-This function creates a bash script named `run_job.sh` (or the name specified by `out`). If the file already exists, the function adds the specified `path` to the `folders` array within the existing script. 
-If the file does not exist, it creates a new script with the necessary structure to run VASP in each folder specified in the `folders` array.
-The script will iterate over each folder in the `folders` array, change to that directory, execute the VASP command, and then return to the parent directory.
 """
-function write_run_script(vasp_exe, path; out="run_job.sh", cb="none", run_out="vasp.log")
+function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.log")
     if out in readdir()
         add_path_to_folders(out, path)
     else
@@ -27,7 +23,11 @@ function write_run_script(vasp_exe, path; out="run_job.sh", cb="none", run_out="
             println(runfile, "for folder in \"\${folders[@]}\"")
             println(runfile, "do")
             println(runfile, "    cd \$folder")
-            println(runfile, "    srun $vasp_exe  > $run_out")
+            if occursin(".sh", exe)
+                println(runfile, "    srun bash $exe > $run_out")
+            else
+                println(runfile, "    srun $exe  > $run_out")
+            end
             if cb ≠ "none"; println(runfile, "    "*cb); end 
             println(runfile, "    cd ..")
             println(runfile, "done")
