@@ -133,8 +133,16 @@ end
 function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     nscf_create_subdirectories(args["p"], args["kpoints"], args["incar"])
     filename = joinpath(args["p"], "run_nscf.sh")
-    write_run_script(args["exe"], args["p"], cb="ln scf/CHGCAR nscf/CHGCAR && vamp w90 set --par windows --eigenval scf/EIGENVAL", out=filename)
+    cb = get_exclude_callback(args["exclude"])
+    if length(cb) > 0; cb *= "\n"; end
+    cb *= "    if [[ \"\$folder\" == \"scf\" ]]; then\n      ln CHGCAR ../nscf/CHGCAR\n      vamp w90 set --par windows --eigenval EIGENVAL --incar ../nscf/INCAR\n    fi"
+    write_run_script(args["exe"], args["p"], cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
 
-    set_key_in_incar("LWANNIER90_RUN", "False", joinpath(args["p"] ,"scf/INCAR"))
+    scf_incar = joinpath(path, "scf/INCAR")
+    set_key_in_incar("LWANNIER90_RUN", "False", scf_incar)
+
+    nscf_incar = joinpath(path, "nscf/INCAR")
+    set_key_in_incar("LWANNIER90_RUN", "True", nscf_incar)
+    return nothing
 end
