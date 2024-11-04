@@ -50,22 +50,87 @@ function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
     end
 end
 
+"""
+    vamp [-r] w90_hr test [--w90_hr <file>] [--method <error_function>] [--N <bandmin>]
+
+Calculate the eigenvalues from a Wannier90 Hr file and compare them to DFT eigenvalues from the EIGENVAL file.
+
+# Arguments
+- `w90_hr`: The filename of the Wannier90 `Hr` file containing the Hamiltonian.
+- `method`: Specifies the error function (not case sensitive). Options include:
+    - `"rmse"` (Root Mean Square Error, default)
+    - `"mae"` (Mean Absolute Error)
+    - `"mse"` (Mean Squared Error)
+- `N`: Starting band index for comparison (default is 1).
+- `p`: The path to the directory containing both the `Hr` and `EIGENVAL` files.
+
+# Returns
+- `["<method>_error"]`: The name of the error metric calculated.
+- `[error]`: The calculated error.
+
+# Examples
+```bash
+# Example 1: Calculate RMSE between Wannier90 and DFT eigenvalues starting from band 14.
+vamp w90_hr test --method rmse --N 14
+
+# Example 2: Calculate the MAE between Wannier90 and DFT in every subfolder for custom filenames.
+vamp -r w90_hr test --w90_hr custom_hr.dat --eigenval custom_EIGENVAL
+"""
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:test}}, args)
-    bandmin, bandmax = parse.(split_line(args["N"], char=','))
-    ks, Es_dft, _ = read_eigenval(joinpath(args["p"], args["eigenval"]))
-    Hr, Rs, deg = read_hrdat(joinpath(args["p"], args["w90_hr"]))
+    bandmin = parse(Int64, args["N"]) == 0 ? 1 : parse(Int64, args["N"])
+    method = args["method"] == "none" ? "rmse" : args["method"]
+    hr_file = joinpath(args["p"], args["w90_hr"])
+    eig_file = joinpath(args["p"], args["eigenval"])
 
-    Es_dft = Es_dft[bandmin:bandmax, :]
-    Es_w90, _ = get_wannier90_eigenvalues(Hr, Rs, deg, ks)
-
-    method = args["method"]
-    error = 0
-    if method == "rmse"
-        error = RMSE(Es_dft, Es_w90)
-    elseif method == "mae"
-        error = MAE(Es_dft, Es_w90)
-    elseif method == "mse"
-        error = MSE(Es_dft, Es_w90)
-    end
+    error = compare_w90_and_dft(hr_file, eig_file, bandmin=bandmin, method=method)
     return ["$method"*"_error"], [error]
+end
+
+"""
+    vamp w90 set [--par <parameter>] [--tol <tolerance>] [--N <bandmin>] [--p <path>] [--incar <file>]
+
+Set parameters in the INCAR file for a Wannier90 calculation based on the specified parameter.
+
+# Arguments
+- `par`: Specifies the parameter to configure in the INCAR file. Options include:
+    - `"windows"`: Sets energy windows (`dis_win_min`, `dis_win_max`, `dis_froz_min`, `dis_froz_max`) for the Wannier90 disentanglement process.
+    - `"projections"`: Specifies projections (this functionality is pending).
+- `tol`: Tolerance applied when calculating energy windows (default is 0.1).
+- `N`: Starting band index for calculating energy windows (default is 1).
+- `p`: The path to the directory containing both the `incar` and `eigenval` files.
+- `incar`: Path to the INCAR file in which the specified parameters will be set.
+
+# Behavior
+- If `par` is set to `"windows"`, this function computes the energy windows (`dis_win_min`, `dis_win_max`, `dis_froz_min`, `dis_froz_max`) based on the DFT eigenvalues in `EIGENVAL`, the Wannier band range, and the tolerance.
+- The function then updates these parameters in the specified INCAR file.
+
+# Returns
+- No explicit return, but the INCAR file is modified with updated energy window values.
+
+# Examples
+```bash
+# Example 1: Set energy windows in the INCAR file with a tolerance of 0.15, starting from band index 10.
+vamp w90 set --par windows --tol 0.15 --N 10 --p /path/to/dir --incar INCAR
+
+# Example 2: Set energy windows in the INCAR file using default settings, specifying the path and INCAR file.
+vamp w90 set --par windows --p /path/to/dir --incar INCAR
+"""
+function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
+    tol = parse(Float64, args["tol"])
+
+    if args["par"] == "windows"
+        incar = joinpath(args["p"], args["incar"])
+        eig_file = joinpath(args["p"], args["eigenval"])
+        bandmin = parse(Int64, args["N"]) == 0 ? 1 : parse(Int64, args["N"])
+        num_wann = findvalue(incar, "num_wann")
+        
+        dis_win_min, dis_win_max, dis_froz_min, dis_froz_max = get_energy_windows(eig_file, num_wann; bandmin=bandmin, tol=tol)
+        
+        args["par"] = "dis_win_min,dis_win_max,dis_froz_min,dis_froz_max"
+        args["val"] = "$dis_win_min,$dis_win_max,$dis_froz_min,$dis_froz_max"
+    elseif args["par"] == "projections"
+        # TODO
+    end
+    
+    run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 end
