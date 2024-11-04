@@ -3,14 +3,19 @@ list of available tasks:
 
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
+    test: test the accuracy of a W90 model versus DFT
+w90
+    set: set parameters in the INCAR file that are specific to W90
 """
 
 
 """
-# CLI Commands to work with the Wannier90 hr file
+# CLI Commands to work with Wannier90 files
 
 Available commands:
 * `vamp w90_hr read`: Read the Wannier90 `w90_hr.dat` file and export its data.
+* `vamp w90_hr test`: Test the accuracy of a W90 model versus DFT.
+* `vamp w90 set`: Set parameters in the INCAR file that are specific to W90.
 """
 run_task(::Type{Val{:w90_hr}}, ::Type{Val{:none}}, args) = nothing
 
@@ -89,7 +94,7 @@ end
 """
     vamp w90 set [--par <parameter>] [--tol <tolerance>] [--N <bandmin>] [--p <path>] [--incar <file>]
 
-Set parameters in the INCAR file for a Wannier90 calculation based on the specified parameter.
+Set parameters in the INCAR file for a Wannier90 calculation based on the specified parameter. If `par` is an INCAR parameter simply calls `incar set`.
 
 # Arguments
 - `par`: Specifies the parameter to configure in the INCAR file. Options include:
@@ -100,20 +105,10 @@ Set parameters in the INCAR file for a Wannier90 calculation based on the specif
 - `p`: The path to the directory containing both the `incar` and `eigenval` files.
 - `incar`: Path to the INCAR file in which the specified parameters will be set.
 
-# Behavior
-- If `par` is set to `"windows"`, this function computes the energy windows (`dis_win_min`, `dis_win_max`, `dis_froz_min`, `dis_froz_max`) based on the DFT eigenvalues in `EIGENVAL`, the Wannier band range, and the tolerance.
-- The function then updates these parameters in the specified INCAR file.
-
-# Returns
-- No explicit return, but the INCAR file is modified with updated energy window values.
-
 # Examples
 ```bash
 # Example 1: Set energy windows in the INCAR file with a tolerance of 0.15, starting from band index 10.
-vamp w90 set --par windows --tol 0.15 --N 10 --p /path/to/dir --incar INCAR
-
-# Example 2: Set energy windows in the INCAR file using default settings, specifying the path and INCAR file.
-vamp w90 set --par windows --p /path/to/dir --incar INCAR
+vamp w90 set --par windows --tol 0.15 --N 10 --p /path/to/dir --incar INCAR --eigenval EIGENVAL_bands
 """
 function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
     tol = parse(Float64, args["tol"])
