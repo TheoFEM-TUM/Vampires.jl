@@ -155,8 +155,8 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         ###
         #SBATCH --nodes=$nodes
         #SBATCH --time=$time_str
+        #SBATCH --ntasks-per-node=$ntasks
         #SBATCH --partition=$partition
-        #SBATCH --ntasks=$ntasks
         """)
         if num_gpu > 0
             print(outfile, """
@@ -166,14 +166,9 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             # GPU allocation (VASP specific; necessary?)
             #SBATCH --gpus-per-task=1       # num GPUs per process
             """)
-        elseif ntasks_per_core == 0
-            print(outfile, """
-            #SBATCH --partition=$partition
-            """)
-        else
+        elseif ntasks_per_core ≠ 1
             print(outfile, """
             #SBATCH --ntasks-per-core=$ntasks_per_core
-            #SBATCH --partition=$partition
             """)
         end
         print(outfile, """
