@@ -110,7 +110,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
             end
         end
     else
-        write_slurm_script(exe, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
+        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
     end
 end
 
