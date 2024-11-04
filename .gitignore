@@ -54,6 +54,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 playground.jl
+settings
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
