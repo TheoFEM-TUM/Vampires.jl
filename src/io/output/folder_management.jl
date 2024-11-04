@@ -57,16 +57,15 @@ function nscf_create_subdirectories(path, kpoints, incar; verbose=false)
     kpoint_files = split_line(kpoints, char=','); if length(kpoint_files) == 1; append!(kpoint_files, kpoint_files); end
     incar_files = split_line(incar, char=','); if length(incar_files) == 1; append!(incar_files, incar_files); end
     for (k, folder) in enumerate(folders)
-        mkdir(path*folder)
+        mkdir(joinpath(path, folder))
         copy_vasp_input(path, folder, ignore=["KPOINTS", "INCAR"], include=[kpoint_files[k]=>"KPOINTS", incar_files[k]=>"INCAR"])
     end
+    scf_incar = joinpath(path, "scf/INCAR")
+    set_key_in_incar(["ISTART", "LCHARG"], ["0", "True"], scf_incar, verbose=verbose)
 
-    set_key_in_incar("ISTART", "0", path*"scf/INCAR", verbose=verbose)
-    set_key_in_incar("LCHARG", "True", path*"scf/INCAR", verbose=verbose)
-
-    remove_key_from_incar("ISTART", path*"nscf/INCAR", verbose=verbose)
-    set_key_in_incar("ICHARG", "11", path*"nscf/INCAR", verbose=verbose)
-    set_key_in_incar("LCHARG", "False", path*"nscf/INCAR", verbose=verbose)
+    nscf_incar = joinpath(path, "nscf/INCAR")
+    remove_key_from_incar("ISTART", nscf_incar, verbose=verbose)
+    set_key_in_incar(["ICHARG", "LCHARG"], ["11", "False"], nscf_incar, verbose=verbose)
 end
 
 """
