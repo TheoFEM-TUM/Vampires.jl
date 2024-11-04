@@ -76,5 +76,8 @@ list of available tasks
 ```
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
+    test: test the accuracy of a W90 model versus DFT
+w90
+    set: set parameters in the INCAR file that are specific to W90
 ```
 
