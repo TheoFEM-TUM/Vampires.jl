@@ -133,7 +133,7 @@ function print_output(key, value; folder="none", error=0.)
     out = "The value for $key "
     if folder ≠ "none"; out *= "in $folder "; end
     out *= "is: $value"
-    if error ≠ 0. && error ≠ [0.]; out *= " ± $error"; end
+    if error ≠ 0. && sum(error) ≠ 0.; out *= " ± $error"; end
     out *= "."
     println(out)
 end
