@@ -100,7 +100,6 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     mail = haskey(args, "mail") ? args["mail"] : ""
     module_list = split_line(haskey(args, "module_list") ? args["module_list"] : "", char=',')
     module_path = haskey(args, "module_path") ? args["module_path"] : ""
-
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
         for file in readdir(args["p"])            
@@ -111,7 +110,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
             end
         end
     else
-        write_slurm_script(args["exe"], args["p"], filename=args["o"])
+        write_slurm_script(exe, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
     end
 end
 

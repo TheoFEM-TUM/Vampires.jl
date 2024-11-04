@@ -139,7 +139,7 @@ write_slurm_script(
     script_filename="my_slurm_script.sh"
 )
 """
-function write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", filename="job")
+function write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0, partition="batch", mail="", filename="job")
     out = filename*".job"
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
