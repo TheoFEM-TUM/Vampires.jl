@@ -92,6 +92,7 @@ function add_path_to_folders(file::String, new_path::String)
             end
         end
     end
+    return nothing
 end
 
 """
