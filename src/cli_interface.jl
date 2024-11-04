@@ -145,7 +145,7 @@ function parse_commandline(args)
         if arg == "-h" || arg == "--help"
             args_dict["help"] = true
         elseif occursin("--", arg)
-            new_arg = (length(args) > k && !occursin("-", args[k+1])) ? args[k+1] : true
+            new_arg = (length(args) > k && args[k+1][1] ≠ '-') ? args[k+1] : true
             j = 0
             while k+j+1 < length(args) && args[k+1+j][end] == ','
                 new_arg *= args[k+2+j]
@@ -153,7 +153,7 @@ function parse_commandline(args)
             end
 
             args_dict[arg[3:end]] = new_arg
-        elseif occursin("-", arg)
+        elseif arg[1] == '-'
             args_dict[arg[2:end]] = true
         elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false) || args[k-1] == "--help"
             num_pos += 1
