@@ -129,3 +129,12 @@ function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
     
     run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 end
+
+function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
+    nscf_create_subdirectories(args["p"], args["kpoints"], args["incar"])
+    filename = joinpath(args["p"], "run_nscf.sh")
+    write_run_script(args["exe"], args["p"], cb="ln scf/CHGCAR nscf/CHGCAR && vamp w90 set --par windows --eigenval scf/EIGENVAL", out=filename)
+    add_path_to_folders.(filename, ["scf", "nscf"])
+
+    set_key_in_incar("LWANNIER90_RUN", "False", joinpath(args["p"] ,"scf/INCAR"))
+end
