@@ -13,15 +13,17 @@ Calculate the phase factor for `R⃗` and `k⃗`.
 exp_2πi(R⃗, k⃗) = @. exp(2π*im * $*(R⃗', k⃗))
 
 function get_wannier90_eigenvalues(Hr, Rs, deg, ks)
-    exp_2πikR = exp_2πi(R⃗, k⃗)
+    exp_2πiRk = exp_2πi(Rs, ks)
     Hk = zeros(ComplexF64, size(Hr, 1), size(Hr, 1), size(ks, 2))
-    @time for R in axes(Rs, 2), k in axes(ks, 2)
-        @. Hk[:, :, k] += Hr[:, :, R] * exp_2πikR[k, R] / deg[R]
+    @views for R in axes(Rs, 2), k in axes(ks, 2)
+        @. Hk[:, :, k] += Hr[:, :, R] * exp_2πiRk[R, k] / deg[R]
     end
-    Es = zeros(ComplexF64, size(Hr, 1), size(ks, 2))
+    Es = zeros(Float64, size(Hr, 1), size(ks, 2))
     vs = zeros(ComplexF64, size(Hr, 1), size(Hr, 1), size(ks, 2))
-    @time for k in axes(Hk, 3)
-        @views Es[:, k], vs[:, :, k] = eigen(Hk[:, :, k])
+    @views for k in axes(Hk, 3)
+        eig = eigen(Hk[:, :, k])
+        Es[:, k] = real.(eig.values)
+        vs[:, :, k] = eig.vectors
     end
-    return Es[:, k]
+    return Es, vs
 end
