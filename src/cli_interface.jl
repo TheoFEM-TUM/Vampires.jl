@@ -52,9 +52,6 @@ function main(cli_args)
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
         if args["help"]
             if args["task"] == "none" && args["subtask"] == "none"
-                task_file = joinpath(@__DIR__, "..", "TASKS.md")
-                # VASP Analysis for Materials Properties In Realistic Energy Surfaces
-                tasks_md = read(task_file, String)
                 println("********************************************************************************")
                 println("* Welcome to                                                                   *")
                 println("* __     ___    __  __ ____ ___ ____  _____                                    *")
@@ -64,7 +61,19 @@ function main(cli_args)
                 println("*    \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/         Energy Surfaces       *")
                 println("*                                                                              *")
                 println("********************************************************************************")
-                print(replace(tasks_md, "```\n" => ""))
+                arg_descriptions = get_args_description()
+                println("Positional arguments:")
+                println("   Task : ", arg_descriptions[1].second)
+                println("   Subtask : ", arg_descriptions[2].second)
+                println("")
+                println("Optional arguments:")
+                for (first, second) in arg_descriptions[3:end]
+                    println("   ", first, " : ", second)
+                end
+                println("")
+                println("get more information by querying specific tasks and subtasks:")
+                println("   - vamp --help <task>")
+                println("   - vamp --help <task> <subtask>")
             else
                 println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
             end
@@ -128,7 +137,8 @@ function get_default_args()
 end
 
 function get_args_description()
-    args_dict = Dict{String, Union{String, Bool}}(
+    # args_dict = Dict{String, String}(
+    args_dict = (
         "task" => "positional argument 1: task defines which task is to be performed",
         "subtask" => "positional argument 2: some tasks require further specification",
         "r" => "if true, task will be applied recursively to all folders",
