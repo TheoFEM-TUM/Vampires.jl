@@ -1,5 +1,5 @@
-MSE(y...) = mean((diff(y...)).^2)
+MSE(y...) = mean((-(y...)).^2)
 
-RMSE(y...) = √MSE(diff(y...))
+RMSE(y...) = √MSE(-(y...))
 
-MAE(y...) = mean(abs.(diff(y...)))
+MAE(y...) = mean(abs.(-(y...)))
