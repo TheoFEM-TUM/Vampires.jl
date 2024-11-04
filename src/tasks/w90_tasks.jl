@@ -6,6 +6,8 @@ w90_hr
     test: test the accuracy of a W90 model versus DFT
 w90
     set: set parameters in the INCAR file that are specific to W90
+w90_nscf
+    make: create the folder structure for a NSCF calculation with W90
 """
 
 
