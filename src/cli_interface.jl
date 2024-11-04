@@ -105,7 +105,9 @@ function get_default_args()
         "o"=>"none",
         "N"=>"0",
         "tol"=>"0.1",
+        "npar"=>"1",
         "method"=>"none",
+        "exclude"=>"",
         "incar"=>"INCAR",
         "eigenval"=>"EIGENVAL",
         "doscar"=>"DOSCAR",
@@ -115,7 +117,7 @@ function get_default_args()
         "outcar"=>"OUTCAR",
         "kpoints"=>"KPOINTS",
         "w90_hr"=>"wannier90_hr.dat",
-        "vasp_exe"=>"vasp_std"
+        "exe"=>"vasp_std"
     )
     return args_dict
 end
