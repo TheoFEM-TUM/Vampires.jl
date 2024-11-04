@@ -52,17 +52,28 @@ function main(cli_args)
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
         if args["help"]
             if args["task"] == "none" && args["subtask"] == "none"
-                task_file = joinpath(@__DIR__, "..", "TASKS.md")
-                tasks_md = read(task_file, String)
-                println("Welcome to")
+                println("********************************************************************************")
+                println("* Welcome to                                                                   *")
+                println("* __     ___    __  __ ____ ___ ____  _____                                    *")
+                println("* \\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___    VASP Analysis               *")
+                println("*  \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|     for Materials Properties  *")
+                println("*   \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\          In Realistic         *")
+                println("*    \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/         Energy Surfaces       *")
+                println("*                                                                              *")
+                println("********************************************************************************")
+                arg_descriptions = get_args_description()
+                println("Positional arguments:")
+                println("   Task : ", arg_descriptions[1].second)
+                println("   Subtask : ", arg_descriptions[2].second)
                 println("")
-                println("__     ___    __  __ ____ ___ ____  _____")
-                println("\\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___")
-                println(" \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|")
-                println("  \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\")
-                println("   \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/")
+                println("Optional arguments:")
+                for (first, second) in arg_descriptions[3:end]
+                    println("   ", first, " : ", second)
+                end
                 println("")
-                print(replace(tasks_md, "```\n" => ""))
+                println("get more information by querying specific tasks and subtasks:")
+                println("   - vamp --help <task>")
+                println("   - vamp --help <task> <subtask>")
             else
                 println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
             end
@@ -98,25 +109,70 @@ function get_default_args()
         "r" => false,
         "v" => false,
         "help" => false,
-        "par"=>"",
-        "val"=>"",
-        "block"=>"",
-        "p"=>"./",
-        "o"=>"none",
-        "N"=>"0",
-        "method"=>"",
-        "incar"=>"INCAR",
-        "eigenval"=>"EIGENVAL",
-        "doscar"=>"DOSCAR",
-        "poscar"=>"POSCAR",
-        "xdatcar"=>"XDATCAR",
-        "outcar"=>"OUTCAR",
-        "kpoints"=>"KPOINTS",
-        "w90_hr"=>"wannier90_hr.dat",
-        "vasp_exe"=>"vasp_std"
+        "par" => "",
+        "val" => "",
+        "block" => "",
+        "p" => "./",
+        "o" => "none",
+        "N" => "0",
+        "method" => "",
+        "incar" => "INCAR",
+        "eigenval" => "EIGENVAL",
+        "doscar" => "DOSCAR",
+        "poscar" => "POSCAR",
+        "xdatcar" => "XDATCAR",
+        "outcar" => "OUTCAR",
+        "kpoints" => "KPOINTS",
+        "w90_hr" => "wannier90_hr.dat",
+        "vasp_exe" => "vasp_std",
+        "exclude" => "none",
+        "account" => "none",
+        "ext_par_file" => "none",
+        "ncore" => "none",
+        "nsim" => "none",
+        "kpar" => "none",
+        "super_cell_vector" => "none",
     )
     return args_dict
 end
+
+function get_args_description()
+    # args_dict = Dict{String, String}(
+    args_dict = (
+        "task" => "positional argument 1: task defines which task is to be performed",
+        "subtask" => "positional argument 2: some tasks require further specification",
+        "r" => "if true, task will be applied recursively to all folders",
+        "v" => "if true, Vampires are verbos",
+        "help" => "print help output",
+        "par" => "define a parameter that is to be adapted",
+        "val" => "define the value of the parameter",
+        "block" => "define the block that a parameter belongs to",
+        "p" => "set the default path",
+        "o" => "set the output (file-) name",
+        "N" => "general task dependent number parameter",
+        "method" => "general task dependent method parameter",
+        "incar" => "set the name of the INCAR file",
+        "eigenval" => "set the name of the EIGENVAL file",
+        "doscar" => "set the name of the DOSCAR file",
+        "poscar" => "set the name of the POSCAR file",
+        "xdatcar" => "set the name of the XDATCAR file",
+        "outcar" => "set the name of the OUTCAR file",
+        "kpoints" => "set the name of the kpoints file",
+        "exclude" => "task dependent exclude parameter",
+        "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
+        "account" => "set the account name for job submission on slurm system",
+        "w90_hr" => "set the name of the *_hr.dat file",
+        "vasp_exe" => "set the name of the VASP executable",
+        "ext_par_file" => "Path to an extended parameter file that contains additional settings for the simulation.",
+        "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
+        "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
+        "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
+        "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
+    )
+    return args_dict
+end
+
+
 
 """
     parse_commandline(args::Vector{String}) -> Dict{String, Any}
