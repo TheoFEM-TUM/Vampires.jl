@@ -1,3 +1,14 @@
+println("Welcome to")
+println("")
+println("__     ___    __  __ ____ ___ ____  _____")
+println("\\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___")
+println(" \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|")
+println("  \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\")
+println("   \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/")
+println("")
+
+println("Starting Vampires installation...")
+
 using Pkg
 
 # Add and import the `ArgParse` package

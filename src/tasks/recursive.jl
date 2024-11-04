@@ -32,11 +32,16 @@ function run_task_recursive(task, subtask, args)
     keys = Vector{String}[]
     values = map(readfolders(base_path)) do folder
         args["p"] = joinpath(base_path, folder * "/")
-        key, value = run_task(task, subtask, args)
-        push!(keys, key)
-        value
+        out = run_task(task, subtask, args)
+        if out ≠ nothing
+            key, value = out
+            push!(keys, key)
+            return value
+        end
     end
     args["p"] = base_path
-    keys = keys[1]
+    if length(keys) > 0
+        keys = keys[1]
+    end
     return keys, values
 end

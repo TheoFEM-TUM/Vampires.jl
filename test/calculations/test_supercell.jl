@@ -27,15 +27,15 @@ _, configs = read_xdatcar(test_file_path*"XDATCAR_gaas")
     inds = read_from_file(path*"config_inds.dat", type=Int64)
     @test length(inds) == N
     for i in 1:N, file in ["POSCAR", "POTCAR", "KPOINTS", "INCAR"]
-        @test file ∈ readdir(path*"snap_$i")
+        @test file ∈ readdir(path*"config_$i")
     end
     for i in 1:N
-        poscar = read_poscar(path*"snap_$i/POSCAR")
+        poscar = read_poscar(path*"config_$i/POSCAR")
         @test poscar.rs_atom == configs[:, :, inds[i]]
     end
     @test minimum(inds) ≥ Nmin
 end
 rm(path*"config_inds.dat")
 for i in 1:N
-    rm(path*"snap_$i", recursive=true)
+    rm(path*"config_$i", recursive=true)
 end
