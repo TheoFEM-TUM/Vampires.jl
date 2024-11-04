@@ -69,6 +69,13 @@ run
 ```
 
 ```
+settings
+    set: set a new setting in the settings file
+    rm: remove a setting from the settings file
+    read: read a setting from the settings file
+```
+
+```
 """
 list of available tasks
 ```
