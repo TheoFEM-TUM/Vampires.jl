@@ -16,8 +16,9 @@ Available commands:
 * `vamp w90_hr read`: Read the Wannier90 `w90_hr.dat` file and export its data.
 * `vamp w90_hr test`: Test the accuracy of a W90 model versus DFT.
 * `vamp w90 set`: Set parameters in the INCAR file that are specific to W90.
+* `vamp w90_nscf make`: Create the folder structure for a NSCF calculation with W90.
 """
-run_task(::Type{Val{:w90_hr}}, ::Type{Val{:none}}, args) = nothing
+run_task(::Type{Val{:w90}}, ::Type{Val{:none}}, args) = nothing
 
 """
     vamp [-r] w90_hr read [--w90_hr <file>] [--o <output_file>]
@@ -130,6 +131,23 @@ function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
     run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 end
 
+"""
+    vamp [-r] w90_nscf make [--p <path>] [--exe <executable>] [--kpoints <kpoints_file>] [--incar <incar_file>] [--exclude <files>]
+
+Prepare subdirectories and scripts for a non-self-consistent field (NSCF) Wannier90 calculation.
+
+# Arguments
+- `p`: The base path where the subdirectories and run scripts are created.
+- `exe`: The executable file for the NSCF calculation.
+- `kpoints`: Path to the KPOINTS file(s). If applicable, first file is used for SCF and second file for NSCF calculation.
+- `incar`: Path to the INCAR file. If applicable, first file is used for SCF and second file for NSCF calculation.
+- `exclude`: Optional files or list of files to be removed after each calculation, using a callback for customization.
+
+# Examples
+```bash
+# Example: Set up an NSCF Wannier90 calculation with specific INCAR and KPOINTS, and exclude certain files.
+vamp w90_nscf make --p /path/to/calc --exe vasp_std --kpoints KPOINTS,KPOINTS_W90 --incar INCAR,INCAR_W90 --exclude WAVECAR,XDATCAR
+"""
 function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     nscf_create_subdirectories(args["p"], args["kpoints"], args["incar"])
     filename = joinpath(args["p"], "run_nscf.sh")
