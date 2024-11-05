@@ -61,14 +61,16 @@ function main(cli_args)
                 println("*    \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/         Energy Surfaces       *")
                 println("*                                                                              *")
                 println("********************************************************************************")
-                arg_descriptions = get_args_description()
+                arg_descriptions = get_arg_description()
                 println("Positional arguments:")
-                println("   Task : ", arg_descriptions[1].second)
-                println("   Subtask : ", arg_descriptions[2].second)
+                println("   Task : ", arg_descriptions["task"])
+                println("   Subtask : ", arg_descriptions["subtask"])
                 println("")
+                delete!(arg_descriptions, "task")
+                delete!(arg_descriptions, "subtask")
                 println("Optional arguments:")
-                for (first, second) in arg_descriptions[3:end]
-                    println("   ", first, " : ", second)
+                for (key, value) in arg_descriptions
+                    println("   ", key, " : ", value)
                 end
                 println("")
                 println("get more information by querying specific tasks and subtasks:")
@@ -137,12 +139,12 @@ function get_default_args()
         "kpar" => "none",
         "super_cell_vector" => "none",
     )
+    read_settings!(args_dict)
     return args_dict
 end
 
-function get_args_description()
-    # args_dict = Dict{String, String}(
-    args_dict = (
+function get_arg_description()
+    arg_descriptions = OrderedDict{String, String}(
         "task" => "positional argument 1: task defines which task is to be performed",
         "subtask" => "positional argument 2: some tasks require further specification",
         "r" => "if true, task will be applied recursively to all folders",
@@ -167,17 +169,14 @@ function get_args_description()
         "account" => "set the account name for job submission on slurm system",
         "w90_hr" => "set the name of the *_hr.dat file",
         "vasp_exe" => "set the name of the VASP executable",
-        "ext_par_file" => "Path to an extended parameter file that contains additional settings for the simulation.",
+        "ext_par_file" => "Path to an extended parameter file that contains additional settings for the simulation",
         "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
         "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
         "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
         "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
     )
-    read_settings!(args_dict)
-    return args_dict
+    return arg_descriptions
 end
-
-
 
 """
     parse_commandline(args::Vector{String}) -> Dict{String, Any}
