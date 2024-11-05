@@ -3,6 +3,11 @@ list of available tasks:
 
 run
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: create a new job file
+    submit: submit all *.job files
+input
+    cp: copy all VASP input files to a new folder
 """
 
 
@@ -141,11 +146,32 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
     end
 end
 
+"""
+    vamp [-r] input cp [--p <origin>] [--o <dest>] [--include <additional_files>] [--exclude <file_to_exlude>]
+
+Copy all input files (`POSCAR`, `POTCAR`, `INCAR`, `KPOINTS` by default) to the destination `dest`. If `dest` does not exist, create it. 
+Files can be included/excluded using the `include`/`exclude` keywords.
+
+# Arguments
+- `p`: Origin path of where to look for the files.
+- `o`: Destination path of where to copy files.
+- `include`: Additional files to copied.
+- `exclude`: Files to exclude.
+
+# Examples
+```bash
+# Example 1: Copy all VASP inputs to a new folder `MYFOLDER`.
+vamp input cp --o MYFOLDER
+
+# Example 2: Copy all files but the `KPOINTS` file and include `myfile`.
+vamp input cp --o MYFOLDER --exclude KPOINTS --include myfile
+```
+"""
 function run_task(::Type{Val{:input}}, ::Type{Val{:cp}}, args)
     path = args["p"]
     target = args["o"]
     if target ∉ readdir(); mkdir(target); end
     ignore = split_line(args["exclude"], char=',')
-    include = split_line(args["include"], char=',')
-    copy_vasp_input(path, target, ignore=ignore, include=[file=>file for file in include])
+    include = get_include(split_line(args["include"], char=','))
+    copy_vasp_input(path, target, ignore=ignore, include=include)
 end
