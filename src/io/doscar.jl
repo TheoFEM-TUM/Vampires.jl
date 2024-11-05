@@ -66,3 +66,8 @@ function read_doscar_with_pdos(file)
     end
     return transpose(dos), transpose.(pdos), meta
 end
+
+# TODO: account for spin, f-orbitals, ...
+function get_pdos_orbital_list()
+    return ["s", "p_y", "p_z", "p_x", "d_xy", "d_yz", "d_z2-r2", "d_xz", "d_x2-y2"]
+end

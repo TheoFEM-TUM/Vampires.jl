@@ -35,11 +35,22 @@ Reads the density of states (DOS) data from a DOSCAR file and writes the results
 vamp doscar read --doscar DOSCAR --o output.h5
 """
 function run_task(::Type{Val{:doscar}}, ::Type{Val{:read}}, args)
-    output_filename = args["o"]
-    dos, _ = read_doscar(args["doscar"])
-    if occursin("h5", output_filename)
-        write_data_to_hdf5(output_filename, ["energy", "dos", "idos"], [dos[:, 1], dos[:, 2], dos[:, 3]])
+    doscar = joinpath(args["p"], args["doscar"])
+    dos, _ = read_doscar(doscar)
+    keys = String["energy", "total_dos", "integrated_dos"]
+    values = Vector{Float64}[dos[:, 1], dos[:, 2], dos[:, 3]]
+    if args["par"] == "pdos"
+        atom_types = read_poscar(joinpath(args["p"], args["poscar"])).atom_types
+        atom_types = add_atom_counts(atom_types)
+        orbitals = get_pdos_orbital_list()
+        _, pdos, _ = read_doscar_with_pdos(doscar)
+        for (i, type) in enumerate(atom_types), (j, orbital) in enumerate(orbitals)
+            push!(keys, "$type"*"_"*"$orbital")
+            push!(values, pdos[i][1+j, :])
+        end
     end
+    @show keys
+    return keys, values
 end
 
 """
