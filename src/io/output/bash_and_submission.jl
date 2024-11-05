@@ -24,7 +24,7 @@ function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.
             println(runfile, "do")
             println(runfile, "    cd \$folder")
             if occursin(".sh", exe)
-                println(runfile, "    srun bash $exe > $run_out")
+                println(runfile, "    bash $exe > $run_out")
             else
                 println(runfile, "    srun $exe  > $run_out")
             end
@@ -264,7 +264,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             """)
         elseif num_gpu == 0 && occursin(".sh", exe)
             print(outfile, """
-            srun bash $exe
+            bash $exe
             """)
         else
             print(outfile, """
