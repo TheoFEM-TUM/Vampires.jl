@@ -11,7 +11,7 @@ include("io/test_read_utils.jl")
     include("io/input/test_doscar.jl")
     include("io/input/test_poscar.jl")
     include("io/input/test_xdatcar.jl")
-    include("io/input/test_outcar.jl")    
+    include("io/input/test_outcar.jl")
 end
 
 @testset "io/output" begin
