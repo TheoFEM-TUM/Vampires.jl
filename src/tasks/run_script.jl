@@ -140,3 +140,12 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
         end
     end
 end
+
+function run_task(::Type{Val{:input}}, ::Type{Val{:cp}}, args)
+    path = args["p"]
+    target = args["o"]
+    if target ∉ readdir(); mkdir(target); end
+    ignore = split_line(args["exclude"], char=',')
+    include = split_line(args["include"], char=',')
+    copy_vasp_input(path, target, ignore=ignore, include=[file=>file for file in include])
+end
