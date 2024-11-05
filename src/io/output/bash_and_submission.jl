@@ -182,6 +182,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         end
         if length(module_path) > 0 || length(module_list) > 0
             print(outfile, """
+
             #========================================#
             # module setup for VASP
             #========================================#
@@ -200,6 +201,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             end
         end
         print(outfile, """
+
         # ALL RUNS IN \$WORK !
         # ... better
         # start the jobs inside the correct directory
@@ -224,6 +226,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         #========================================#
         # 4. Parallel execution
         #========================================#
+
         export OMP_NUM_THREADS=$omp_num_threads
         # make sure that MKL does not overwrite your OMP configuration
         export MKL_NUM_THREADS=$omp_num_threads
@@ -237,6 +240,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             """)
         end
         print(outfile, """
+
         #========================================#
         # 5. System info
         #========================================#
@@ -251,7 +255,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         echo The VASP version is $exe >> host.info
 
         #========================================#
-        # 5. VASP run
+        # 5. Main job execution
         #========================================#
         """)
         if num_gpu == 0 && occursin("vasp", exe)
