@@ -66,6 +66,11 @@ any_task
 ```
 run
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: create a new job file
+    submit: submit all *.job files
+input
+    cp: copy all VASP input files to a new folder
 ```
 
 ```
