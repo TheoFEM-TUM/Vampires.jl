@@ -48,4 +48,16 @@ import Vampires: parse_commandline
     # Test 12: Test h flag instead of help
     args12 = parse_commandline(["-h", "--par", "bandgap"])
     @test args12["help"] && args12["par"] == "bandgap"
+
+    # Test 13: Test number of default args and descriptions
+    default_args = Vampires.get_default_args()
+    args_descriptions = Vampires.get_args_description()
+    args_have_description = map(collect(keys(default_args))) do key
+        hasdescription = haskey(args_descriptions, key)
+        if !hasdescription
+            @warn "No description found for $key, did you just add this?"
+        end
+        return hasdescription
+    end
+    @test all(args_have_description)
 end
