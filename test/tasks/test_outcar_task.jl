@@ -51,4 +51,13 @@
     @test h5read("mean.h5", "mean_forces") == [0., 0., 0.]
     @test h5read("mean.h5", "mean_positions") == [0.7062500000000002, 0.7062500000000002, 0.7062500000000002]
     rm("mean.h5")
+
+    # Test 4: test OUTCAR recursive total energy
+    args["par"] = "free  energy"
+    args["o"] = "toten.h5"
+    args["method"] = "none"
+    keys, values = run_task_recursive(Val{Symbol("outcar")}, Val{Symbol("read")}, args)
+    Vampires.task_output(keys, values, args)
+    @test h5read("toten.h5", "free  energy") == [-8.25135668, -8.25135668, -8.25135668]
+    rm("toten.h5")
 end

@@ -56,7 +56,8 @@ Processes the `keys` and `values` according to the specified function `f` and th
 - `values_out`: A collection of outputs from applying `f` to each element in `values`, following broadcast or recursion rules as appropriate.
 - `errors`: A collection of error values returned by `f` for each processed `value` or sub-collection in `values`.
 """
-reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, recursive) = keys, values, [zeros(length(keys)) for _ in 1:length(values[1])]
+reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, recursive) = keys, values, zeros(length(keys))
+reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, ::Type{Val{:recursive}}) = keys, values, [zeros(length(keys)) for _ in 1:length(values)]
 
 function reduce_output(keys, values, f, method, broadcasted, recursive)
     keys_out = eltype(keys)[]
