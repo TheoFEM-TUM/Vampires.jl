@@ -132,7 +132,6 @@ function get_default_args()
         "kpoints" => "KPOINTS",
         "w90_hr" => "wannier90_hr.dat",
         "exe" => "vasp_std",
-        "exclude" => "none",
         "account" => "none",
         "ext_par_file" => "none",
         "ncore" => "none",

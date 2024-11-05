@@ -153,9 +153,10 @@ vamp w90_nscf make --p /path/to/calc --exe vasp_std --kpoints KPOINTS,KPOINTS_W9
 function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     nscf_create_subdirectories(args["p"], args["kpoints"], args["incar"])
     filename = joinpath(args["p"], "run_nscf.sh")
+    bandmin = args["N"] == "0" ? 1 : parse(Int64, args["N"])
     cb = get_exclude_callback(args["exclude"])
     if length(cb) > 0; cb *= "\n"; end
-    cb *= "    if [[ \"\$folder\" == \"scf\" ]]; then\n      ln CHGCAR ../nscf/CHGCAR\n      vamp w90 set --par windows --eigenval EIGENVAL --incar ../nscf/INCAR\n    fi"
+    cb *= "    if [[ \"\$folder\" == \"scf\" ]]; then\n      ln -f CHGCAR ../nscf/CHGCAR\n      vamp w90 set --N $bandmin --par windows --eigenval EIGENVAL --incar ../nscf/INCAR\n    fi"
     write_run_script(args["exe"], args["p"], cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
 

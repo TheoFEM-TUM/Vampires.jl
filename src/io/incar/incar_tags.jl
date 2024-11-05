@@ -137,7 +137,7 @@ const VASP_DEFAULTS = Dict{String, String}(
     "LSORBIT" => "False",
     "NUM_WANN" => "0",
     "LWANNIER90" => "False",
-    "LWANNIER_RUN" => "True",
+    "LWANNIER90_RUN" => "True",
     "LWRITE_UNK" => "False",
     "LWRITE_MMN_AMN" => "True",
     "LWRITE_SPN" => "False",
@@ -170,6 +170,6 @@ const BLOCK_KEYWORDS = Dict{String, Vector{String}}(
     "ElectronicConvergence" => ["ENCUT", "ISMEAR", "SIGMA", "EDIFF", "NELMIN", "NELM", "PREC"],
     "Output" => ["NWRITE", "LCHARG", "LWAVE", "LORBIT"],
     "Setup" => ["ISTART", "ICHARG"],
-    "Wannier90" => ["NUM_WANN", "LWANNIER_RUN", "LWANNIER90", "LWRITE_UNK", "LWRITE_MMN_AMN", "LWRITE_SPN"],
+    "Wannier90" => ["NUM_WANN", "LWANNIER90_RUN", "LWANNIER90", "LWRITE_UNK", "LWRITE_MMN_AMN", "LWRITE_SPN"],
     "Disentanglement" => ["dis_num_iter", "dis_win_max", "dis_win_min", "dis_froz_max", "dis_froz_min"],
 )
