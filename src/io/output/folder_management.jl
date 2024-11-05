@@ -82,17 +82,18 @@ Create subdirectories for supercell configurations extracted from an XDATCAR fil
   while "uniform" selects them evenly spaced along the XDATCAR trajectory.
 - `Nmin::Int=1`: The minimum index of configurations to consider. Defaults to 1.
 """
-function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1, potcar="POTCAR", kpoints="KPOINTS", incar="INCAR")
+function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1, potcar="POTCAR", kpoints="KPOINTS", incar="INCAR", include_files=String[])
     poscar = read_poscar(poscar_path)
     lattice, configs = read_xdatcar(xdatcar_path)
     Nmax = size(configs, 3)
     inds = lowercase(method[1]) == 'u' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
     write_to_file(inds, joinpath(path, "config_inds"))
+    include = vcat(get_include(include_files), [potcar=>"POTCAR", kpoints=>"KPOINTS", incar=>"INCAR"])
     for (k, ind) in enumerate(inds)
         mkdir(joinpath(path, "config_$k"))
         new_poscar = Poscar(1, lattice, poscar.atom_names, poscar.atom_numbers, configs[:, :, ind], poscar.atom_types)
         write_poscar(new_poscar, filename=joinpath(path, "config_$k/POSCAR"))
-        copy_vasp_input(path, "config_$k", ignore=["POSCAR"], include=[potcar=>"POTCAR", kpoints=>"KPOINTS", incar=>"INCAR"])
+        copy_vasp_input(path, "config_$k", ignore=["POSCAR"], include=include)
     end
 end
 
@@ -129,3 +130,5 @@ function copy_vasp_input(path, folder; ignore=String[], include=Pair{String, Str
         end
     end
 end
+
+get_include(include_files) = [file=>file for file in include_files]
