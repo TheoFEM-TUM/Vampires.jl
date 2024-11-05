@@ -67,8 +67,6 @@ function main(cli_args)
                     println("   ", uppercasefirst(key), " : ", value)
                 end
                 println("")
-                delete!(arg_descriptions, "task")
-                delete!(arg_descriptions, "subtask")
                 println("Optional arguments:")
                 for (key, value) in arg_descriptions["optargs"]
                     println("   ", key, " : ", value)
