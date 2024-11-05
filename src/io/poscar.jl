@@ -107,3 +107,22 @@ function write_poscar(poscar::Poscar; system_name="unknown_system", filename="PO
     end
     close(file)
 end
+
+"""
+    add_atom_counts!(atom_types)
+
+Modifies the `atom_types` array in-place by appending a unique count suffix to each atom type.
+This function is useful for assigning unique labels to atoms of the same type when differentiating them 
+is necessary (e.g., when visualizing or processing atomic data).
+
+# Arguments
+- `atom_types`: A vector of strings where each element represents an atom type. The function appends a suffix `"-i"`
+  to each atom type, where `i` is a unique integer for each occurrence of that type.
+"""
+function add_atom_counts(atom_types)
+    counted_atom_types = map(enumerate(atom_types)) do (n, type)
+        i = count(t->t==type, atom_types[1:n-1]) + 1
+        type * "-$i"
+    end
+    return counted_atom_types
+end
