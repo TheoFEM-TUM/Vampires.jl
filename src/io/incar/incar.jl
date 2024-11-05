@@ -69,11 +69,10 @@ function read_incar(file::AbstractString)
             block_label = get_block_label(line)
         elseif iscomment(line)
             @warn "Ignoring comment"
-        elseif occursin('=', line)
+        elseif occursin('=', line) || (isprojection && occursin(':', line))
             key, value, comment = isprojection ? read_incar_line(line, [':', '!', '#']) : read_incar_line(line)
             comment = comment == "" ? get_comment(key) : comment
             key = isprojection ? "proj"*key : key
-            
             if key ≠ "WANNIER90_WIN"
                 set_key!(incar, key, value, comment=comment, block_label=block_label, isW90=isW90, verbose=false)
             elseif key == "WANNIER90_WIN"
@@ -270,10 +269,10 @@ function write_incar(incar::Incar, filename="INCAR")
                 println(file, "  !"*w90_label)
                 for (w90_key, w90_value) in w90_lines
                     if occursin("proj", w90_key) && isprojection == false
-                        println(file, "  begin projection")
+                        println(file, "   begin projections")
                         isprojection = true
                     elseif !occursin("proj", w90_key) && isprojection == true
-                        println(file, "  end")
+                        println(file, "   end")
                         isprojection = false
                     end
                     w90_key = isprojection ? string(w90_key[5:end]) : w90_key

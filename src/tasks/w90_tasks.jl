@@ -159,10 +159,10 @@ function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     write_run_script(args["exe"], args["p"], cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
 
-    scf_incar = joinpath(path, "scf/INCAR")
-    set_key_in_incar("LWANNIER90_RUN", "False", scf_incar)
+    scf_incar = joinpath(args["p"], "scf/INCAR")
+    set_key_in_incar("LWANNIER90_RUN", "False", scf_incar, verbose=args["v"])
 
-    nscf_incar = joinpath(path, "nscf/INCAR")
-    set_key_in_incar("LWANNIER90_RUN", "True", nscf_incar)
+    nscf_incar = joinpath(args["p"], "nscf/INCAR")
+    set_key_in_incar("LWANNIER90_RUN", "True", nscf_incar, verbose=args["v"])
     return nothing
 end
