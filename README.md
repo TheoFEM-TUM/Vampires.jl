@@ -28,6 +28,20 @@ Since `Vampires.jl` is not (yet) a registered Julia package, the documentation i
 julia vampires_docs.jl
 ```
 
+For the CLI, you can access detailed documentation directly from the command line using the `--help` (or `-h`) flag. You don't need to build the documentation for this.
+For a general overview of all available tasks, enter:
+```bash
+vamp --help
+```
+To list all available subtasks for a specific `task`, use:
+```bash
+vamp --help <task>
+```
+Finally, to see detailed documentation for a particular subtask, enter:
+```bash
+vamp --help <task> <subtask>
+```
+
 ## Example Usage
 
 Below are several examples demonstrating how to use `Vampires.jl` in practice. Each command begins with the main executable (`vamp` by default), followed by two positional arguments: `task` and `subtask` (the latter is sometimes optional). The `task` typically represents a category or file type (e.g., `incar`, `outcar`), while the `subtask` is an action verb (e.g., `make`, `read`, `plot`) describing the operation to be performed. After these positional arguments, various keyword arguments can be added to specify the exact operation the user wants to perform.
