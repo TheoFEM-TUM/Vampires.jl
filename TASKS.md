@@ -86,13 +86,6 @@ list of available tasks
 ```
 
 ```
-settings
-    set: set a new setting in the settings file
-    rm: remove a setting from the settings file
-    read: read a setting from the settings file
-```
-
-```
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
     test: test the accuracy of a W90 model versus DFT
