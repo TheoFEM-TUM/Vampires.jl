@@ -138,6 +138,11 @@ function get_default_args()
         "nsim" => "none",
         "kpar" => "none",
         "super_cell_vector" => "none",
+        "partition" => "batch",
+        "nodes" => "1",
+        "mail" => "",
+        "module_list" => "",
+        "module_paths" => ""
     )
     read_settings!(args_dict)
     return args_dict
@@ -178,7 +183,12 @@ function get_arg_description()
         "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
         "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
         "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
-        "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
+        "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)",
+        "partition" => "the partition the job should be run on (slurm script)",
+        "nodes" => "the number of requested nodes (slurm script)",
+        "mail" => "the mail address to mail job updates to (slurm script)",
+        "module_list" => "the module names to be imported in a slurm script",
+        "module_paths" => "additional paths where modules may be located (slurm script)"
     )
     return arg_descriptions
 end
