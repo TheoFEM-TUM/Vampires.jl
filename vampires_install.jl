@@ -1,12 +1,13 @@
-println("Welcome to")
+println("********************************************************************************")
+println("* Welcome to                                                                   *")
+println("* __     ___    __  __ ____ ___ ____  _____                                    *")
+println("* \\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___    VASP Analysis               *")
+println("*  \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|     for Materials Properties  *")
+println("*   \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\          In Realistic         *")
+println("*    \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/         Energy Surfaces       *")
+println("*                                                                              *")
+println("********************************************************************************")
 println("")
-println("__     ___    __  __ ____ ___ ____  _____")
-println("\\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___")
-println(" \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|")
-println("  \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\")
-println("   \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/")
-println("")
-
 println("Starting Vampires installation...")
 
 using Pkg
@@ -15,8 +16,10 @@ using Pkg
 Pkg.add("ArgParse")
 using ArgParse
 
-Pkg.develop(PackageSpec(path="."))
-Pkg.activate(".")
+vampires_path = @__DIR__
+
+Pkg.develop(PackageSpec(path=vampires_path))
+Pkg.activate(vampires_path)
 Pkg.instantiate()
 
 # Parse command line arguments
@@ -38,7 +41,6 @@ function parse_commandline()
 end
 
 #Check if Vampires can be imported
-vampires_path = string(@__DIR__)
 try 
     cd("..")
     using Vampires
@@ -49,7 +51,7 @@ end
 
 # Add Vampires executable to path
 args = parse_commandline()
-vampires_exec = vampires_path * "/vampires_exec.jl"
+vampires_exec = joinpath(vampires_path, "vampires_exec.jl")
 exec_name = args["exec_name"]
 alias = "alias $exec_name='julia $vampires_exec'"
 bashrc_path = args["bashrc"]
