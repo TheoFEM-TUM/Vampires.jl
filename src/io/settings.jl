@@ -1,4 +1,5 @@
-const settings_file = joinpath(@__DIR__, "../../settings")
+const settings_folder = joinpath(ENV["HOME"], ".Vampires")
+const settings_file = joinpath(settings_folder, "settings")
 
 """
     read_settings!(args)
@@ -30,6 +31,7 @@ Appends key-value pairs from `keys` and `values` vectors to a settings file, whe
 - `values::Vector{String}`: A vector of values corresponding to each key in `keys`.
 """
 function write_settings(keys::Vector, values::Vector)
+    if !isdir(settings_folder); mkdir(settings_folder); end
     remove_setting.(keys)
     open(settings_file, "a") do file
         for (key, value) in zip(keys, values)
