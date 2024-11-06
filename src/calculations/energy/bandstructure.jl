@@ -137,6 +137,7 @@ to the energy eigenvalues `Es` as a function of the k-point positions `kp`.
   dispersion around the band edge.
 """
 function get_effective_mass(kp, Es, lattice; method="parabola")
+    method = method == "none" ? "parabola" : method
     bs = get_bs(lattice)
     kp_cart = frac_to_cart(kp, bs)
 

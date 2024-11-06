@@ -49,6 +49,10 @@ vamp -r outcar read --par LOOP+
 
 # Example 5: Read the bandgap from the OUTCAR file.
 vamp outcar read --par bandgap
+
+# Example 6: Read the effective mass at the Gamma point from each configuration in the OUTCAR
+using third-order finite differences
+vamp outcar read --par effective_mass --kpoints 0,0,0 --N 3 --method fdm
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
     param = args["par"]
