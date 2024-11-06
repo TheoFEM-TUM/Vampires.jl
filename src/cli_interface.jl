@@ -157,6 +157,7 @@ function get_arg_description()
         "eigenval" => "set the name of the EIGENVAL file",
         "doscar" => "set the name of the DOSCAR file",
         "poscar" => "set the name of the POSCAR file",
+        "potcar" => "set the name of the POTCAR file",
         "xdatcar" => "set the name of the XDATCAR file",
         "outcar" => "set the name of the OUTCAR file",
         "kpoints" => "set the name of the kpoints file",
