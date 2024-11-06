@@ -99,23 +99,23 @@ vamp run job make --exe vasp_std --module_list module1,module2 --module_path /pa
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     exe = args["exe"]
-    partition = haskey(args, "partition") ? args["partition"] : "batch"
-    nodes = haskey(args, "nodes") ? args["nodes"] : 1
-    time = haskey(args, "time") ? args["time"] : 1
-    mail = haskey(args, "mail") ? args["mail"] : ""
-    module_list = split_line(haskey(args, "module_list") ? args["module_list"] : "", char=',')
-    module_path = haskey(args, "module_path") ? args["module_path"] : ""
+    partition = args["partition"]
+    nodes = args["nodes"]
+    time = args["time"]
+    mail = args["mail"]
+    module_list = split_line(args["module_list"], char=',')
+    module_paths = split_line(args["module_paths"], char=',')
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
         for file in readdir(args["p"])            
             if occursin(exe, file)
                 filename = args["o"] * "_$num_exe"
-                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
+                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
                 num_exe += 1
             end
         end
     else
-        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
+        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
     end
 end
 
