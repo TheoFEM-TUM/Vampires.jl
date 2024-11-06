@@ -39,6 +39,7 @@ export add_incar_block!, rm_incar_block!
 export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
 export plot_bandstructure, plot_value_convergence
+export read_hrdat
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy
