@@ -24,6 +24,7 @@ end
     include("tasks/test_outcar_task.jl")
     include("tasks/test_poscar_task.jl")
     include("tasks/test_eigenval_task.jl")
+    include("tasks/test_w90_tests.jl")
 end
 
 @testset "calculations" begin
