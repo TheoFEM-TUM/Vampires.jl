@@ -66,7 +66,6 @@ function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
         meffs = map(eachrow(Es)) do E_band
             get_effective_mass(kp[:, k_ind:k_ind+N], E_band[k_ind:k_ind+N], lattice, method=args["method"])
         end
-        @show meffs
         return ["effective_mass"], [meffs]
     else
         throw("Unknown output file format.")
