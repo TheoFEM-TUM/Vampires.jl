@@ -76,7 +76,10 @@ function main(cli_args)
                 println("   - vamp --help <task>")
                 println("   - vamp --help <task> <subtask>")
             else
-                println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+                if (@doc run_task(::Type{task}, ::Type{subtask}, ::Any)) !== nothing
+                    println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+                end
+                # println(doc_string)
             end
             return nothing
         end
@@ -218,4 +221,8 @@ function parse_commandline(args)
     return args_dict
 end
 
-run_task(task, subtask, args) = println("Task is none. Exiting ...")
+# """
+
+# Task does not exist. Please specify a valid task.
+# """
+# run_task(task, subtask, args) = println("Task is none. Exiting ...")
