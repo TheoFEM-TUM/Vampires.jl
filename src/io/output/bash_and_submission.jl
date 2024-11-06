@@ -139,7 +139,7 @@ write_slurm_script(
     script_filename="my_slurm_script.sh"
 )
 """
-function write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0, partition="batch", mail="", filename="job")
+function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0, partition="batch", mail="", filename="job")
     out = filename*".job"
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
@@ -180,7 +180,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             #SBATCH --mail-type=START,FAIL,END
             """)
         end
-        if length(module_path) > 0 || length(module_list) > 0
+        if length(module_paths) > 0 || length(module_list) > 0
             print(outfile, """
 
             #========================================#
@@ -188,10 +188,12 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             #========================================#
             """)
         end
-        if length(module_path) > 0
-            print(outfile, """
-            module use $module_path
-            """)
+        if length(module_paths) > 0
+            for mod_path in module_paths
+                print(outfile, """
+                module use $mod_path
+                """)
+            end
         end
         if length(module_list) > 0
             for mod in module_list
