@@ -16,7 +16,7 @@ Available commands:
 run_task(::Type{Val{:file}}, ::Type{Val{:plot}}, args) = nothing
 
 """
-    vamp <task> plot [--par <param>] [--xdata <xkey>] [--ydata <ykey>] [--xlabel <xlabel>] [--ylabel <ylabel>] [--o <filename>]
+    vamp [-r] <task> plot [--par <param>] [--xdata <xkey>] [--ydata <ykey>] [--xlabel <xlabel>] [--ylabel <ylabel>] [--o <filename>]
 
 Call the read task to read the contents from `task` and plot them. If output file is neither `png` or `pdf` the plot will be printed to stdout.
 
@@ -46,11 +46,32 @@ function run_task(task, ::Type{Val{:plot}}, args)
         xdata = values[x_data_index]
     end
 
-    fig = make_plot(xdata, ydata, title=title, xlabel=xlabel, ylabel=ylabel)
+    fig = make_plot(xdata, ydata, title=args["title"], xlabel=args["xlabel"], ylabel=args["ylabel"])
     
     output_plot(fig, output_filename)
 end
 
 function run_task_recursive(task, ::Type{Val{plot}}, args)
-    # TODO
+    output_filename = args["o"]
+    set_backend(output_filename)
+
+    keys, values = run_task_recursive(task, Val{Symbol("read")}, args)
+    # TODO: add reduce output
+    
+    y_data_index = findfirst(x->x==args["ydata"], keys)
+    ydata = values[y_data_index]
+
+    if length(args["xdata"]) > 0
+        x_data_index = findfirst(x->x==args["xdata"], keys)
+        xdata = values[x_data_index]
+    else
+        folders = readfolders(args["p"])
+        xdata = parse.(Float64, [split_line(folder, char=',')[2] for folder in folders])
+        xlabel = split_line(folders[1], char=',')[1]
+    end
+    xlabel = args["xlabel"] == "" ? xlabel : args["xlabel"]
+
+    fig = make_plot(xdata, ydata, title=args["title"], xlabel=xlabel, ylabel=args["ylabel"])
+
+    output_plot(fig, output_filename)
 end
