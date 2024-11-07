@@ -100,8 +100,8 @@ vamp run job make --exe vasp_std --module_list module1,module2 --module_path /pa
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     exe = args["exe"]
     partition = args["partition"]
-    nodes = args["nodes"]
-    time = args["time"]
+    nodes = parse(Int64, args["nodes"])
+    time = parse(Float64, args["time"])
     mail = args["mail"]
     module_list = split_line(args["module_list"], char=',')
     module_paths = split_line(args["module_paths"], char=',')
