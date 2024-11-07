@@ -35,7 +35,16 @@ function write_settings(keys::Vector, values::Vector)
     remove_setting.(keys)
     open(settings_file, "a") do file
         for (key, value) in zip(keys, values)
-            println(file, "$key=$value")
+            default_args = get_default_args()
+            if !haskey(default_args, key)
+                error("$key is not found in default keys. Did you spell it correctly?")
+            else
+                if value == ""
+                    error("Value for $key is empty.")
+                else
+                    println(file, "$key=$value")
+                end
+            end
         end
     end
 end
