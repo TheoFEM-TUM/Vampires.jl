@@ -120,7 +120,7 @@ function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
         incar = joinpath(args["p"], args["incar"])
         eig_file = joinpath(args["p"], args["eigenval"])
         bandmin = parse(Int64, args["N"]) == 0 ? 1 : parse(Int64, args["N"])
-        num_wann = findvalue(read_incar(incar), "num_wann")
+        num_wann = parse(Int64, findvalue(read_incar(incar), "num_wann"))
         
         dis_win_min, dis_win_max, dis_froz_min, dis_froz_max = get_energy_windows(eig_file, num_wann; bandmin=bandmin, tol=tol)
         
