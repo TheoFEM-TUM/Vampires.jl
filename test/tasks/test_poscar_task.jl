@@ -13,7 +13,7 @@
     args["r"] = true
     args["v"] = false
     args["o"] = "poscars.h5"
-    args["method"] = "none"
+    args["reduce"] = "none"
     keys, values = run_task_recursive(Val{Symbol("poscar")}, Val{Symbol("read")}, args)
     Vampires.task_output(keys, values, args)
     data_correct_in_file = map(1:3) do i

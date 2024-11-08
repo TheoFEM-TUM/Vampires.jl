@@ -19,13 +19,13 @@ Processes and outputs data from a `read` task based on a specified method, handl
 """
 function task_output(keys, values, args)
     output_file = args["o"]
-    method = args["method"]
+    method = args["reduce"]
     broadcasted = method[end] == '.' ? Val{Symbol("broadcasted")} : nothing
     recursive = args["r"] ? Val{Symbol("recursive")} : nothing
     method = strip(method, '.')
     f = get_method(method)
     keys_out, values_out, errors = reduce_output(keys, values, f, method, broadcasted, recursive)
-    time = @elapsed if args["r"] && (args["method"][end] == '.' || method == "none")
+    time = @elapsed if args["r"] && (args["reduce"][end] == '.' || method == "none")
         for (value, error, folder) in zip(values_out, errors, readfolders(args["p"]))
             write_output(output_file, keys_out, value, error, folder=folder)
         end
