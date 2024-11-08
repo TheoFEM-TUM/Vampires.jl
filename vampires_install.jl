@@ -7,8 +7,6 @@ println("*   \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\          In Realis
 println("*    \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/         Energy Surfaces       *")
 println("*                                                                              *")
 println("********************************************************************************")
-println("")
-println("Starting Vampires installation...")
 
 using Pkg
 
@@ -16,7 +14,7 @@ using Pkg
 Pkg.add("ArgParse")
 using ArgParse
 
-vampires_path = @__DIR__
+vampires_path = string(@__DIR__)
 
 Pkg.develop(PackageSpec(path=vampires_path))
 Pkg.activate(vampires_path)
@@ -34,7 +32,11 @@ function parse_commandline()
         "--bashrc"
             help = "sets the path where your executable is located"
             arg_type = String
-            default = "~/.bashrc"
+            default = "default"
+        "--add_path"
+            help = "decides whether the Vampires package is added to path"
+            arg_type = String
+            default = "yes"
     end
     args :: Dict{String, String} = parse_args(s)
     return args
@@ -46,23 +48,38 @@ try
     using Vampires
     cd(vampires_path)
 catch e
-    println("Vampire was not installed successfully", e)
+    println("Vampire was not installed successfully")
+    rethrow(e)
 end
 
 # Add Vampires executable to path
 args = parse_commandline()
-vampires_exec = joinpath(vampires_path, "vampires_exec.jl")
 exec_name = args["exec_name"]
-alias = "alias $exec_name='julia $vampires_exec'"
-bashrc_path = args["bashrc"]
+exec_file = joinpath(vampires_path, exec_name)
+if !isfile(exec_file)
+    println("Generating Vampires.jl executable...")
+    open(exec_file, "w+") do file
+        println(file, "#!/bin/bash")
+        println(file, "julia --project=$vampires_path $vampires_path/vampires_main.jl \"\$@\"")
+    end
+    println("")
+    run(`chmod +x $exec_file`)
+end
 
-# Add line to bashrc file
-open(bashrc_path, "a") do bashrc_file
-    println(bashrc_file, "")
-    println(bashrc_file, "# Create an alias for the Vampires.jl package.")
-    println(bashrc_file, alias)
+if args["add_path"] == "yes"
+    println("Adding Vampires.jl to PATH...")
+    bashrc_path = args["bashrc"] == "default" ? joinpath(ENV["HOME"], ".bashrc") : args["bashrc"]
+    open(bashrc_path, "a") do bashrc_file
+        println(bashrc_file, "")
+        println(bashrc_file, "# Add Vampires.jl to PATH.")
+        println(bashrc_file, "export PATH=\"\$PATH:$vampires_path\"")
+    end
+    println("")
 end
 
 Pkg.test("Vampires")
 
 println("Vampires was configured successfully.")
+println("")
+println("You can now use the Vampires CLI interface.")
+println("Try `$exec_name --help`!")
