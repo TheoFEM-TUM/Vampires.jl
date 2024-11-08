@@ -164,6 +164,6 @@ function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     set_key_in_incar("LWANNIER90_RUN", "False", scf_incar, verbose=args["v"])
 
     nscf_incar = joinpath(args["p"], "nscf/INCAR")
-    set_key_in_incar("LWANNIER90_RUN", "True", nscf_incar, verbose=args["v"])
+    set_key_in_incar("LWANNIER90_RUN,NCORE", "True,1", nscf_incar, verbose=args["v"])
     return nothing
 end
