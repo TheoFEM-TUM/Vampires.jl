@@ -160,6 +160,7 @@ vamp job status
 function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
     user = ENV["USER"]
     run(`squeue -u $user`)
+    return nothing
 end
 
 """
