@@ -63,13 +63,12 @@ function main(cli_args)
                 println("********************************************************************************")
                 arg_descriptions = get_arg_description()
                 println("Positional arguments:")
-                println("   Task : ", arg_descriptions["task"])
-                println("   Subtask : ", arg_descriptions["subtask"])
+                for (key, value) in arg_descriptions["posargs"]
+                    println("   ", uppercasefirst(key), " : ", value)
+                end
                 println("")
-                delete!(arg_descriptions, "task")
-                delete!(arg_descriptions, "subtask")
                 println("Optional arguments:")
-                for (key, value) in arg_descriptions
+                for (key, value) in arg_descriptions["optargs"]
                     println("   ", key, " : ", value)
                 end
                 println("")
@@ -77,7 +76,11 @@ function main(cli_args)
                 println("   - vamp --help <task>")
                 println("   - vamp --help <task> <subtask>")
             else
-                println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+                if applicable(run_task, task, subtask, Any)
+                    println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+                else
+                    println("Please specify a valid task, subtask combination. Type `vamp --help`` for more information.")
+                end
             end
             return nothing
         end
@@ -117,7 +120,9 @@ function get_default_args()
         "p" => "./",
         "o" => "none",
         "N" => "0",
+        "npar"=>"1",
         "method" => "none",
+        "exclude"=>"",
         "incar" => "INCAR",
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
@@ -127,7 +132,7 @@ function get_default_args()
         "outcar" => "OUTCAR",
         "kpoints" => "KPOINTS",
         "w90_hr" => "wannier90_hr.dat",
-        "vasp_exe" => "vasp_std",
+        "exe" => "vasp_std",
         "exclude" => "none",
         "account" => "none",
         "ext_par_file" => "none",
@@ -136,41 +141,47 @@ function get_default_args()
         "kpar" => "none",
         "super_cell_vector" => "none",
     )
+    read_settings!(args_dict)
     return args_dict
 end
 
 function get_arg_description()
-    arg_descriptions = OrderedDict{String, String}(
-        "task" => "positional argument 1: task defines which task is to be performed",
-        "subtask" => "positional argument 2: some tasks require further specification",
-        "r" => "if true, task will be applied recursively to all folders",
-        "v" => "if true, Vampires are verbos",
-        "help" => "print help output",
-        "par" => "define a parameter that is to be adapted",
-        "val" => "define the value of the parameter",
-        "block" => "define the block that a parameter belongs to",
-        "p" => "set the default path",
-        "o" => "set the output (file-) name",
-        "N" => "general task dependent number parameter",
-        "method" => "general task dependent method parameter",
-        "incar" => "set the name of the INCAR file",
-        "eigenval" => "set the name of the EIGENVAL file",
-        "doscar" => "set the name of the DOSCAR file",
-        "poscar" => "set the name of the POSCAR file",
+    arg_descriptions = OrderedDict{String, OrderedDict{String, String}}(
+        "posargs" => OrderedDict{String, String}(
+            "task" => "positional argument 1: task defines which task is to be performed",
+            "subtask" => "positional argument 2: some tasks require further specification"
+        ),
+        "optargs" => OrderedDict{String, String}(
+            "r" => "if true, task will be applied recursively to all folders",
+            "v" => "if true, Vampires are verbos",
+            "help" => "print help output",
+            "par" => "define a parameter that is to be adapted",
+            "val" => "define the value of the parameter",
+            "block" => "define the block that a parameter belongs to",
+            "p" => "set the default path",
+            "o" => "set the output (file-) name",
+            "N" => "general task dependent integer parameter",
+            "npar" => "general task dependent parallelization parameter",
+            "method" => "general task dependent method parameter",
+            "incar" => "set the name of the INCAR file",
+            "eigenval" => "set the name of the EIGENVAL file",
+            "doscar" => "set the name of the DOSCAR file",
+            "poscar" => "set the name of the POSCAR file",
         "potcar" => "set the name of the POTCAR file",
-        "xdatcar" => "set the name of the XDATCAR file",
-        "outcar" => "set the name of the OUTCAR file",
-        "kpoints" => "set the name of the kpoints file",
-        "exclude" => "task dependent exclude parameter",
-        "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
-        "account" => "set the account name for job submission on slurm system",
-        "w90_hr" => "set the name of the *_hr.dat file",
-        "vasp_exe" => "set the name of the VASP executable",
-        "ext_par_file" => "Path to an extended parameter file that contains additional settings for the simulation",
-        "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
-        "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
-        "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
-        "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
+            "xdatcar" => "set the name of the XDATCAR file",
+            "outcar" => "set the name of the OUTCAR file",
+            "kpoints" => "set the name of the kpoints file",
+            "exclude" => "task dependent exclude parameter",
+            "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
+            "account" => "set the account name for job submission on slurm system",
+            "w90_hr" => "set the name of the *_hr.dat file",
+            "exe" => "set the name of the main executable",
+            "ext_par_file" => "Path to an extended parameter file that contains additional settings for the simulation",
+            "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
+            "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
+            "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
+            "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
+        )
     )
     return arg_descriptions
 end
@@ -216,5 +227,3 @@ function parse_commandline(args)
     end
     return args_dict
 end
-
-run_task(task, subtask, args) = println("Task is none. Exiting ...")
