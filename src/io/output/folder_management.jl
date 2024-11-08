@@ -10,18 +10,20 @@ Create subdirectories for convergence testing by varying a specified parameter a
 - `verbose::Bool`: A boolean flag indicating whether to print detailed information during execution. Default is `false`.
 - `method::AbstractString`: The method to use for k-point grid generation. Can be `"none"`, `"gamma"`, or `"monkhorst"`. Default is `"none"`.
 """
-function convergence_create_subdirectories(param, param_range; path="./", verbose=false, method="none")
+function convergence_create_subdirectories(param, param_range; path="./", verbose=false, method="none", incar="INCAR", potcar="POTCAR", kpoints="KPOINTS", poscar="POSCAR", include_files=String[])
+    files = [poscar, potcar, incar, kpoints]
+    include = get_include(include_files)
     for value in param_range
         folder = param*"_"*value
-        mkpath(path*folder)
+        mkpath(joinpath(path, folder))
         if param == "kgrid"
             N = parse(Int64, value)
             gamma_centered = lowercase(method[1]) == 'm' ? false : true
-            write_kpoints(N, gamma_centered=gamma_centered, out=path*folder*"/KPOINTS")
-            copy_vasp_input(path, folder, ignore=["KPOINTS"])
+            copy_vasp_input(path, folder, files, ignore=["KPOINTS"], include=include)
+            write_kpoints(N, gamma_centered=gamma_centered, out=joinpath(path, folder, "KPOINTS"))
         else
-            copy_vasp_input(path, folder, ignore=["INCAR"])
-            set_key_in_incar(param, value, path*"INCAR", out=path*folder*"/INCAR", verbose=verbose)
+            copy_vasp_input(path, folder, files, ignore=["INCAR"], include=include)
+            set_key_in_incar(param, value, joinpath(path, incar), out=joinpath(path, folder, incar), verbose=verbose)
         end
     end
 end
@@ -88,12 +90,13 @@ function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; met
     Nmax = size(configs, 3)
     inds = lowercase(method[1]) == 'u' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
     write_to_file(inds, joinpath(path, "config_inds"))
-    include = vcat(get_include(include_files), [potcar=>"POTCAR", kpoints=>"KPOINTS", incar=>"INCAR"])
+    include = get_include(include_files)
+    files = [incar, potcar, poscar, kpoints]
     for (k, ind) in enumerate(inds)
         mkdir(joinpath(path, "config_$k"))
         new_poscar = Poscar(1, lattice, poscar.atom_names, poscar.atom_numbers, configs[:, :, ind], poscar.atom_types)
         write_poscar(new_poscar, filename=joinpath(path, "config_$k/POSCAR"))
-        copy_vasp_input(path, "config_$k", ignore=["POSCAR"], include=include)
+        copy_vasp_input(path, "config_$k", files, ignore=["POSCAR"], include=include)
     end
 end
 
@@ -111,9 +114,7 @@ Copy VASP input files from a specified directory to a target folder, with option
 - `include::Vector{Pair{String, String}}`: A list of pairs specifying additional files to include in the copying process, where the first element is the source file name and the second is the target file name in the destination folder. Defaults to an empty list.
 
 """
-function copy_vasp_input(path, folder; ignore=String[], include=Pair{String, String}[])
-    files = ["KPOINTS", "POTCAR", "POSCAR", "INCAR"]
-    
+function copy_vasp_input(path, folder, files=["KPOINTS", "POTCAR", "POSCAR", "INCAR"]; ignore=String[], include=Pair{String, String}[])
     # Filter files that are in the ignore list
     filter!(file->file ∉ ignore, files)
 
