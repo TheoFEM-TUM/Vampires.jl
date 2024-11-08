@@ -1,7 +1,7 @@
 """
     read_xdatcar(xdatcar::AbstractString) -> Xdatcar
 
-Read the configurations in the `xdatcar` file and store them in an `Xdatcar` object.
+Read the configurations in the `xdatcar` file and return the lattice vectors and configurations.
 
 # Arguments
 - `xdatcar::AbstractString`: The path to the XDATCAR file.
@@ -12,8 +12,7 @@ Read the configurations in the `xdatcar` file and store them in an `Xdatcar` obj
 
 """
 function read_xdatcar(xdatcar="XDATCAR")
-    lines = open_and_read(xdatcar)
-    lines = split_lines(lines)
+    lines = split_lines(open_and_read(xdatcar))
 
     # Scaling parameter
     a = parse(Float64, lines[2][1])
@@ -55,9 +54,8 @@ Read the configurations in the `xdatcar` file and return the lattice vectors and
 - `lattice::Array{Float64, 3}`: A 3x3xNconfig array where each slice `lattice[:, :, k]` represents the lattice vectors for configuration `k`.
 - `configs::Array{Float64, 3}`: A 3xNionxNconfig array where each slice `configs[:, :, k]` represents the atomic positions for configuration `k`.
 """
-function read_xdatcar_npt(xdatcar)
-    lines_ = open_and_read(xdatcar)
-    lines = split_lines(lines_)
+function read_xdatcar_npt(xdatcar="XDATCAR")
+    lines = split_lines(open_and_read(xdatcar))
     Nconfig, config_inds = count_lines_with("Direct", lines)
     Nion = sum(parse.(Int64, lines[7]))
 
@@ -70,7 +68,7 @@ function read_xdatcar_npt(xdatcar)
        for i in axes(configs, 2)
            config = @view configs[:, i, k]
            config .= parse.(Float64, lines[ind+i])
-       end 
+       end
     end
     return lattice, configs
 end
