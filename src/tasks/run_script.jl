@@ -147,6 +147,22 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
 end
 
 """
+    vamp job status
+
+Get the status of all active jobs of the current user.
+
+# Examples
+```bash
+# Example 1: Show the status of all active jobs.
+vamp job status
+```
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
+    user = ENV["USER"]
+    run(`squeue -u $user`)
+end
+
+"""
     vamp [-r] input cp [--p <origin>] [--o <dest>] [--include <additional_files>] [--exclude <file_to_exlude>]
 
 Copy all input files (`POSCAR`, `POTCAR`, `INCAR`, `KPOINTS` by default) to the destination `dest`. If `dest` does not exist, create it. 
