@@ -57,11 +57,11 @@ using PrecompileTools: @compile_workload, @setup_workload
     task = Val{:incar}
     subtask = Val{:set}
     args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"")
-    args_list = ARGS
+    args_list = ["--help"]
     @compile_workload begin
         redirect_stdout(Base.DevNull()) do
-            main(args_list)
             run_task(task, subtask, args)
+            main(args_list)
         end
     end
 end
