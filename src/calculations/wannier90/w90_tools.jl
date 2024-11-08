@@ -57,9 +57,9 @@ function get_energy_windows(eig_file, num_wann; bandmin=1, tol=0.1)
     bandmax = bandmin + num_wann - 1
     Es = Es[bandmin:bandmax, :]
 
-    dis_win_min = minimum(Es) - tol   
-    dis_win_max = maximum(Es) + tol
+    dis_win_min = round(minimum(Es) - tol, digits=2)
+    dis_win_max = round(maximum(Es) + tol, digits=2)
     dis_froz_min = dis_win_min
-    dis_froz_max = VBM + tol
+    dis_froz_max = round(VBM + tol, digits=2)
     return dis_win_min, dis_win_max, dis_froz_min, dis_froz_max
 end
