@@ -192,3 +192,34 @@ function run_task(::Type{Val{:input}}, ::Type{Val{:cp}}, args)
     include = get_include(split_line(args["include"], char=','))
     copy_vasp_input(path, target, ignore=ignore, include=include)
 end
+
+"""
+    vamp [-r] output rm [--p <path>] [--include <files_to_include>] [--exclude <files_to_exclude>]
+
+Removes selected VASP output files in the specified directory.
+
+# Arguments
+
+- `p`: Path to the directory containing files to be removed. Defaults to the current directory if not provided.
+- `include`: (Optional) A comma-separated list of additional files (or file patterns) to include in the deletion, beyond the default VASP outputs.
+- `exclude`: (Optional) A comma-separated list of files (or file patterns) to exclude from deletion, even if they match the default VASP outputs or `--include` list.
+
+# Examples
+```bash
+# Example 1: Remove all VASP output files in `MYFOLDER`
+vamp output rm --p MYFOLDER
+
+# Example 2: Remove all VASP output files but EIGENVAL,DOSCAR
+vamp output rm --exclude EIGENVAL,DOSCAR
+```
+"""
+function run_task(::Type{Val{:output}}, ::Type{Val{:rm}}, args)
+    vasp_outputs = ["CHG", "CHGCAR", "CONTCAR", "DOSCAR", "EIGENVAL", "IBZKPT", "OUTCAR", "PCDAT", "XDATCAR", "WAVECAR", "REPORT", "OSZICAR", "vasp.log", "vasprun.xml", "vaspout.h5", "wannier90.amn", "wannier90.chk", "wannier90.eig", "wannier90.mmn", "wannier90_wsvec.dat"]
+    exclude = split_line(args["exclude"], char=',')
+    include = split_line(args["include"], char=',')
+    for file in readdir(args["p"])
+        if (file ∈ vasp_outputs || any(occursin.(file, include))) && !any(occursin.(file, exclude))
+            rm(joinpath(args["p"], file), force=true)
+        end
+    end
+end
