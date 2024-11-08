@@ -140,6 +140,7 @@ function get_default_args()
         "kpar" => "none",
         "super_cell_vector" => "none",
     )
+    read_settings!(args_dict)
     return args_dict
 end
 
