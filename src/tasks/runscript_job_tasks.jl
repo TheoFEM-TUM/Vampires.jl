@@ -60,8 +60,8 @@ function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp run job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>] 
-                      [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>] 
+    vamp run job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>]
+                      [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>]
 
 Creates and submits a Slurm job script to run the specified executable with customized job settings.
 
@@ -103,7 +103,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
 
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
-        for file in readdir(args["p"])            
+        for file in readdir(args["p"])
             if occursin(exe, file)
                 filename = args["o"] * "_$num_exe"
                 write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
