@@ -30,6 +30,7 @@ Set a key-value pair in the specified block of an `Incar` object, either in the 
 """
 function set_key!(incar::Incar, key::AbstractString, incar_value::IncarValue, block_label::AbstractString, isW90::Bool)
     key_dict = isW90 ? incar.w90 : incar.vasp
+    block_label = occursin("proj", key) ? "Projections" : block_label
     if haskey(key_dict, block_label)
         key_dict[block_label][key] = incar_value
     else
@@ -65,7 +66,8 @@ function read_incar(file::AbstractString)
     for line in lines
         if occursin("begin projections", line); isprojection = true; end
         if occursin("end", line) && isprojection; isprojection = false; end
-        if isblock_label(line) 
+
+        if isblock_label(line)
             block_label = get_block_label(line)
         elseif iscomment(line)
             @warn "Ignoring comment"
@@ -278,12 +280,13 @@ function write_incar(incar::Incar, filename="INCAR")
                     w90_key = isprojection ? string(w90_key[5:end]) : w90_key
                     write_line(w90_key, w90_value, file, isW90=true, isprojection=isprojection)
                 end
+                if isprojection
+                    println(file, "   end projections")
+                    isprojection = false
+                end
                 if w90_label ≠ collect(keys(incar.w90))[end]; println(file, ""); end
             end
-            if isprojection
-                println(file, "  end")
-                isprojection = false
-            end
+            
             println(file, " \"")
         end
         if block_label ≠ collect(keys(incar.vasp))[end]; println(file, ""); end
