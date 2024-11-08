@@ -272,7 +272,7 @@ function write_incar(incar::Incar, filename="INCAR")
                         println(file, "   begin projections")
                         isprojection = true
                     elseif !occursin("proj", w90_key) && isprojection == true
-                        println(file, "   end")
+                        println(file, "   end projections")
                         isprojection = false
                     end
                     w90_key = isprojection ? string(w90_key[5:end]) : w90_key
