@@ -11,7 +11,7 @@ Writes a bash script to run a command in specified folders. If the script alread
 - `run_out::String`: The output filename for the executed `exe` command
 
 """
-function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.log")
+function write_run_script(exe, path; out="run_job.sh", cb="", run_out="vasp.log")
     if out in readdir()
         add_path_to_folders(out, path)
     else
@@ -30,7 +30,8 @@ function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.
             else
                 println(runfile, "    srun $exe  > $run_out")
             end
-            if cb ≠ "none"; println(runfile, "    "*cb); end
+            if cb ≠ ""; println(runfile, "    "*cb); end
+            println("    echo \"Calculation in \$folder completed.\"")
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
