@@ -14,9 +14,9 @@
 ```bash
 git clone <git_clone_link>
 ```
-* Then, run the install packages script form the main package folder
+* Then, run the install packages script form the main package folder (assuming your `.bashrc` file is located at `$HOME`).
 ```bash
-path=<path_to_your_bashrc> && julia vampires_install.jl --bashrc $path && source $path
+julia vampires_install.jl && source $HOME/.bashrc
 ```
 You can then call the `Vampires` CLI interface using `vamp`.
 
