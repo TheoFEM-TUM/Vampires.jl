@@ -24,4 +24,3 @@ args = Dict{String, Any}("v"=>false, "p" => path_recursive, "outcar" => "OUTCAR"
 output = @capture_out run_task_recursive(task, subtask, args)
 
 @test output == "The value in ENCUT_250 is: -8.25135668\nThe value in ENCUT_300 is: -8.25251696\nThe value in ENCUT_350 is: -8.25259894\n"
-        
