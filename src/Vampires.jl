@@ -1,6 +1,6 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters
 import Documenter: @doc
 
 include("io/read_utils.jl")
@@ -12,7 +12,7 @@ include("io/outcar.jl")
 include("io/w90_hr.jl")
 
 # output
-include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl"); 
+include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl");
 include("io/output/kpoints.jl")
 
 # calculations
@@ -27,7 +27,7 @@ include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); in
 # recursive.jl has to be the first include as it defines the @rcalc macro
 include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl")
-include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/run_script.jl"); include("tasks/outcar_task.jl")
+include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
 include("tasks/w90_tasks.jl")
 
