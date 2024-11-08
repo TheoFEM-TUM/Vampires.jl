@@ -76,6 +76,11 @@ settings
 ```
 
 ```
+"""
+list of available tasks
+```
+
+```
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
 ```
