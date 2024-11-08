@@ -91,11 +91,11 @@ function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; met
     inds = lowercase(method[1]) == 'u' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
     write_to_file(inds, joinpath(path, "config_inds"))
     include = get_include(include_files)
-    files = [incar, potcar, poscar_path, kpoints]
+    files = [incar, potcar, kpoints]
     for (k, ind) in enumerate(inds)
         mkdir(joinpath(path, "config_$k"))
         new_poscar = Poscar(1, lattice, poscar.atom_names, poscar.atom_numbers, configs[:, :, ind], poscar.atom_types)
-        write_poscar(new_poscar, filename=joinpath(path, "config_$k/POSCAR"))
+        write_poscar(new_poscar, filename=joinpath(path, "config_$k", "POSCAR"))
         copy_vasp_input(path, "config_$k", files, ignore=["POSCAR"], include=include)
     end
 end
