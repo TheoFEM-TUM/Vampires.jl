@@ -40,7 +40,7 @@ function write_settings(keys::Vector, values::Vector)
         for (key, value) in zip(keys, values)
             default_args = get_default_args()
             if !haskey(default_args, key)
-                error("Key \"$key\" is not found in default keys. Did you spell it correctly?")
+                error("Key \"$key\" could not be found among the default keys. Did you spell it correctly?")
             else
                 println(file, "$key=$value")
                 println("Added new default value for \"$key\".")
@@ -65,7 +65,7 @@ function remove_setting(key_to_remove)
         N_1 = length(lines)
         rm(settings_file)
         filter!(lines) do line
-            key, value = split_line(line, char='=')
+            key, _ = split_line(line, char='=')
             key ≠ key_to_remove
         end
         N_2 = length(lines)
