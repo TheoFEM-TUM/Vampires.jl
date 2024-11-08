@@ -18,7 +18,7 @@ include("io/output/kpoints.jl")
 # calculations
 include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl"); include("calculations/lattice/supercell.jl")
 include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
-include("calculations/wannier90/hamiltonian.jl")
+include("calculations/wannier90/hamiltonian.jl"); include("calculations/lattice/dynamics.jl")
 
 # plotting
 include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl")
@@ -29,7 +29,7 @@ include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
-include("tasks/w90_tasks.jl"); include("tasks/settings_tasks.jl")
+include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/settings_tasks.jl")
 
 include("cli_interface.jl")
 
