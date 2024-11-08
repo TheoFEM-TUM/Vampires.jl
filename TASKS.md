@@ -59,7 +59,7 @@ any_task
 ```
 
 ```
-run_script
+runscript
     make: creates a bash script that runs vasp in a specific folder
 ```
 

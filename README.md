@@ -14,9 +14,9 @@
 ```bash
 git clone <git_clone_link>
 ```
-* Then, run the install packages script form the main package folder
+* Then, run the install packages script form the main package folder (assuming your `.bashrc` file is located at `$HOME`).
 ```bash
-path=<path_to_your_bashrc> && julia vampires_install.jl --bashrc $path && source $path
+julia vampires_install.jl && source $HOME/.bashrc
 ```
 You can then call the `Vampires` CLI interface using `vamp`.
 
@@ -26,6 +26,20 @@ Since `Vampires.jl` is not (yet) a registered Julia package, the documentation i
 
 ```bash
 julia vampires_docs.jl
+```
+
+For the CLI, you can access detailed documentation directly from the command line using the `--help` (or `-h`) flag. You don't need to build the documentation for this.
+For a general overview of all available tasks, enter:
+```bash
+vamp --help
+```
+To list all available subtasks for a specific `task`, use:
+```bash
+vamp --help <task>
+```
+Finally, to see detailed documentation for a particular subtask, enter:
+```bash
+vamp --help <task> <subtask>
 ```
 
 ## Example Usage
