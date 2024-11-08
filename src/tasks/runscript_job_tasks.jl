@@ -1,7 +1,7 @@
 """
 list of available tasks:
 
-run
+runscript
     make: creates a bash script that runs vasp in a specific folder
 job
     make: create a new job file
@@ -15,12 +15,12 @@ input
 # CLI Commands to work with bash scripts
 
 Available commands:
-* `vamp run_script make`: Create a bash script to perform VASP calculations.
+* `vamp runscript make`: Create a bash script to perform VASP calculations.
 """
-run_task(::Type{Val{:run}}, ::Type{Val{:none}}, args) = nothing
+run_task(::Type{Val{:job}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] run make [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
+    vamp [-r] runscript make [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
 
 Creates a run script that executes the VASP executable at the specified path.
 
@@ -37,21 +37,21 @@ Creates a run script that executes the VASP executable at the specified path.
 # Examples
 ```bash
 # Example 1: Create a run script to run VASP in all subfolders using the standard vasp executable.
-vamp -r run make --exe vasp_std
+vamp -r runscript make --exe vasp_std
 
 # Example 2: Create a run script to run VASP in all subfolders using the non-collinear vasp executable.
-vamp -r run make --exe vasp_ncl
+vamp -r runscript make --exe vasp_ncl
 
 # Example 3: Use the `exclude` keyword to specify files to be removed from each subfolder after each calculation.
-vamp -r run make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
+vamp -r runscript make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 ```
 """
-function run_task(::Type{Val{:run}}, ::Type{Val{:make}}, args)
+function run_task(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
     cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
 end
 
-function run_task_recursive(::Type{Val{:run}}, ::Type{Val{:make}}, args)
+function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
     base_path = args["p"]
     cb = get_exclude_callback(args["exclude"])
     nchunks = parse(Int64, args["npar"])
@@ -65,8 +65,8 @@ function run_task_recursive(::Type{Val{:run}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp run job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>] 
-                      [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>] 
+    vamp run job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>]
+                      [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>]
 
 Creates and submits a Slurm job script to run the specified executable with customized job settings.
 
@@ -107,7 +107,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     module_paths = split_line(args["module_paths"], char=',')
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
-        for file in readdir(args["p"])            
+        for file in readdir(args["p"])
             if occursin(exe, file)
                 filename = args["o"] * "_$num_exe"
                 write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)

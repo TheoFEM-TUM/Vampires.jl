@@ -64,7 +64,7 @@ any_task
 ```
 
 ```
-run
+runscript
     make: creates a bash script that runs vasp in a specific folder
 job
     make: create a new job file

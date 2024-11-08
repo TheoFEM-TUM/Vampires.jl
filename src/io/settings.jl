@@ -33,9 +33,18 @@ Appends key-value pairs from `keys` and `values` vectors to a settings file, whe
 function write_settings(keys::Vector, values::Vector)
     if !isdir(settings_folder); mkdir(settings_folder); end
     remove_setting.(keys)
+    if length(values) == 0
+        error("Argument \"--val\" is empty.")
+    end
     open(settings_file, "a") do file
         for (key, value) in zip(keys, values)
-            println(file, "$key=$value")
+            default_args = get_default_args()
+            if !haskey(default_args, key)
+                error("Key \"$key\" could not be found among the default keys. Did you spell it correctly?")
+            else
+                println(file, "$key=$value")
+                println("Added new default value for \"$key\".")
+            end
         end
     end
 end
@@ -53,15 +62,22 @@ Removes a specific key-value pair from the `settings_file`, where each entry is 
 function remove_setting(key_to_remove)
     if isfile(settings_file)
         lines = open_and_read(settings_file)
+        N_1 = length(lines)
         rm(settings_file)
         filter!(lines) do line
-            key, value = split_line(line, char='=')
+            key, _ = split_line(line, char='=')
             key ≠ key_to_remove
         end
+        N_2 = length(lines)
         if length(lines) > 0
             open(settings_file, "w") do file
                 println.(file, lines)
             end
+        end
+        if N_1 == N_2 + 1
+            println("Default setting for \"$key_to_remove\" was removed.")
+        else
+            println("No setting for $key_to_remove was found. Did you spell it correctly?")
         end
     end
 end

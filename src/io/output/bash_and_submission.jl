@@ -7,6 +7,8 @@ Writes a bash script to run a command in specified folders. If the script alread
 - `exe::String`: The command to execute in each subfolder.
 - `path::String`: The path to add to the `folders` array in the script.
 - `out::String`: The output file name for the script. Defaults to `"run_job.sh"`.
+- `cb::String`: callback function to be executed after the `exe` run in each subdirectory
+- `run_out::String`: The output filename for the executed `exe` command
 
 """
 function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.log")
@@ -15,7 +17,7 @@ function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.
     else
         open(out, "a") do runfile
             println(runfile, "#!/bin/bash")
-            if path ≠ "./" 
+            if path ≠ "./"
                 println(runfile, "folders=(\"$path\")")
             else
                 println(runfile, "folders=()")
@@ -28,7 +30,7 @@ function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.
             else
                 println(runfile, "    srun $exe  > $run_out")
             end
-            if cb ≠ "none"; println(runfile, "    "*cb); end 
+            if cb ≠ "none"; println(runfile, "    "*cb); end
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
@@ -66,26 +68,26 @@ Adds a new path to the `folders` line in a bash script file.
 - `new_path::String`: The new path to add to the `folders` line.
 
 # Description
-This function reads the specified file line-by-line, looks for the line that defines the `folders` array 
-(e.g., `folders=("path1" "path2")`), and adds the `new_path` to this array. The line will be modified to 
-include the new path, and all other lines in the file will remain unchanged. The modified file is written 
+This function reads the specified file line-by-line, looks for the line that defines the `folders` array
+(e.g., `folders=("path1" "path2")`), and adds the `new_path` to this array. The line will be modified to
+include the new path, and all other lines in the file will remain unchanged. The modified file is written
 back to the original file.
 """
 function add_path_to_folders(file::String, new_path::String)
     lines = readlines(file)
-    
+
     target_pattern = r"""folders=\((.*)\)"""
-    
+
     open(file, "w") do f
         for line in lines
             if occursin(target_pattern, line)
                 # Extract the existing paths
                 captures = match(target_pattern, line).captures
                 existing_paths = captures[1]
-                
+
                 # Add the new path to the list of existing paths
                 new_folders_line = "folders=(" * existing_paths * " \"$new_path\")"
-                
+
                 write(f, new_folders_line * "\n")
             else
                 write(f, line * "\n")
@@ -96,7 +98,7 @@ function add_path_to_folders(file::String, new_path::String)
 end
 
 """
-    write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48, 
+    write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48,
                        ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
 
 Generate a SLURM batch script for running VASP on an HPC system, optimized for JUWELS, but may require adjustments for other HPC systems.
