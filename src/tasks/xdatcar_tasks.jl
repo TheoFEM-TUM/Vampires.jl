@@ -52,3 +52,29 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
 
     return ["lattice", "configs"], [lattice, configs]
 end
+
+"""
+    vamp [-r] xdatcar merge [--xdatcar <file0, file1, ...>] [--p <path>] [--o <file>]
+
+Merges atomic configurations from several XDATCARs in the given order and writes them to an output file.
+
+# Arguments
+- `xdatcar`: The name of the XDATCAR files from an molecular dynamics simulation in the order they should be merged.
+- `p`: The path where the XDATCAR files are located.
+- `o`: The name of the output file.
+
+# Returns
+- Otherwise: Returns the lattice vectors and configurations from the XDATCAR file.
+
+# Examples
+```bash
+# Example 1: Merge two XDATCAR_* files to a single XDATCAR
+vamp xdatcar merge --xdatcar XDATCAR_0-100,XDATCAR_101-200 --out XDATCAR
+```
+"""
+function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
+    for xdatcar_file_i in args["xdatcar"]
+        lattice, configs = read_xdatcar(joinpath(args["p"], ))
+    end
+    # TODO
+end
