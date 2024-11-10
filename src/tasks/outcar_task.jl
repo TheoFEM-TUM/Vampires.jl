@@ -52,36 +52,21 @@ vamp outcar read --par bandgap
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
     param = args["par"]
-    output_filename = args["o"]
+    input_file = joinpath(args["p"], args["outcar"])
 
-    if occursin("h5", output_filename) && param == "eigenvalues"
-        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
-        write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
-        println("Data for $param was saved to $output_filename.")
-    elseif occursin("h5", output_filename) && param == "forces"
-        positions, forces = read_forces_from_outcar(args["p"]*args["outcar"])
-        write_data_to_hdf5(output_filename, ["positions", "forces"], [positions, forces])
-        println("Data for $param was saved to $output_filename.")
+    if param == "eigenvalues"
+        kp, Es, occs = read_eigenvalues_from_outcar(input_file)
+        return ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs]
+    elseif param == "forces"
+        positions, forces = read_forces_from_outcar(input_file)
+        return ["positions", "forces"], [positions, forces]
     elseif param == "bandgap"
-        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
-        ΔEs = [get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)]
-        if occursin("h5", output_filename)
-            write_data_to_hdf5(output_filename, ["bandgap"], [ΔEs])
-        else
-            for (n, ΔE) in enumerate(ΔEs)
-                println("The bandgap for configuration $n is: $ΔE eV.")
-            end
-        end
+        kp, Es, occs = read_eigenvalues_from_outcar(input_file)
+        ΔEs = to_scalar_if_single([get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)])
+        return ["bandgap"], [ΔEs]
     else
-        values = read_value_from_outcar(param, args["p"]*args["outcar"])
-        value = strip(string(values), ['[', ']'])
-        if !args["r"]
-            println("The value(s) for $param is $value")
-        end
-        if occursin("h5", output_filename)
-            write_data_to_hdf5(output_filename, [param], [values])
-        end
-        return values
+        values = to_scalar_if_single(read_value_from_outcar(param, input_file))
+        return [param], [values]
     end
 end
 

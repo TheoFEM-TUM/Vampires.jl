@@ -64,7 +64,7 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:make}}, args)
     elseif length(args["block"]) > 0
         add_incar_block!(split_line(args["block"], char=','), incar)
     end
-    write_incar(incar, args["p"]*args["incar"])
+    write_incar(incar, joinpath(args["p"], args["incar"]))
 end
 
 """
@@ -94,11 +94,12 @@ vamp incar read --par EDIFF --incar INCAR_relax
 ```
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
-    incar = read_incar(args["p"]*args["incar"])
-    for key in split_line(args["par"], char=',')
-        value = findvalue(incar, key)
-        println("The value of $key is: $value")
+    incar = read_incar(joinpath(args["p"], args["incar"]))
+    keys = split_line(args["par"], char=',')
+    values = map(keys) do key
+        findvalue(incar, key)
     end
+    return keys, values
 end
 
 """
@@ -173,10 +174,10 @@ vamp -r incar set --par EDIFF --val 1e-5
 * `vamp addincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
-    if length(args["par"]) > 0
-        set_key_in_incar(split_line(args["par"], char=','), split_line(args["val"], char=','), args["p"]*args["incar"], out=args["p"]*args["incar"], block_label=args["block"])
+    if length(args["par"]) > 0 
+        set_key_in_incar(split_line(args["par"], char=','), split_line(args["val"], char=','), joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]), block_label=args["block"])
     elseif length(args["block"]) > 0
-        add_block_to_incar(split_line(args["block"], char=','), args["p"]*args["incar"])
+        add_block_to_incar(split_line(args["block"], char=','), joinpath(args["p"], args["incar"]))
     end
 end
 run_task(::Type{Val{:setincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
@@ -215,10 +216,10 @@ vamp -r incar rm --par EDIFF
 * `vamp rmincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:rm}}, args)
-    if length(args["par"]) > 0
-        remove_key_from_incar(args["par"], args["p"]*args["incar"], out=args["p"]*args["incar"])
+    if length(args["par"]) > 0 
+        remove_key_from_incar(args["par"], joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]))
     elseif length(args["block"]) > 0
-        remove_block_from_incar(args["block"], args["p"]*args["incar"])
+        remove_block_from_incar(args["block"], joinpath(args["p"], args["incar"]))
     end
 end
 run_task(::Type{Val{:rmincar}}, subtask, args) = run_task(Val{Symbol("rm")}, Val{Symbol("incar")}, args)

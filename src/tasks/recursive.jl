@@ -28,31 +28,20 @@ This function scans the current directory for subdirectories. For each subdirect
 The function assumes that the `task` function accepts the `subtask` function and an `args` dictionary as parameters, and that the `args` dictionary should include the path to the current subdirectory.
 """
 function run_task_recursive(task, subtask, args)
-    param = args["par"]
     base_path = args["p"]
+    keys = Vector{String}[]
     values = map(readfolders(base_path)) do folder
         args["p"] = joinpath(base_path, folder * "/")
-        value = run_task(task, subtask, args)
-        if typeof(value) <: AbstractVector
-            if args["method"] == "mean"
-                mean_val = mean(value)
-                std_val = std(value)
-                println("The mean value of $param is: $mean_val ± $std_val.")
-            else
-                index = parse(Int64, args["N"])
-                if index == 0 # The default should be end
-                    println("The value in $folder is: ", value[end])
-                else
-                    println("The value in $folder is: ", value[index])
-                end
-            end
+        out = run_task(task, subtask, args)
+        if out ≠ nothing
+            key, value = out
+            push!(keys, key)
+            return value
         end
-        value
     end
-    if args["method"] == "mean"
-        mean_val = mean(values)
-        std_val = std(values)
-        println("The mean value of $param is: $mean_val ± $std_val.")
+    args["p"] = base_path
+    if length(keys) > 0
+        keys = keys[1]
     end
-    return values
+    return keys, values
 end

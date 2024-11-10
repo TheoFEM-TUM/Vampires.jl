@@ -9,8 +9,6 @@ kp, Es, occs = read_eigenval(test_file_path*"EIGENVAL_gaas")
 # Compute DOS and Fermi level
 dos, efermi = compute_dos(Es, occs, sigma, E_grid)
 
-
-
 # Plot DOS
 plot(E_grid, dos, xlabel="Energy (eV)", ylabel="DOS", title="Density of States")
 vline!([0], label="Fermi Level", line=:dash)

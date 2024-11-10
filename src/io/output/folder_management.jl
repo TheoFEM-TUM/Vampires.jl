@@ -83,17 +83,17 @@ Create subdirectories for supercell configurations extracted from an XDATCAR fil
   while "uniform" selects them evenly spaced along the XDATCAR trajectory.
 - `Nmin::Int=1`: The minimum index of configurations to consider. Defaults to 1.
 """
-function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
+function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1, potcar="POTCAR", kpoints="KPOINTS", incar="INCAR")
     poscar = read_poscar(poscar_path)
     lattice, configs = read_xdatcar(xdatcar_path)
     Nmax = size(configs, 3)
     inds = lowercase(method[1]) == 'u' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
-    write_to_file(inds, path*"config_inds")
+    write_to_file(inds, joinpath(path, "config_inds"))
     for (k, ind) in enumerate(inds)
-        mkdir(path*"snap_$k")
+        mkdir(joinpath(path, "config_$k"))
         new_poscar = Poscar(1, lattice, poscar.atom_names, poscar.atom_numbers, configs[:, :, ind], poscar.atom_types)
-        write_poscar(new_poscar, filename=path*"snap_$k/POSCAR")
-        copy_vasp_input(path, "snap_$k", ignore=["POSCAR"])
+        write_poscar(new_poscar, filename=joinpath(path, "config_$k/POSCAR"))
+        copy_vasp_input(path, "config_$k", ignore=["POSCAR"], include=[potcar=>"POTCAR", kpoints=>"KPOINTS", incar=>"INCAR"])
     end
 end
 
@@ -113,14 +113,20 @@ Copy VASP input files from a specified directory to a target folder, with option
 """
 function copy_vasp_input(path, folder; ignore=String[], include=Pair{String, String}[])
     files = ["KPOINTS", "POTCAR", "POSCAR", "INCAR"]
+    
+    # Filter files that are in the ignore list
     filter!(file->file ∉ ignore, files)
+
+    # Filter files that are added via the include list
+    filter!(file->file ∉ [b for (_, b) in include], files)
+    
     infiles = vcat(files, [a for (a, _) in include])
     outfiles = vcat(files, [b for (_, b) in include])
     for (infile, outfile) in zip(infiles, outfiles)
-        if !isfile(path*infile)
+        if !isfile(joinpath(path, infile))
             @info "$infile file was not found in current path ($path)."
-        elseif isfile(path*infile)
-            cp(path*infile, path*folder*"/$outfile", force=true)
+        elseif isfile(joinpath(path, infile))
+            cp(joinpath(path, infile), joinpath(path, folder, "$outfile"), force=true)
         end
     end
 end

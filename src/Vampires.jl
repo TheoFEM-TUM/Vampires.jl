@@ -26,10 +26,10 @@ include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); in
 # tasks
 # recursive.jl has to be the first include as it defines the @rcalc macro
 include("tasks/recursive.jl")
-include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl")
+include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("tasks/poscar_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
-include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/settings_tasks.jl")
+include("tasks/w90_tasks.jl"); include("tasks/task_output.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/settings_tasks.jl")
 
 include("cli_interface.jl")
 
@@ -39,6 +39,7 @@ export add_incar_block!, rm_incar_block!
 export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
 export plot_bandstructure, plot_value_convergence
+export read_hrdat
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy

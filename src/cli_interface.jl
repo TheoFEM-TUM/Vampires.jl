@@ -89,10 +89,10 @@ function main(cli_args)
             task_string = args["task"]
             subtask_string = args["subtask"]
             println("Running task $task_string $subtask_string ...")
-            if args["r"]
-                run_task_recursive(task, subtask, args)
-            else
-                run_task(task, subtask, args)
+            out = args["r"] ? run_task_recursive(task, subtask, args) : run_task(task, subtask, args)
+            if out ≠ nothing
+                keys, values = out
+                task_output(keys, values, args)
             end
         catch e
             if e == ArgumentError
@@ -121,12 +121,13 @@ function get_default_args()
         "o" => "none",
         "N" => "0",
         "npar"=>"1",
-        "method" => "",
+        "method" => "none",
         "exclude"=>"",
         "incar" => "INCAR",
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
         "poscar" => "POSCAR",
+        "potcar"=>"POTCAR",
         "xdatcar" => "XDATCAR",
         "outcar" => "OUTCAR",
         "kpoints" => "KPOINTS",
@@ -166,6 +167,7 @@ function get_arg_description()
             "eigenval" => "set the name of the EIGENVAL file",
             "doscar" => "set the name of the DOSCAR file",
             "poscar" => "set the name of the POSCAR file",
+        "potcar" => "set the name of the POTCAR file",
             "xdatcar" => "set the name of the XDATCAR file",
             "outcar" => "set the name of the OUTCAR file",
             "kpoints" => "set the name of the kpoints file",

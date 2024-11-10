@@ -17,9 +17,9 @@ This function reads a file line-by-line and searches for lines containing the sp
 It extracts the values associated with the parameter from each line, converts them to the specified `type`, and collects them in a vector.
 """
 function read_value_from_outcar(param, file; type=Float64, line_mode="first")::Vector
-    lines = open_and_read(file)
+    #lines = open_and_read(file)
     param_values = type[]
-    for line in lines
+    for line in eachline(file)
         if occursin(param, line)
             
             # Replace some symbols with space
