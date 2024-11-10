@@ -61,6 +61,11 @@ any_task
 ```
 runscript
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
 ```
 
 ```
