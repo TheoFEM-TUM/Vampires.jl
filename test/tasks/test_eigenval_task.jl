@@ -14,7 +14,7 @@
     args["r"] = true
     args["v"] = false
     args["o"] = "eigenvals.h5"
-    args["method"] = "none"
+    args["reduce"] = "none"
     keys, values = run_task_recursive(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
     Vampires.task_output(keys, values, args)
     data_correct_in_file = map(1:3) do i
@@ -31,7 +31,7 @@
     @test values[1] == 0.5953680000000001
 
     # Test 4 Test recursive bandgap read
-    args["method"] = "mean"
+    args["reduce"] = "mean"
     args["o"] = "bandgap.h5"
     keys, values = run_task_recursive(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
     @test values == [[0.5953680000000001], [0.5953680000000001], [0.5953680000000001]]

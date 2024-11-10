@@ -3,6 +3,11 @@ list of available tasks:
 
 runscript
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: create a new job file
+    submit: submit all *.job files
+input
+    cp: copy all VASP input files to a new folder
 """
 
 
@@ -94,24 +99,23 @@ vamp run job make --exe vasp_std --module_list module1,module2 --module_path /pa
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     exe = args["exe"]
-    partition = haskey(args, "partition") ? args["partition"] : "batch"
-    nodes = haskey(args, "nodes") ? args["nodes"] : 1
-    time = haskey(args, "time") ? args["time"] : 1
-    mail = haskey(args, "mail") ? args["mail"] : ""
-    module_list = split_line(haskey(args, "module_list") ? args["module_list"] : "", char=',')
-    module_path = haskey(args, "module_path") ? args["module_path"] : ""
-
+    partition = args["partition"]
+    nodes = parse(Int64, args["nodes"])
+    time = parse(Float64, args["time"])
+    mail = args["mail"]
+    module_list = split_line(args["module_list"], char=',')
+    module_paths = split_line(args["module_paths"], char=',')
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
         for file in readdir(args["p"])
             if occursin(exe, file)
                 filename = args["o"] * "_$num_exe"
-                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_path=module_path)
+                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
                 num_exe += 1
             end
         end
     else
-        write_slurm_script(args["exe"], args["p"], filename=args["o"])
+        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
     end
 end
 
@@ -138,6 +142,84 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
     for file in readdir(args["p"])
         if occursin(".job", file)
             run(`sbatch -A $account $file`)
+        end
+    end
+end
+
+"""
+    vamp job status
+
+Get the status of all active jobs of the current user.
+
+# Examples
+```bash
+# Example 1: Show the status of all active jobs.
+vamp job status
+```
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
+    user = ENV["USER"]
+    run(`squeue -u $user`)
+    return nothing
+end
+
+"""
+    vamp [-r] input cp [--p <origin>] [--o <dest>] [--include <additional_files>] [--exclude <file_to_exlude>]
+
+Copy all input files (`POSCAR`, `POTCAR`, `INCAR`, `KPOINTS` by default) to the destination `dest`. If `dest` does not exist, create it. 
+Files can be included/excluded using the `include`/`exclude` keywords.
+
+# Arguments
+- `p`: Origin path of where to look for the files.
+- `o`: Destination path of where to copy files.
+- `include`: Additional files to copied.
+- `exclude`: Files to exclude.
+
+# Examples
+```bash
+# Example 1: Copy all VASP inputs to a new folder `MYFOLDER`.
+vamp input cp --o MYFOLDER
+
+# Example 2: Copy all files but the `KPOINTS` file and include `myfile`.
+vamp input cp --o MYFOLDER --exclude KPOINTS --include myfile
+```
+"""
+function run_task(::Type{Val{:input}}, ::Type{Val{:cp}}, args)
+    path = args["p"]
+    target = args["o"]
+    if target ∉ readdir(); mkdir(target); end
+    ignore = split_line(args["exclude"], char=',')
+    include = get_include(split_line(args["include"], char=','))
+    copy_vasp_input(path, target, ignore=ignore, include=include)
+end
+
+"""
+    vamp [-r] output rm [--p <path>] [--include <files_to_include>] [--exclude <files_to_exclude>]
+
+Removes selected VASP output files in the specified directory.
+
+# Arguments
+
+- `p`: Path to the directory containing files to be removed. Defaults to the current directory if not provided.
+- `include`: (Optional) A comma-separated list of additional files (or file patterns) to include in the deletion, beyond the default VASP outputs.
+- `exclude`: (Optional) A comma-separated list of files (or file patterns) to exclude from deletion, even if they match the default VASP outputs or `--include` list.
+
+# Examples
+```bash
+# Example 1: Remove all VASP output files in `MYFOLDER`
+vamp output rm --p MYFOLDER
+
+# Example 2: Remove all VASP output files but EIGENVAL,DOSCAR
+vamp output rm --exclude EIGENVAL,DOSCAR
+```
+"""
+function run_task(::Type{Val{:output}}, ::Type{Val{:rm}}, args)
+    vasp_outputs = ["CHG", "CHGCAR", "CONTCAR", "DOSCAR", "EIGENVAL", "IBZKPT", "OUTCAR", "PCDAT", "XDATCAR", "WAVECAR", "REPORT", "OSZICAR", "vasp.log", "vasprun.xml", "vaspout.h5", "wannier90.amn", "wannier90.chk", "wannier90.eig", "wannier90.mmn", "wannier90_wsvec.dat"]
+    exclude = split_line(args["exclude"], char=',')
+    include = split_line(args["include"], char=',')
+    for file in readdir(args["p"])
+        if (file ∈ vasp_outputs || any(occursin.(file, include))) && !any(occursin.(file, exclude))
+            rm(joinpath(args["p"], file), force=true)
         end
     end
 end

@@ -110,7 +110,7 @@ end
     @test findvalue(incar_w90, "projGa") == "sp3"
     block_label, isW90 = Vampires.findkey(incar_w90, "projGa")
     @test isW90
-    @test block_label == "Initial guess for WFs"
+    @test block_label == "Projections"
 
     set_key!(incar_w90, "wannier_plot", "True", verbose=false, block_label="Plotting")
     @test findvalue(incar_w90, "wannier_plot") == "True"

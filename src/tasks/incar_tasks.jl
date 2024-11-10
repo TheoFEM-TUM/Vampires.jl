@@ -174,7 +174,7 @@ vamp -r incar set --par EDIFF --val 1e-5
 * `vamp addincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
-    if length(args["par"]) > 0 
+    if length(args["par"]) > 0
         set_key_in_incar(split_line(args["par"], char=','), split_line(args["val"], char=','), joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]), block_label=args["block"])
     elseif length(args["block"]) > 0
         add_block_to_incar(split_line(args["block"], char=','), joinpath(args["p"], args["incar"]))
@@ -216,7 +216,7 @@ vamp -r incar rm --par EDIFF
 * `vamp rmincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:rm}}, args)
-    if length(args["par"]) > 0 
+    if length(args["par"]) > 0
         remove_key_from_incar(args["par"], joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]))
     elseif length(args["block"]) > 0
         remove_block_from_incar(args["block"], joinpath(args["p"], args["incar"]))

@@ -120,26 +120,35 @@ function get_default_args()
         "p" => "./",
         "o" => "none",
         "N" => "0",
+        "tol"=>"0.1",
         "npar"=>"1",
-        "method" => "none",
-        "exclude"=>"",
+        "npar"=>"1",
+        "method"=>"none",
+        "reduce" => "nonenone",
+        "exclude" => "",
+        "include"=> "",
         "incar" => "INCAR",
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
         "poscar" => "POSCAR",
-        "potcar"=>"POTCAR",
+        "potcar" => "POTCAR",
         "xdatcar" => "XDATCAR",
         "outcar" => "OUTCAR",
         "kpoints" => "KPOINTS",
         "w90_hr" => "wannier90_hr.dat",
         "exe" => "vasp_std",
-        "exclude" => "none",
         "account" => "none",
         "ext_par_file" => "none",
         "ncore" => "none",
         "nsim" => "none",
         "kpar" => "none",
         "super_cell_vector" => "none",
+        "partition" => "batch",
+        "time" => "1",
+        "nodes" => "1",
+        "mail" => "",
+        "module_list" => "",
+        "module_paths" => ""
     )
     read_settings!(args_dict)
     return args_dict
@@ -160,18 +169,22 @@ function get_arg_description()
             "block" => "define the block that a parameter belongs to",
             "p" => "set the default path",
             "o" => "set the output (file-) name",
-            "N" => "general task dependent integer parameter",
+            "N" => "general task dependent integer (Int) parameter",
+            "npar" => "parallelization parameter",
+            "tol" => "a numerical tolerance parameter",
             "npar" => "general task dependent parallelization parameter",
             "method" => "general task dependent method parameter",
+            "reduce" => "specifies a function to reduce the task output",
             "incar" => "set the name of the INCAR file",
             "eigenval" => "set the name of the EIGENVAL file",
             "doscar" => "set the name of the DOSCAR file",
             "poscar" => "set the name of the POSCAR file",
-        "potcar" => "set the name of the POTCAR file",
+            "potcar" => "set the name of the POTCAR file",
             "xdatcar" => "set the name of the XDATCAR file",
             "outcar" => "set the name of the OUTCAR file",
             "kpoints" => "set the name of the kpoints file",
             "exclude" => "task dependent exclude parameter",
+            "include" => "task dependent include parameter",
             "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
             "account" => "set the account name for job submission on slurm system",
             "w90_hr" => "set the name of the *_hr.dat file",
@@ -180,7 +193,13 @@ function get_arg_description()
             "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
             "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
             "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
-            "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
+            "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)",
+            "partition" => "the partition the job should be run on (slurm script)",
+            "time" => "maximum walltime for a job (slurm script)",
+            "nodes" => "the number of requested nodes (slurm script)",
+            "mail" => "the mail address to mail job updates to (slurm script)",
+            "module_list" => "the module names to be imported in a slurm script",
+            "module_paths" => "additional paths where modules may be located (slurm script)"
         )
     )
     return arg_descriptions
@@ -209,7 +228,7 @@ function parse_commandline(args)
         if arg == "-h" || arg == "--help"
             args_dict["help"] = true
         elseif occursin("--", arg)
-            new_arg = (length(args) > k && !occursin("-", args[k+1])) ? args[k+1] : true
+            new_arg = (length(args) > k && args[k+1][1] ≠ '-') ? args[k+1] : true
             j = 0
             while k+j+1 < length(args) && args[k+1+j][end] == ','
                 new_arg *= args[k+2+j]
@@ -217,7 +236,7 @@ function parse_commandline(args)
             end
 
             args_dict[arg[3:end]] = new_arg
-        elseif occursin("-", arg)
+        elseif arg[1] == '-'
             args_dict[arg[2:end]] = true
         elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false) || args[k-1] == "--help"
             num_pos += 1

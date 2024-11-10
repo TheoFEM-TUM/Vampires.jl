@@ -66,6 +66,11 @@ any_task
 ```
 runscript
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: create a new job file
+    submit: submit all *.job files
+input
+    cp: copy all VASP input files to a new folder
 ```
 
 ```
@@ -73,11 +78,17 @@ settings
     set: set a new setting in the settings file
     rm: remove a setting from the settings file
     read: read a setting from the settings file
+>>>>>>>>> Temporary merge branch 2
 ```
 
 ```
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
+    test: test the accuracy of a W90 model versus DFT
+w90
+    set: set parameters in the INCAR file that are specific to W90
+w90_nscf
+    make: create the folder structure for a NSCF calculation with W90
 ```
 
 ```

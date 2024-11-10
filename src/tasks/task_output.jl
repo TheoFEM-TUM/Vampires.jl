@@ -19,13 +19,13 @@ Processes and outputs data from a `read` task based on a specified method, handl
 """
 function task_output(keys, values, args)
     output_file = args["o"]
-    method = args["method"]
+    method = args["reduce"]
     broadcasted = method[end] == '.' ? Val{Symbol("broadcasted")} : nothing
     recursive = args["r"] ? Val{Symbol("recursive")} : nothing
     method = strip(method, '.')
     f = get_method(method)
     keys_out, values_out, errors = reduce_output(keys, values, f, method, broadcasted, recursive)
-    time = @elapsed if args["r"] && (args["method"][end] == '.' || method == "none")
+    time = @elapsed if args["r"] && (args["reduce"][end] == '.' || method == "none")
         for (value, error, folder) in zip(values_out, errors, readfolders(args["p"]))
             write_output(output_file, keys_out, value, error, folder=folder)
         end
@@ -56,7 +56,8 @@ Processes the `keys` and `values` according to the specified function `f` and th
 - `values_out`: A collection of outputs from applying `f` to each element in `values`, following broadcast or recursion rules as appropriate.
 - `errors`: A collection of error values returned by `f` for each processed `value` or sub-collection in `values`.
 """
-reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, recursive) = keys, values, [zeros(length(keys)) for _ in 1:length(values[1])]
+reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, recursive) = keys, values, zeros(length(keys))
+reduce_output(keys, values, f::Type{Val{:none}}, method, broadcasted, ::Type{Val{:recursive}}) = keys, values, [zeros(length(keys)) for _ in 1:length(values)]
 
 function reduce_output(keys, values, f, method, broadcasted, recursive)
     keys_out = eltype(keys)[]
@@ -133,7 +134,7 @@ function print_output(key, value; folder="none", error=0.)
     out = "The value for $key "
     if folder ≠ "none"; out *= "in $folder "; end
     out *= "is: $value"
-    if error ≠ 0.; out *= " ± $error"; end
+    if error ≠ 0. && sum(error) ≠ 0.; out *= " ± $error"; end
     out *= "."
     println(out)
 end
