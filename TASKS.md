@@ -52,14 +52,14 @@ outcar
 ```
 
 ```
-poscar
-    read: read the POSCAR file
-```
-
-```
 
 file:
     plot: call the read task for `file` and create a plot.
+```
+
+```
+poscar
+    read: read the POSCAR file
 ```
 
 ```
@@ -84,7 +84,11 @@ settings
     set: set a new setting in the settings file
     rm: remove a setting from the settings file
     read: read a setting from the settings file
->>>>>>>>> Temporary merge branch 2
+```
+
+```
+"""
+list of available tasks
 ```
 
 ```
