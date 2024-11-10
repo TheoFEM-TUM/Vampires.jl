@@ -147,7 +147,7 @@ function get_default_args()
         "xdata" => "",
         "ydata" => "",
         "xlabel" => "",
-        "ylabel" => ""
+        "ylabel" => "",
         "partition" => "batch",
         "time" => "1",
         "nodes" => "1",
