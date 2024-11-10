@@ -116,28 +116,76 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp [-r] job submit [--account <account_name>]
+    vamp [-r] job submit [--account <account_name>] [--hostname <hostname>] [--p <path>]
 
-Submit all job files that contain the `.job` file ending.
+Submit all job files with the `.job` file extension. If the current hostname matches the specified `hostname`, the jobs are submitted locally; otherwise, they are submitted to a remote host.
+
+**Note:** Remote submission requires ssh to be configured such that `ssh <hostname>` establishes a connection to the host. Furthermore, an environment variable `\$SCRATCH_<account_name>` needs to be defined and point to a directory that is accessible on both the local and remote systems.
+The paths have to look something like `~/sshfs/<hostname>/path/to/job` (local) and `\$SCRATCH_<account_name>/path/to/job` (remote).
 
 # Arguments
-- `r`: if set, submit all job files in all subfolders.
-- `account`: the account for which the job is submitted.
+- `r`: if set, submit all `.job` files in all subdirectories.
+- `account`: specifies the account to which the job submission is charged.
+- `hostname`: optional, specifies the target hostname for the job submission.
+- `p`: the directory path where `.job` files are located. If not provided, the current directory is used.
 
 # Examples
 ```bash
-# Example 1: Submit all jobs for `MYACCOUNT`.
+# Example 1: Submit all `.job` files in the current directory for `MYACCOUNT`.
 vamp job submit --account MYACCOUNT
 
-# Example 2: Submit all jobs in all subfolders for `MYACCOUNT`
+# Example 2: Submit all `.job` files in all subdirectories for `MYACCOUNT`.
 vamp -r job submit --account MYACCOUNT
-```
+
+# Example 3: Submit `.job` files on a specific host and in a specific directory.
+vamp job submit --account MYACCOUNT --hostname target_host
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
     account = args["account"]
-    for file in readdir(args["p"])
-        if occursin(".job", file)
-            run(`sbatch -A $account $file`)
-        end
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+    original_working_directory = pwd()
+    path = args["p"]
+
+    cd(path)
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`sbatch -A $account \*.job`)
+    else
+        scratch_path = "\$SCRATCH_$account/\$USER/"
+        path_on_host = split_path_at_folder(pwd(), hostname)
+        total_path = joinpath(scratch_path, path_on_host)
+        run(`ssh $hostname "sbatch -A $account $total_path/*.job"`)
     end
+    cd(original_working_directory)
+    return nothing
+end
+
+"""
+    vamp job status [--hostname <hostname>]
+
+Check the status of all jobs for the current user. If the current hostname matches the specified `hostname`, the job status is queried locally; otherwise, it is queried on the specified remote host.
+
+**Note:** Remote status queries require SSH to be configured such that `ssh <hostname>` establishes a connection to the remote host.
+
+# Arguments
+- `hostname`: Optional, specifies the target hostname to query the job status. If not provided or set to `"none"`, the query runs on the local host.
+
+# Examples
+```bash
+# Example 1: Check the status of all jobs for the current user on the local host.
+vamp job status
+
+# Example 2: Check the status of all jobs for the current user on a remote host `target_host`.
+vamp job status --hostname target_host
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`squeue -u \$USER`)
+    else
+        run(`ssh $hostname "squeue -u \$USER"`)
+    end
+    return nothing
 end
