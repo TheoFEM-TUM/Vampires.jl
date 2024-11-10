@@ -189,3 +189,33 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
     end
     return nothing
 end
+
+"""
+    vamp job cancel [--hostname <hostname>] [--N <job_id>]
+
+Cancel a job with the specified `job_id`. If the current hostname matches the specified `hostname`, the job is cancelled locally; otherwise, it is cancelled remotely on the specified host.
+
+# Arguments
+- `hostname`: optional, the target hostname where the job is running. If set to `"none"`, the job is cancelled on the local machine.
+- `N`: the job ID of the job to cancel.
+
+# Examples
+```bash
+# Example 1: Cancel a job with job ID 12345 on the local machine.
+vamp job cancel --N 12345
+
+# Example 2: Cancel a job with job ID 12345 on a remote host.
+vamp job cancel --hostname remote_host --N 12345
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:cancel}}, args)
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+    job_id = args["N"]
+
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`scancel $job_id`)
+    else
+        run(`ssh $hostname "scancel $job_id"`)
+    end
+    return nothing
+end
