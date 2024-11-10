@@ -3,14 +3,23 @@ list of available tasks:
 
 runscript
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
 """
 
 
 """
-# CLI Commands to work with bash scripts
+# CLI Commands to work with bash scripts and jobs (slurm)
 
 Available commands:
 * `vamp runscript make`: Create a bash script to perform VASP calculations.
+* `vamp job make`: Creates a job script for the given parameters.
+* `vamp job submit`: Submits all *.job files.
+* `vamp job status`: Shows the status of all active jobs.
+* `vamp job cancel`: Cancel a given job
 """
 run_task(::Type{Val{:job}}, ::Type{Val{:none}}, args) = nothing
 
