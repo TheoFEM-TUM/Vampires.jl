@@ -143,6 +143,11 @@ function get_default_args()
         "nsim" => "none",
         "kpar" => "none",
         "super_cell_vector" => "none",
+        "title" => "",
+        "xdata" => "",
+        "ydata" => "",
+        "xlabel" => "",
+        "ylabel" => ""
         "partition" => "batch",
         "time" => "1",
         "nodes" => "1",
