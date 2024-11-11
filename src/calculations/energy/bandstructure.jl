@@ -15,7 +15,7 @@ function get_bandgap(Es, kvalmax::Int64; printit=false)
     valmax = maximum(Es[kvalmax, :])
     condmin = minimum(Es[kvalmax+1, :])
     ΔE = condmin - valmax
-    if printit; @show ΔE; end 
+    if printit; @show ΔE; end
     return ΔE
 end
 
@@ -123,17 +123,17 @@ end
 """
     get_effective_mass(kp, Es, lattice)
 
-Calculate the effective mass of charge carriers by fitting a parabolic dispersion relation 
+Calculate the effective mass of charge carriers by fitting a parabolic dispersion relation
 to the energy eigenvalues `Es` as a function of the k-point positions `kp`.
 
 # Arguments
-- `kp::Array{T, 2}`: A 2D array of k-point positions in fractional coordinates, where each column 
+- `kp::Array{T, 2}`: A 2D array of k-point positions in fractional coordinates, where each column
   corresponds to a k-point in the Brillouin zone.
 - `Es::Array{T, 1}`: A 1D array of energy eigenvalues (in eV) at each k-point.
 - `lattice::Array{T, 2}`: The lattice basis vectors, used to convert fractional k-points to Cartesian coordinates.
 
 # Returns
-- `meff::Float64`: The effective mass, calculated by fitting a parabolic function to the energy 
+- `meff::Float64`: The effective mass, calculated by fitting a parabolic function to the energy
   dispersion around the band edge.
 """
 function get_effective_mass(kp, Es, lattice; method="parabola")
@@ -142,7 +142,7 @@ function get_effective_mass(kp, Es, lattice; method="parabola")
     kp_cart = frac_to_cart(kp, bs)
 
     xs = [norm(kp_cart[:, 1] .- kp_cart[:, i]) for i in axes(kp_cart, 2)]
-    
+
     if method[1] == 'p'
         f = ParabolicDispersion(Es[1])
         fit = curve_fit(f, xs, Es, [0.])
@@ -155,13 +155,13 @@ function get_effective_mass(kp, Es, lattice; method="parabola")
     end
 
     meff = ħ^2 / (d2E_dk2 * eV_to_J * A_to_m^2 * m_e)
-    
+
     return meff
 end
 
 function find_kpoint(kpoint, kpoints)
-    k_ind = findfirst(k->k≈kpoint, eachcol(kpoints))
-    while kpoints[:, k_ind+1] == kpoints[:, k_ind]
+    k_ind = findfirst(k -> k ≈ kpoint, eachcol(kpoints))
+    while kpoints[:, k_ind + 1] == kpoints[:, k_ind]
         k_ind += 1
     end
     return k_ind
