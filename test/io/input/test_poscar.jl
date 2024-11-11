@@ -20,4 +20,14 @@ poscar2 = read_poscar("POSCAR")
     @test poscar2.atom_types == ["Ga", "As"]
 end
 
+@testset "add_atom_counts" begin
+    atom_types_1 = ["Ga", "As"]
+    atom_types_1 = Vampires.add_atom_counts(atom_types_1)
+    @test atom_types_1 == ["Ga-1", "As-1"]
+
+    atom_types_2 = ["Cs", "Pb", "Br", "Br", "Br"]
+    atom_types_2 = Vampires.add_atom_counts(atom_types_2)
+    @test atom_types_2 == ["Cs-1", "Pb-1", "Br-1", "Br-2", "Br-3"]
+end
+
 rm("POSCAR")
