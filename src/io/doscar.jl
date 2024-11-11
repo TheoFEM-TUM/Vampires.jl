@@ -66,7 +66,6 @@ function read_doscar_with_pdos(file)
             parse.(Float64, line)
         end
         push!(pdos, hcat(atom_pdos...))
-        #push!(pdos, parse_lines_as_array(lines[ibegin:iend], i1=1, i2=10))
     end
     return transpose(dos), pdos, meta
 end
@@ -77,15 +76,15 @@ end
 Returns a vector of base orbital types based on the provided maximum angular momentum quantum number.
 
 # Arguments
-- `LMAXMIX::Int`: The maximum angular momentum quantum number. Determines which orbital types are included. 
+- `LMAXMIX::Int`: The maximum angular momentum quantum number. Determines which orbital types are included.
   - Valid values correspond to:
     - `0` for "s" orbitals,
     - `1` for "p" orbitals,
     - `2` for "d" orbitals,
     - `3` for "f" orbitals.
-  
+
 # Returns
-- A `Vector{String}` containing the base orbital types ("s", "p", "d", "f") that are allowed based on the `LMAXMIX` input. 
+- A `Vector{String}` containing the base orbital types ("s", "p", "d", "f") that are allowed based on the `LMAXMIX` input.
 """
 function get_base_orbs(LMAXMIX)
     base_orbs = String[]
@@ -103,17 +102,17 @@ end
 Generates a list of orbital states for projected density of states (PDOS) calculations based on specified INCAR parameters for spin, orbital decomposition, and angular momentum.
 
 # Keywords
-- `ISPIN::Int`: The spin state to consider for the orbital list. 
+- `ISPIN::Int`: The spin state to consider for the orbital list.
   - `1` corresponds to non-spin-polarized orbitals (default).
   - `2` corresponds to spin-polarized orbitals.
 
 - `LORBIT::Int`: Values greater than `10` indicate that the orbitals are m-decomposed.
 
-- `LSORBIT::Bool`: Indicates whether spin-orbit coupling effects should be included. 
+- `LSORBIT::Bool`: Indicates whether spin-orbit coupling effects should be included.
   - `false` (default) means spin-orbit coupling is not considered.
   - `true` means spin-orbit coupling is considered
 
-- `LMAXMIX::Int`: The maximum angular momentum quantum number used to determine the base orbitals. 
+- `LMAXMIX::Int`: The maximum angular momentum quantum number used to determine the base orbitals.
   - Affects which base orbitals are included in the output list.
 
 # Returns
@@ -126,7 +125,7 @@ function get_pdos_orbital_list(;ISPIN=1, LORBIT=0, LSORBIT=false, LMAXMIX=2)
     base_orbs = get_base_orbs(LMAXMIX)
     orbs_out = String[]
 
-    if LORBIT > 10 # orbitals are m-decomposed
+    if LORBIT > 10  # orbitals are m-decomposed
         for orb in base_orbs
             if orb == "s"
                 push!(orbs_out, "s")
@@ -142,11 +141,11 @@ function get_pdos_orbital_list(;ISPIN=1, LORBIT=0, LSORBIT=false, LMAXMIX=2)
         orbs_out = base_orbs
     end
 
-    if ISPIN == 2 # orbitals are spin polarized
+    if ISPIN == 2  # orbitals are spin polarized
         orbs_out = [string(orb, suffix) for orb in orbs_out for suffix in ["(up)", "(down)"]]
     end
 
-    if LSORBIT == true # spin-orbit coupling is switched on
+    if LSORBIT == true  # spin-orbit coupling is switched on
         orbs_out = [string(orb, suffix) for orb in orbs_out for suffix in ["(total)", "(mx)", "(my)", "(mz)"]]
     end
 
