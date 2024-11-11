@@ -131,6 +131,7 @@ to the energy eigenvalues `Es` as a function of the k-point positions `kp`.
   corresponds to a k-point in the Brillouin zone.
 - `Es::Array{T, 1}`: A 1D array of energy eigenvalues (in eV) at each k-point.
 - `lattice::Array{T, 2}`: The lattice basis vectors, used to convert fractional k-points to Cartesian coordinates.
+- `method::String`: The method that is used to calculate the effective mass
 
 # Returns
 - `meff::Float64`: The effective mass, calculated by fitting a parabolic function to the energy
