@@ -31,7 +31,7 @@ function write_run_script(exe, path; out="run_job.sh", cb="", run_out="vasp.log"
                 println(runfile, "    srun $exe  > $run_out")
             end
             if cb ≠ ""; println(runfile, "    "*cb); end
-            println("    echo \"Calculation in \$folder completed.\"")
+            println(runfile, "    echo \"Calculation in \$folder completed.\"")
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
