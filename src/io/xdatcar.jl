@@ -62,7 +62,7 @@ function read_xdatcar(xdatcar="XDATCAR")
 end
 
 
-# TODO: + should return Xdatcar structure
+# TODO: + should return Xdatcar structure; + tests; + should use parse_structure_file_header from poscar.jl
 """
     read_xdatcar_npt(xdatcar::AbstractString) -> Tuple{Array{Float64, 3}, Array{Float64, 3}}
 
