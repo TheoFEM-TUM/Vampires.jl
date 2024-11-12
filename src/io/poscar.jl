@@ -15,7 +15,7 @@ Extract all data from the POSCAR file at `poscar`.
     - `positions`: A 3xNionx(Nconfig=1) array of atomic positions.
     - `atom_types`: An array of atom types corresponding to each atom position.
 """
-function read_poscar(poscar)
+function read_poscar(poscar="POSCAR")
     lines = open_and_read(poscar)
     lines = split_lines(lines)
 
@@ -39,7 +39,7 @@ Write a `Poscar/Structure` struct to a POSCAR file.
 # Returns
 - Nothing. The function writes the data to a file named "POSCAR" (default).
 """
-function write_poscar(poscar; system_name="unknown_system", filename="POSCAR")
+function write_poscar(poscar::Structure; system_name="unknown_system", filename="POSCAR")
     file = open(filename, "w+")
     println(file, system_name)
     println(file, " 1.00")
