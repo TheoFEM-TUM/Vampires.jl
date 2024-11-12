@@ -20,6 +20,9 @@ function read_xdatcar(xdatcar="XDATCAR")
     # Lattice vectors
     lattice = a .* parse_lines_as_array(lines[3:5], i1=1, i2=3)
 
+    # Atom types
+    atom_types = parse_lines_as_array(lines[6], i1=1, i2=3, String)
+
     # Number of ions
     Nion = sum(parse.(Int64, lines[7]))
 
@@ -71,4 +74,27 @@ function read_xdatcar_npt(xdatcar="XDATCAR")
        end
     end
     return lattice, configs
+end
+
+
+"""
+3xNionxNconfig
+"""
+function write_combined_xdatcar(lattice_n, configs_n, output="XDATCAR_merged")
+    # check if all XDATCARs are based on the same structure
+    for i in axes(lattice_n, 3)
+        @assert lattice_n[:, :, 1] ≈ lattice_n[:, :, i]
+    end
+    runinng_index = 1
+    open(output) do file
+        println(file, "unknown system")
+        println(file, "unknown system")
+        for q in axes(configs_n, 4)
+            for i in axes(configs_n, 3)
+            println(file, "Direct configuration=     $runinng_index")
+            for j in axes(configs_n, 2)
+                println(file, "   $(configs_n[1, j, i, q])  $(configs_n[2, j, i, q])  $(configs_n[3, j, i, q])")
+            end
+            runinng_index += 1
+        end
 end

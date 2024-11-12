@@ -73,8 +73,12 @@ vamp xdatcar merge --xdatcar XDATCAR_0-100,XDATCAR_101-200 --out XDATCAR
 ```
 """
 function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
+    lattice_n, configs_n = Float64[], Float64[]
     for xdatcar_file_i in args["xdatcar"]
-        lattice, configs = read_xdatcar(joinpath(args["p"], ))
+        lattice, configs = read_xdatcar(joinpath(args["p"], xdatcar_file_i))
+        push!(lattice_n, lattice)
+        push!(configs_n, configs)
     end
-    # TODO
+    output_filename = args["o"] == "none" ? "XDATCAR_merged" : args["o"]
+    write_combined_xdatcar(lattice_n, configs_n, joinpath(args["p"], output_filename))
 end

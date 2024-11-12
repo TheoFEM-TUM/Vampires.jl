@@ -86,5 +86,5 @@ vamp doscar plot --p /path/to/files --doscar DOSCAR --o dos_plot
 function run_task(::Type{Val{:doscar}}, ::Type{Val{:plot}}, args)
     input_filename = args["p"] * args["doscar"]
     dos, _ = read_doscar(input_filename)
-    plot_dos(dos, args["o"])    
+    plot_dos(dos, args["o"])
 end

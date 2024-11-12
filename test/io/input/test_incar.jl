@@ -34,7 +34,7 @@ values = ["1e-6", "10", "True", "1"]
         set_key!(incar, keyword, value, verbose=false)
         @test findvalue(incar, keyword) == value
     end
-    
+
     # Test that a custom commend is not overwritten
     @test Vampires.findcomment(incar, "POTIM") == "MD time step in fs"
 
@@ -58,7 +58,7 @@ values = ["1e-6", "10", "True", "1"]
     @test findvalue(incar, "KSPACING") == "0.5"
     @test Vampires.findkey(incar, "KSPACING")[1] == "K-Convergence"
     @test Vampires.findcomment(incar, "KSPACING") == Vampires.get_comment("KSPACING")
-    
+
     # Test adding a non-existing key
     set_key!(incar, "MYTAG", "NO", verbose=false)
     @test findvalue(incar, "MYTAG") == "NO"

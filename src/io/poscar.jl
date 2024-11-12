@@ -56,7 +56,7 @@ function read_poscar(poscar)
     end
     atom_names = lines[6]
     atom_numbers = parse.(Int64, lines[7])
-    
+
     atom_types = String[]
     for (k, atom_number) in enumerate(atom_numbers), _ in 1:atom_number
         push!(atom_types, atom_names[k])
@@ -112,7 +112,7 @@ end
     add_atom_counts!(atom_types)
 
 Modifies the `atom_types` array in-place by appending a unique count suffix to each atom type.
-This function is useful for assigning unique labels to atoms of the same type when differentiating them 
+This function is useful for assigning unique labels to atoms of the same type when differentiating them
 is necessary (e.g., when visualizing or processing atomic data).
 
 # Arguments
