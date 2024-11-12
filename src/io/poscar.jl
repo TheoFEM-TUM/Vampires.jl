@@ -41,7 +41,7 @@ function read_poscar(poscar)
     lines = open_and_read(poscar)
     lines = split_lines(lines)
 
-    a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_poscar_header(lines[1:7])
+    a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[1:7])
     rs_atom = zeros(Float64, 3, Nion)
     for i in 1:Nion
        rs_atom[:, i] = [parse(Float64, el) for el in lines[8+i][1:3]]
@@ -50,7 +50,7 @@ function read_poscar(poscar)
 end
 
 """
-    parse_poscar_header(lines::Vector{String}) -> Tuple
+    parse_structure_file_header(lines::Vector{String}) -> Tuple
 
 Parse the header information from the POSCAR or XDATCAR file lines.
 
