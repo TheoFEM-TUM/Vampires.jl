@@ -85,7 +85,8 @@ Create subdirectories for supercell configurations extracted from an XDATCAR fil
 """
 function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
     poscar = read_poscar(poscar_path)
-    lattice, configs = read_xdatcar(xdatcar_path)
+    xdatcar = read_xdatcar(xdatcar_path)
+    lattice, configs = xdatcar.lattice, xdatcar.configs
     Nmax = size(configs, 3)
     inds = lowercase(method[1]) == 'u' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
     write_to_file(inds, path*"config_inds")

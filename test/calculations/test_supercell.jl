@@ -22,7 +22,7 @@ end
 path = test_file_path*"param_test/"
 N = 10; Nmin = 5
 supercell_create_subdirectories(path, test_file_path*"XDATCAR_gaas", test_file_path*"SC_POSCAR", N, method="random", Nmin=Nmin)
-_, configs = read_xdatcar(test_file_path*"XDATCAR_gaas")
+xdatcar = read_xdatcar(test_file_path*"XDATCAR_gaas")
 @testset "Supercell snapshots" begin
     inds = read_from_file(path*"config_inds.dat", type=Int64)
     @test length(inds) == N
@@ -31,7 +31,7 @@ _, configs = read_xdatcar(test_file_path*"XDATCAR_gaas")
     end
     for i in 1:N
         poscar = read_poscar(path*"snap_$i/POSCAR")
-        @test poscar.rs_atom == configs[:, :, inds[i]]
+        @test poscar.rs_atom == xdatcar.configs[:, :, inds[i]]
     end
     @test minimum(inds) ≥ Nmin
 end
