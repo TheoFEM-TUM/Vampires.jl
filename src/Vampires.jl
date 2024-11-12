@@ -1,6 +1,6 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, UnicodePlots
 import Documenter: @doc
 
 include("io/read_utils.jl")

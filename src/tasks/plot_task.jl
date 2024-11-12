@@ -41,17 +41,17 @@ function run_task(task, ::Type{Val{:plot}}, args)
     y_data_index = findfirst(x->x==args["ydata"], keys)
     ydata = values[y_data_index]
 
+    xdata = Float64[]
     if length(args["xdata"]) > 0
         x_data_index = findfirst(x->x==args["xdata"], keys)
         xdata = values[x_data_index]
     end
 
-    fig = make_plot(xdata, ydata, title=args["title"], xlabel=args["xlabel"], ylabel=args["ylabel"])
-    
-    output_plot(fig, output_filename)
+    make_plot(xdata, ydata, output_filename, title=args["title"], xlabel=args["xlabel"], ylabel=args["ylabel"])    
+    return nothing
 end
 
-function run_task_recursive(task, ::Type{Val{plot}}, args)
+function run_task_recursive(task, ::Type{Val{:plot}}, args)
     output_filename = args["o"]
     set_backend(output_filename)
 
@@ -59,19 +59,18 @@ function run_task_recursive(task, ::Type{Val{plot}}, args)
     # TODO: add reduce output
     
     y_data_index = findfirst(x->x==args["ydata"], keys)
-    ydata = values[y_data_index]
+    ydata = [value[y_data_index] for value in values]
 
+    xdata = Float64[]
     if length(args["xdata"]) > 0
         x_data_index = findfirst(x->x==args["xdata"], keys)
         xdata = values[x_data_index]
     else
         folders = readfolders(args["p"])
-        xdata = parse.(Float64, [split_line(folder, char=',')[2] for folder in folders])
+        xdata = parse.(Float64, [split_line(folder, char='_')[end] for folder in folders])
         xlabel = split_line(folders[1], char=',')[1]
     end
     xlabel = args["xlabel"] == "" ? xlabel : args["xlabel"]
-
-    fig = make_plot(xdata, ydata, title=args["title"], xlabel=xlabel, ylabel=args["ylabel"])
-
-    output_plot(fig, output_filename)
+    make_plot(xdata, ydata, output_filename, title=args["title"], xlabel=xlabel, ylabel=args["ylabel"])
+    return nothing
 end

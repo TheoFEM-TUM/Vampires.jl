@@ -17,14 +17,14 @@ If `xdata` is non-empty, it is used as the x-axis data. If `xdata` is empty, `yd
 # Returns
 - `fig` : The plot object with the specified data and labels.
 """
-function make_plot(xdata, ydata; title="", xlabel="", ylabel="")
+function make_plot(xdata, ydata, output_filename; title="", xlabel="", ylabel="")
     fig = plot(title=title, xlabel=xlabel, ylabel=ylabel, legend=false)
     if length(xdata) > 0
-        plot!(xdata, ydata)
+        plot!(fig, xdata, ydata)
     else 
-        plot!(ydata)
+        plot!(fig, ydata)
     end
-    return fig
+    Plots.savefig(fig, "none.txt")
 end
 
 """
@@ -60,8 +60,9 @@ Outputs a plot to a file or displays it in the terminal (depends on backend), ba
 """
 function output_plot(fig, output_filename)
     if occursin(".png", output_filename) || occursin(".pdf", output_filename) || occursin(".tikz", output_filename)
-        savefig(fig, output_filenamename)
+        Plots.savefig(fig, output_filenamename)
     else
-        show(fig)        
+        Plots.savefig(fig, output_filename*".txt")
+        run(`cat $output_filename.txt`)
     end
 end
