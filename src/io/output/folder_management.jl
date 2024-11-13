@@ -70,14 +70,13 @@ function nscf_create_subdirectories(path, kpoints, incar; verbose=false)
 end
 
 """
-    supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
+    supercell_create_subdirectories(path, xdatcar_path, N; method="random", Nmin=1)
 
 Create subdirectories for supercell configurations extracted from an XDATCAR file.
 
 # Arguments
 - `path::String`: The directory path where subdirectories will be created.
 - `xdatcar_path::String`: The file path to the XDATCAR file containing atomic configurations.
-- `poscar_path::String`: The file path to the POSCAR file containing lattice information and atomic positions.
 - `N::Int`: The number of configurations to extract and create subdirectories for.
 - `method::String="random"`: The method for selecting configurations. "random" selects configurations randomly,
   while "uniform" selects them evenly spaced along the XDATCAR trajectory.
