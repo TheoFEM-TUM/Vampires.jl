@@ -151,13 +151,12 @@ function get_effective_mass(kp, Es, lattice; method="parabola")
     elseif method[1] == 'f'
         c_i = get_finite_difference_coef(length(Es))
         d2E_dk2 = (c_i ⋅ Es) / xs[2]^2
-        @show xs[2]
         d2E_dk2
     end
 
-    meff = ħ^2 / (d2E_dk2 * eV_to_J * A_to_m^2 * m_e)
+    meff = uconvert(u"kg", ħ^2 / (d2E_dk2*u"eV*Å^2"))
 
-    return meff
+    return meff / m_e
 end
 
 """
