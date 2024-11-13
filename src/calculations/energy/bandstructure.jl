@@ -160,14 +160,17 @@ function get_effective_mass(kp, Es, lattice; method="parabola")
     return meff
 end
 
-function find_kpoint(kpoint, kpoints)
-    k_ind = findfirst(k -> k ≈ kpoint, eachcol(kpoints))
-    while kpoints[:, k_ind + 1] == kpoints[:, k_ind]
-        k_ind += 1
-    end
-    return k_ind
-end
+"""
+    get_finite_difference_coef(N)
 
+Returns the finite difference coefficients for the second derivative, given a stencil of `N` points. These coefficients can be used to approximate the second derivative in numerical methods, where the accuracy improves with larger stencil sizes (see, e.g., https://en.wikipedia.org/wiki/Finite_difference_coefficient).
+
+# Arguments
+- `N::Int`: The number of points in the finite difference stencil. Must be an integer between 3 and 8 (inclusive).
+
+# Returns
+- `Vector{Float64}`: A vector of finite difference coefficients for the specified stencil size.
+"""
 function get_finite_difference_coef(N)
     if N < 3
         error("Finite difference method needs at least 3 points.")
