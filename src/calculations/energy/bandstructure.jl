@@ -154,6 +154,29 @@ function get_effective_mass(kp, Es, lattice; method="parabola")
     return meff / m_e
 end
 
+function get_effective_mass(kp, Es::AbstractMatrix, lattice; method="parabola")
+    meffs = zeros(length(eachcol(Es)))
+    @views for (i, E_band) in enumerate(eachcol(Es))
+        meffs[i] = get_effective_mass(kp[:, k_ind:k_ind+N], E_band[k_ind:k_ind+N], lattice, method=method)
+    end
+    return meffs
+end
+
+function get_effective_mass(kp, Es::Array{<:Number, 3}, lattice; method="parabola")
+    meffs = zeros(size(Es, 1), size(Es, 3))
+    @views for j in axes(meffs, 2), i in axes(meffs, 1)
+        meffs[i, j] = get_effective_mass(kp[:, k_ind:k_ind+N], Es[i, k_ind:k_ind+N, j], lattice, method=method)
+    end
+end
+
+function parse_parameters_specifically_needed_for_effective_mass(args, kp)
+    N = parse(Int64, args["N"] == "0" ? "3" : args["N"])
+    kpoint = parse.(Float64, split_line(args["kpoints"], char=','))
+    k_ind = find_kpoint(kpoint, kp)
+    lattice = read_poscar(joinpath(args["p"], args["poscar"])).lattice
+    return N, k_ind, lattice
+end
+
 """
     get_finite_difference_coef(N)
 

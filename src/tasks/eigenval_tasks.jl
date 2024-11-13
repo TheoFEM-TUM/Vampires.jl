@@ -63,13 +63,8 @@ function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
     elseif occursin("h5", output_filename)
         write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
     elseif args["par"] == "effective_mass"
-        N = parse(Int64, args["N"] == "0" ? "3" : args["N"])
-        kpoint = parse.(Float64, split_line(args["kpoints"], char=','))
-        k_ind = find_kpoint(kpoint, kp)
-        lattice = read_poscar(joinpath(args["p"], args["poscar"])).lattice
-        meffs = map(eachrow(Es)) do E_band
-            get_effective_mass(kp[:, k_ind:k_ind+N], E_band[k_ind:k_ind+N], lattice, method=args["method"])
-        end
+        N, k_ind, lattice = parse_parameters_specifically_needed_for_effective_mass(args, kp)
+        meffs = get_effective_mass(kp[:, k_ind:k_ind+N], E[:, k_ind:k_ind+N], lattice, method=args["method"])
         return ["effective_mass"], [meffs]
     else
         throw("Unknown output file format.")

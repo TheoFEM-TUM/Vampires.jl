@@ -77,15 +77,9 @@ function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
             end
         end
     elseif param == "effective_mass"
-        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
-        N = parse(Int64, args["N"] == "0" ? "3" : args["N"])
-        kpoint = parse.(Float64, split_line(args["kpoints"], char=','))
-        k_ind = find_kpoint(kpoint, kp)
-        lattice = read_poscar(joinpath(args["p"], args["poscar"])).lattice
-        meffs = zeros(size(Es, 1), size(Es, 3))
-        @views for j in axes(meffs, 2), i in axes(meffs, 1)
-            meffs[i, j] = get_effective_mass(kp[:, k_ind:k_ind+N], Es[i, k_ind:k_ind+N, j], lattice, method=args["method"])
-        end
+        kp, Es, occs = read_eigenvalues_from_outcar(joinpath(args["p"], args["outcar"]))
+        N, k_ind, lattice = parse_parameters_specifically_needed_for_effective_mass(args, kp)
+        meffs = get_effective_mass(kp[:, k_ind:k_ind+N], Es[:, k_ind:k_ind+N, :], lattice, method=args["method"])
         return ["effective_mass"], [meffs]
     else
         values = read_value_from_outcar(param, args["p"]*args["outcar"])
