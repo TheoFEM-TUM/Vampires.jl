@@ -7,7 +7,7 @@ If the Structure represents an XDATCAR file, the `positions` field holds more th
 # Fields
 - `a::Float64`: The scaling factor.
 - `lattice::Array{Float64, 2}`: A 3x3 array representing the lattice vectors.
-- `atom_names::Array{AbstractString, 1}`: An array of atom names.
+- `atom_names::Array{String, 1}`: An array of atom names.
 - `atom_numbers::Array{Int64, 1}`: An array of the number of each type of atom.
 - `atom_types::Array{String, 1}`: An array of atom types corresponding to each atom position.
 - `positions::Array{Float64, 3}`: A 3D array of shape (3, Nion, Nconfig), where each 3xNion slice represents the atomic positions in a configuration;
@@ -16,7 +16,7 @@ If the Structure represents an XDATCAR file, the `positions` field holds more th
 struct Structure
     a :: Float64
     lattice :: Array{Float64, 2}
-    atom_names :: Array{AbstractString, 1}
+    atom_names :: Array{String, 1}
     atom_numbers :: Array{Int64, 1}
     positions :: Array{Float64, 3}
     atom_types :: Array{String, 1}
