@@ -1,7 +1,7 @@
 """
     set_key_in_incar(key, value, file; out=file, block_label="", verbose=true)
 
-Updates a specified key with a new value in an INCAR file and writes the modified content to a specified output file. 
+Updates a specified key with a new value in an INCAR file and writes the modified content to a specified output file.
 
 # Arguments
 - `key::String`: The key in the INCAR file that you want to update.
