@@ -125,3 +125,27 @@ function copy_vasp_input(path, folder; ignore=String[], include=Pair{String, Str
         end
     end
 end
+
+"""
+    split_path_at_folder(path::String, folder::String) -> String
+
+Split a path at the first occurrence of a specified folder name and return the remaining path after that folder.
+
+# Arguments
+- `path::String`: The full path to split.
+- `folder::String`: The folder name at which to split the path.
+
+# Returns
+- A `String` representing the portion of the path following the specified folder name. If the folder is the last element, an empty string is returned.
+"""
+function split_path_at_folder(path, folder)
+    segments = split_line(path, char='/')
+    index = findfirst(seg -> occursin(folder, seg), segments)
+    if index === nothing
+        error("Folder name '$folder' not found in the path '$path'")
+    elseif index ≤ length(segments) - 1
+        return joinpath(segments[index+1:end]...)    
+    else 
+        return ""
+    end
+end
