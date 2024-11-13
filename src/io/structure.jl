@@ -22,7 +22,6 @@ struct Structure{A, L, P}
     atom_types :: Array{String, 1}
 end
 
-
 """
     parse_structure_file_header(lines::Vector{String}) -> Tuple
 

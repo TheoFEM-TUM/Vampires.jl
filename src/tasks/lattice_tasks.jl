@@ -76,9 +76,8 @@ vamp supercell sample --N 100,4000 --poscar custom_POSCAR --xdatcar custom_XDATC
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
-    poscar = args["p"]*args["poscar"]
     xdatcar = args["p"]*args["xdatcar"]
     Ns = parse.(Int64, split_line(args["N"], char=','))
     N, Nmin = length(Ns) > 1 ? Ns : (Ns[1], 1)
-    supercell_create_subdirectories(args["p"], xdatcar, poscar, N, method=args["method"], Nmin=Nmin)
+    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin)
 end

@@ -83,8 +83,7 @@ Create subdirectories for supercell configurations extracted from an XDATCAR fil
   while "uniform" selects them evenly spaced along the XDATCAR trajectory.
 - `Nmin::Int=1`: The minimum index of configurations to consider. Defaults to 1.
 """
-function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
-    poscar = read_poscar(poscar_path)
+function supercell_create_subdirectories(path, xdatcar_path, N; method="random", Nmin=1)
     xdatcar = read_xdatcar(xdatcar_path)
     lattice, configs = xdatcar.lattice, xdatcar.positions
     Nmax = size(configs, 3)
@@ -92,7 +91,7 @@ function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; met
     write_to_file(inds, path*"config_inds")
     for (k, ind) in enumerate(inds)
         mkdir(path*"snap_$k")
-        new_poscar = Structure(1, lattice, poscar.atom_names, poscar.atom_numbers, reshape(configs[:, :, ind], (size(configs[:, :, ind])..., 1)) , poscar.atom_types)
+        new_poscar = Structure(1, lattice, xdatcar.atom_names, xdatcar.atom_numbers, configs[:, :, ind], xdatcar.atom_types)
         write_poscar(new_poscar, filename=path*"snap_$k/POSCAR")
         copy_vasp_input(path, "snap_$k", ignore=["POSCAR"])
     end

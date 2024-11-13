@@ -20,7 +20,7 @@ function read_poscar(poscar="POSCAR")
     lines = split_lines(lines)
 
     a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[1:7])
-    positions = zeros(Float64, 3, Nion, 1)
+    positions = zeros(Float64, 3, Nion)
     for i in 1:Nion
        positions[:, i] = [parse(Float64, el) for el in lines[8+i][1:3]]
     end
