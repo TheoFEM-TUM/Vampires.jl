@@ -55,3 +55,30 @@ end
 
     rm(path*"scf", recursive=true); rm(path*"nscf", recursive=true)
 end
+
+@testset "split_path_at_folder tests" begin
+    # Test 1: Folder found in path
+    result = Vampires.split_path_at_folder("/home/user/project/folder/subfolder", "project")
+    @test result == "folder/subfolder"
+
+    # Test 2: Folder is the last element
+    result = Vampires.split_path_at_folder("/home/user/project", "project")
+    @test result == ""
+
+    # Test 3: Folder not found in path (should throw error)
+    @test_throws ErrorException begin
+        Vampires.split_path_at_folder("/home/user/project/folder", "nonexistent")
+    end
+
+    # Test 4: Folder found at the beginning of the path
+    result = Vampires.split_path_at_folder("/home/user/project/folder/subfolder", "home")
+    @test result == "user/project/folder/subfolder"
+
+    # Test 5: Folder is the second element in the path
+    result = Vampires.split_path_at_folder("/home/user/project/folder", "user")
+    @test result == "project/folder"
+
+    # Test 6: Folder name is a substring of a path segment (check for exact match)
+    result = Vampires.split_path_at_folder("/home/user/project/folder", "proj")
+    @test result == "folder"
+end
