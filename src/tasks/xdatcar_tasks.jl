@@ -42,7 +42,8 @@ vamp xdatcar read --par MSD
 ```
 """
 function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
-    lattice, configs = read_xdatcar(joinpath(args["p"], args["xdatcar"]))
+    xdatcar = read_xdatcar(joinpath(args["p"], args["xdatcar"]))
+    lattice, configs = xdatcar.lattice, xdatcar.configs
 
     if lowercase(args["par"]) == "msd"
         poscar = read_poscar(joinpath(args["p"], args["poscar"]))

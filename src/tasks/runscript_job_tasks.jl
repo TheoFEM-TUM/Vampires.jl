@@ -3,14 +3,23 @@ list of available tasks:
 
 runscript
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
 """
 
 
 """
-# CLI Commands to work with bash scripts
+# CLI Commands to work with bash scripts and jobs (slurm)
 
 Available commands:
 * `vamp runscript make`: Create a bash script to perform VASP calculations.
+* `vamp job make`: Creates a job script for the given parameters.
+* `vamp job submit`: Submits all *.job files.
+* `vamp job status`: Shows the status of all active jobs.
+* `vamp job cancel`: Cancel a given job
 """
 run_task(::Type{Val{:job}}, ::Type{Val{:none}}, args) = nothing
 
@@ -116,28 +125,106 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp [-r] job submit [--account <account_name>]
+    vamp [-r] job submit [--account <account_name>] [--hostname <hostname>] [--p <path>]
 
-Submit all job files that contain the `.job` file ending.
+Submit all job files with the `.job` file extension. If the current hostname matches the specified `hostname`, the jobs are submitted locally; otherwise, they are submitted to a remote host.
+
+**Note:** Remote submission requires ssh to be configured such that `ssh <hostname>` establishes a connection to the host. Furthermore, an environment variable `\$SCRATCH_<account_name>` needs to be defined and point to a directory that is accessible on both the local and remote systems.
+The paths have to look something like `~/sshfs/<hostname>/path/to/job` (local) and `\$SCRATCH_<account_name>/path/to/job` (remote).
 
 # Arguments
-- `r`: if set, submit all job files in all subfolders.
-- `account`: the account for which the job is submitted.
+- `r`: if set, submit all `.job` files in all subdirectories.
+- `account`: specifies the account to which the job submission is charged.
+- `hostname`: optional, specifies the target hostname for the job submission.
+- `p`: the directory path where `.job` files are located. If not provided, the current directory is used.
 
 # Examples
 ```bash
-# Example 1: Submit all jobs for `MYACCOUNT`.
+# Example 1: Submit all `.job` files in the current directory for `MYACCOUNT`.
 vamp job submit --account MYACCOUNT
 
-# Example 2: Submit all jobs in all subfolders for `MYACCOUNT`
+# Example 2: Submit all `.job` files in all subdirectories for `MYACCOUNT`.
 vamp -r job submit --account MYACCOUNT
-```
+
+# Example 3: Submit `.job` files on a specific host and in a specific directory.
+vamp job submit --account MYACCOUNT --hostname target_host
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
     account = args["account"]
-    for file in readdir(args["p"])
-        if occursin(".job", file)
-            run(`sbatch -A $account $file`)
-        end
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+    original_working_directory = pwd()
+    path = args["p"]
+
+    cd(path)
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`sbatch -A $account \*.job`)
+    else
+        scratch_path = "\$SCRATCH_$account/\$USER/"
+        path_on_host = split_path_at_folder(pwd(), hostname)
+        total_path = joinpath(scratch_path, path_on_host)
+        run(`ssh $hostname "sbatch -A $account $total_path/*.job"`)
     end
+    cd(original_working_directory)
+    return nothing
+end
+
+"""
+    vamp job status [--hostname <hostname>]
+
+Check the status of all jobs for the current user. If the current hostname matches the specified `hostname`, the job status is queried locally; otherwise, it is queried on the specified remote host.
+
+**Note:** Remote status queries require SSH to be configured such that `ssh <hostname>` establishes a connection to the remote host.
+
+# Arguments
+- `hostname`: Optional, specifies the target hostname to query the job status. If not provided or set to `"none"`, the query runs on the local host.
+
+# Examples
+```bash
+# Example 1: Check the status of all jobs for the current user on the local host.
+vamp job status
+
+# Example 2: Check the status of all jobs for the current user on a remote host `target_host`.
+vamp job status --hostname target_host
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.9S\"`)
+    else
+        run(`ssh $hostname "squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.9S\""`)
+    end
+    return nothing
+end
+
+"""
+    vamp job cancel [--hostname <hostname>] [--N <job_id>]
+
+Cancel a job with the specified `job_id`. If the current hostname matches the specified `hostname`, the job is cancelled locally; otherwise, it is cancelled remotely on the specified host.
+
+# Arguments
+- `hostname`: optional, the target hostname where the job is running. If set to `"none"`, the job is cancelled on the local machine.
+- `N`: the job ID of the job to cancel.
+
+# Examples
+```bash
+# Example 1: Cancel a job with job ID 12345 on the local machine.
+vamp job cancel --N 12345
+
+# Example 2: Cancel a job with job ID 12345 on a remote host.
+vamp job cancel --hostname remote_host --N 12345
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:cancel}}, args)
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+    job_id = args["N"]
+
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`scancel $job_id`)
+    else
+        run(`ssh $hostname "scancel $job_id"`)
+    end
+    return nothing
 end
