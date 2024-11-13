@@ -6,7 +6,7 @@
     poscar = read_poscar(joinpath(args["p"], args["poscar"]))
     keys, values = run_task(Val{Symbol("poscar")}, Val{Symbol("read")}, args)
     @test values[1] == poscar.lattice
-    @test values[2] == poscar.rs_atom
+    @test values[2] == poscar.positions[:, :, 1]
     @test values[3] == poscar.atom_types
 
     # Test 2: test recursive read to file output
@@ -19,7 +19,7 @@
     data_correct_in_file = map(1:3) do i
         [h5read("poscars.h5", "lattice")[:, :, i] == poscar.lattice,
         h5read("poscars.h5", "atom_types")[:, i] == poscar.atom_types,
-        h5read("poscars.h5", "positions")[:, :, i] == poscar.rs_atom]
+        h5read("poscars.h5", "positions")[:, :, i] == poscar.positions[:, :, 1]]
     end
     @test all(vcat(data_correct_in_file...))
     rm("poscars.h5")

@@ -66,7 +66,7 @@ end
 
 """
     next_line_with(keywords, lines)
-    
+
 Find the next line in lines that contains a set of keywords.
 """
 function next_line_with(keywords::AbstractArray, lines)

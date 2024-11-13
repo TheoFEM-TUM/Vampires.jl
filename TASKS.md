@@ -67,10 +67,10 @@ any_task
 runscript
     make: creates a bash script that runs vasp in a specific folder
 job
-    make: create a new job file
-    submit: submit all *.job files
-input
-    cp: copy all VASP input files to a new folder
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
 ```
 
 ```
@@ -88,10 +88,11 @@ list of available tasks
 ```
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
-    test: test the accuracy of a W90 model versus DFT
-w90
-    set: set parameters in the INCAR file that are specific to W90
-w90_nscf
-    make: create the folder structure for a NSCF calculation with W90
+```
+
+```
+
+xdatcar:
+    read: read the atomic configurations from the XDATCAR file.
 ```
 
