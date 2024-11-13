@@ -102,11 +102,6 @@ function get_fermi_energy(Es, occ; occ_threshold=0.9, printit=false)
     return E_fermi
 end
 
-const ħ = 1.054571817e-34
-const A_to_m = 1e-10
-const eV_to_J = 1.60218e-19
-const m_e = 9.10938356e-31
-
 """
     ParabolicDispersion
 
