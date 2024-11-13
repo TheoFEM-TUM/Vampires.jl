@@ -1,26 +1,4 @@
 """
-    struct Poscar
-
-A structure to represent the data contained in a VASP POSCAR file.
-
-# Fields
-- `a::Float64`: The scaling factor.
-- `lattice::Array{Float64, 2}`: A 3x3 array representing the lattice vectors.
-- `atom_names::Array{AbstractString, 1}`: An array of atom names.
-- `atom_numbers::Array{Int64, 1}`: An array of the number of each type of atom.
-- `rs_atom::Array{Float64, 2}`: A 3xNion array of atomic positions.
-- `atom_types::Array{String, 1}`: An array of atom types corresponding to each atom position.
-"""
-struct Poscar
-    a :: Float64
-    lattice :: Array{Float64, 2}
-    atom_names :: Array{AbstractString, 1}
-    atom_numbers :: Array{Int64, 1}
-    rs_atom :: Array{Float64, 2}
-    atom_types :: Array{String, 1}
-end
-
-"""
     read_poscar(poscar::AbstractString) -> Poscar
 
 Extract all data from the POSCAR file at `poscar`.
@@ -29,61 +7,39 @@ Extract all data from the POSCAR file at `poscar`.
 - `poscar::AbstractString`: The path to the POSCAR file.
 
 # Returns
-- `Poscar`: A `Poscar` struct containing all the extracted data from the POSCAR file, including:
+- `Poscar`: A `Poscar/Structure` struct containing all the extracted data from the POSCAR file, including:
     - `a`: The scaling factor.
     - `lattice`: The 3x3 array of lattice vectors.
     - `atom_names`: An array of atom names.
     - `atom_numbers`: An array of the number of each type of atom.
-    - `Rs`: A 3xNion array of atomic positions.
+    - `positions`: A 3xNionx(Nconfig=1) array of atomic positions.
     - `atom_types`: An array of atom types corresponding to each atom position.
 """
-function read_poscar(poscar)
+function read_poscar(poscar="POSCAR")
     lines = open_and_read(poscar)
     lines = split_lines(lines)
 
-    # Scaling parameter
-    a = parse(Float64, lines[2][1])
-
-    # Lattice vectors
-    lattice = zeros(Float64, 3, 3)
-    for i in 1:3
-        lattice[:, i] = @. a * parse(Float64, lines[2+i])
-    end
-
-    # Atom names and numbers
-    if length(lines[6]) ≠ length(lines[7])
-        throw("Length of atom_names and atom_numbers not equal, check your POSCAR!")
-    end
-    atom_names = lines[6]
-    atom_numbers = parse.(Int64, lines[7])
-    
-    atom_types = String[]
-    for (k, atom_number) in enumerate(atom_numbers), _ in 1:atom_number
-        push!(atom_types, atom_names[k])
-    end
-
-    # Atom positions and types
-    Nion = sum(atom_numbers)
-    rs_atom = zeros(Float64, 3, Nion)
+    a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[1:7])
+    positions = zeros(Float64, 3, Nion, 1)
     for i in 1:Nion
-       rs_atom[:, i] = [parse(Float64, el) for el in lines[8+i][1:3]]
+       positions[:, i] = [parse(Float64, el) for el in lines[8+i][1:3]]
     end
-    return Poscar(a, lattice, atom_names, atom_numbers, rs_atom, atom_types)
+    return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
 end
 
 """
-    write_poscar(poscar::Poscar; system_name="unknown_system", filename="POSCAR")
+    write_poscar(poscar::Structure; system_name="unknown_system", filename="POSCAR")
 
-Write a `Poscar` struct to a POSCAR file.
+Write a `Poscar/Structure` struct to a POSCAR file.
 
 # Arguments
-- `poscar::Poscar`: The `Poscar` struct to be written to file.
+- `poscar::Structure`: The `Poscar/Structure` struct to be written to file.
 - `system_name::String`: The name of the system to be written at the top of the POSCAR file. Default is "unknown_system".
 
 # Returns
 - Nothing. The function writes the data to a file named "POSCAR" (default).
 """
-function write_poscar(poscar::Poscar; system_name="unknown_system", filename="POSCAR")
+function write_poscar(poscar::Structure; system_name="unknown_system", filename="POSCAR")
     file = open(filename, "w+")
     println(file, system_name)
     println(file, " 1.00")
@@ -99,11 +55,30 @@ function write_poscar(poscar::Poscar; system_name="unknown_system", filename="PO
     for number in poscar.atom_numbers; print(file, number); print(file, "  "); end
     print(file, "\n")
     println(file, "Direct")
-    for i in axes(poscar.rs_atom, 2)
-        pos = poscar.rs_atom[:, i]
+    for i in axes(poscar.positions, 2)
+        pos = poscar.positions[:, i]
         sp1 = pos[1] > 0 ? " " : ""
         sps = [pos[i] > 0 ? "   " : "  " for i in 2:3]
         println(file, sp1, pos[1], sps[1], pos[2], sps[2], pos[3], "   ", poscar.atom_types[i])
     end
     close(file)
+end
+
+"""
+    add_atom_counts!(atom_types)
+
+Modifies the `atom_types` array in-place by appending a unique count suffix to each atom type.
+This function is useful for assigning unique labels to atoms of the same type when differentiating them
+is necessary (e.g., when visualizing or processing atomic data).
+
+# Arguments
+- `atom_types`: A vector of strings where each element represents an atom type. The function appends a suffix `"-i"`
+  to each atom type, where `i` is a unique integer for each occurrence of that type.
+"""
+function add_atom_counts(atom_types)
+    counted_atom_types = map(enumerate(atom_types)) do (n, type)
+        i = count(t->t==type, atom_types[1:n-1]) + 1
+        type * "-$i"
+    end
+    return counted_atom_types
 end
