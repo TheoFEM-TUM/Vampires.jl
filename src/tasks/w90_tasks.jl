@@ -165,7 +165,7 @@ function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     cb = get_exclude_callback(args["exclude"])
     if length(cb) > 0; cb *= "\n"; end
     cb *= "    if [[ \"\$folder\" == \"scf\" ]]; then\n      ln -f CHGCAR ../nscf/CHGCAR\n      vamp w90 set --N $bandmin --par windows --eigenval EIGENVAL --incar ../nscf/INCAR\n    fi"
-    write_run_script(args["exe"], args["p"], cb=cb, out=filename)
+    write_run_script(args["exe"], "./", cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
 
     scf_incar = joinpath(args["p"], "scf/INCAR")
