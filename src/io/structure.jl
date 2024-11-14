@@ -72,3 +72,24 @@ function parse_structure_file_header(lines)
     Nion = sum(atom_numbers)
     return (a, lattice, atom_names, atom_numbers, atom_types, Nion)
 end
+
+
+
+
+function write_structure_file_header!(iostream, structure::Structure, system_name="unknown structure")
+    println(system_name)
+    println(iostream, "           $(structure.a)")
+    for pos in structure.lattice
+        println(iostream, "    $(pos[1])    $(pos[2])    $(pos[3])")
+    end
+    for element in structure.atom_names
+        print(iostream, " ")
+        print(iostream, "   $element")
+        println(iostream, "")
+    end
+    for number in structure.atom_numbers
+        print(iostream, " ")
+        print(iostream, "   $number")
+        println(iostream, "")
+    end
+end
