@@ -169,7 +169,7 @@ function get_effective_mass(kp, Es::Array{<:Number, 3}, lattice; method="parabol
     end
 end
 
-function parse_parameters_specifically_needed_for_effective_mass(args, kp)
+function parse_effective_mass_parameters(args, kp)
     N = parse(Int64, args["N"] == "0" ? "3" : args["N"])
     kpoint = parse.(Float64, split_line(args["kpoints"], char=','))
     k_ind = find_kpoint(kpoint, kp)

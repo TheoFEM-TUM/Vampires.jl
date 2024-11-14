@@ -78,7 +78,7 @@ function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
         end
     elseif param == "effective_mass"
         kp, Es, occs = read_eigenvalues_from_outcar(joinpath(args["p"], args["outcar"]))
-        N, k_ind, lattice = parse_parameters_specifically_needed_for_effective_mass(args, kp)
+        N, k_ind, lattice = parse_effective_mass_parameters(args, kp)
         meffs = get_effective_mass(kp[:, k_ind:k_ind+N], Es[:, k_ind:k_ind+N, :], lattice, method=args["method"])
         return ["effective_mass"], [meffs]
     else

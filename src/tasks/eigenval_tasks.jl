@@ -63,7 +63,7 @@ function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
     elseif occursin("h5", output_filename)
         write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
     elseif args["par"] == "effective_mass"
-        N, k_ind, lattice = parse_parameters_specifically_needed_for_effective_mass(args, kp)
+        N, k_ind, lattice = parse_effective_mass_parameters(args, kp)
         meffs = get_effective_mass(kp[:, k_ind:k_ind+N], E[:, k_ind:k_ind+N], lattice, method=args["method"])
         return ["effective_mass"], [meffs]
     else
