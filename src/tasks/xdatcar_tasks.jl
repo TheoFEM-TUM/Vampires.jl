@@ -43,11 +43,11 @@ vamp xdatcar read --par MSD
 """
 function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
     xdatcar = read_xdatcar(joinpath(args["p"], args["xdatcar"]))
-    lattice, configs = xdatcar.lattice, xdatcar.configs
+    lattice, configs = xdatcar.lattice, xdatcar.positions
 
     if lowercase(args["par"]) == "msd"
         poscar = read_poscar(joinpath(args["p"], args["poscar"]))
-        msd, err = get_msd(poscar.rs_atom, configs, lattice)
+        msd, err = get_msd(poscar.positions, configs, lattice)
         return ["msd", "deviation"], [msd, err]
     end
 
