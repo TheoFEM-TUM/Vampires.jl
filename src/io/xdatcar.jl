@@ -75,13 +75,16 @@ end
 
 function write_combined_xdatcar(structure_n::Array{Structure}, output_filename="XDATCAR_merged")
     running_index =  1 # to keep track of the total amount of configurations
-    open(output_filename) do file
+    open(output_filename, "w") do file
         write_structure_file_header!(file, structure_n[1])
         for (i, structure) in enumerate(structure_n)
             num_digits = floor(Int, log10(running_index) + 1)
-            println(file, "Direct configuration=$(repeat(" ", 6-num_digits))$(running_index)")
-            for pos in structure.positions[:, i]
-                println(iostream, "    $(pos[1])    $(pos[2])    $(pos[3])")
+            for pos in axes(structure.positions, 3)
+                println(file, "Direct configuration=$(repeat(" ", 6-num_digits))$(running_index)")
+                for (x, y, z) in eachcol(structure.positions[:, :, pos])
+                    println(file, "    $(x)    $(y)    $(z)")
+                end
+                running_index += 1
             end
         end
     end

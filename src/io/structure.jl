@@ -77,19 +77,22 @@ end
 
 
 function write_structure_file_header!(iostream, structure::Structure, system_name="unknown structure")
-    println(system_name)
+    println(iostream, system_name)
     println(iostream, "           $(structure.a)")
-    for pos in structure.lattice
-        println(iostream, "    $(pos[1])    $(pos[2])    $(pos[3])")
+    for pos in axes(structure.lattice, 2)
+        println(pos)
+        println(structure.lattice[:, pos])
+        println("$(structure.lattice[:, pos][1])    $(structure.lattice[:, pos][2])    $(structure.lattice[:, pos][3])")
+        println(iostream, "    $(structure.lattice[:, pos][1])    $(structure.lattice[:, pos][2])    $(structure.lattice[:, pos][3])")
     end
+    print(iostream, " ")
     for element in structure.atom_names
-        print(iostream, " ")
         print(iostream, "   $element")
-        println(iostream, "")
     end
+    println(iostream, "")
+    print(iostream, " ")
     for number in structure.atom_numbers
-        print(iostream, " ")
         print(iostream, "   $number")
-        println(iostream, "")
     end
+    println(iostream, "")
 end
