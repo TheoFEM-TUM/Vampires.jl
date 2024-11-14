@@ -81,5 +81,7 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
         push!(structure_n, structure)
     end
     output_filename = args["o"] == "none" ? "XDATCAR_merged" : args["o"]
-    write_combined_xdatcar(structure_n, joinpath(args["p"], output_filename))
+    open(joinpath(args["p"], output_filename), "w") do file
+        write_combined_xdatcar(file, structure_n)
+    end
 end

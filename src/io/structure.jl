@@ -73,26 +73,40 @@ function parse_structure_file_header(lines)
     return (a, lattice, atom_names, atom_numbers, atom_types, Nion)
 end
 
+"""
+    write_structure_file_header(iostream, structure::Structure, system_name="unknown structure")
 
+Writes the header information for a structure to an open `iostream` in XDATCAR format.
+The header includes the system name, lattice scaling factor, lattice vectors, atomic species, and atom counts.
 
+# Arguments
+- `iostream`: The IO stream to write to, such as an open file or standard output.
+- `structure::Structure`: A `Structure` object containing details about the lattice and atoms. It should have the following fields:
+  - `a`: A scaling factor for the lattice vectors.
+  - `lattice`: A 3x3 matrix representing the lattice vectors.
+  - `atom_names`: An array of atomic species names (e.g., `["H", "O"]`).
+  - `atom_numbers`: An array of integers representing the count of each atom type (e.g., `[2, 1]` for two H and one O).
+- `system_name`: An optional string specifying the name of the system. Defaults to `"unknown structure"` if not provided.
 
-function write_structure_file_header!(iostream, structure::Structure, system_name="unknown structure")
+# Example
+```julia
+# Open a file to write the header for a structure
+open("structure_header.txt", "w") do io
+    write_structure_file_header(io, structure, "Water Molecule")
+end
+"""
+function write_structure_file_header(iostream, structure::Structure, system_name="unknown structure")
     println(iostream, system_name)
     println(iostream, "           $(structure.a)")
-    for pos in axes(structure.lattice, 2)
-        println(pos)
-        println(structure.lattice[:, pos])
-        println("$(structure.lattice[:, pos][1])    $(structure.lattice[:, pos][2])    $(structure.lattice[:, pos][3])")
-        println(iostream, "    $(structure.lattice[:, pos][1])    $(structure.lattice[:, pos][2])    $(structure.lattice[:, pos][3])")
+    for (x, y, z) in eachcol(structure.lattice)
+        println(iostream, "     $(rpad(x, 8, '0'))    $(rpad(y, 8, '0'))    $(rpad(z, 8, '0'))")
     end
-    print(iostream, " ")
     for element in structure.atom_names
         print(iostream, "   $element")
     end
     println(iostream, "")
-    print(iostream, " ")
     for number in structure.atom_numbers
-        print(iostream, "   $number")
+        print(iostream, "     $number")
     end
     println(iostream, "")
 end
