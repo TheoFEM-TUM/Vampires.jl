@@ -59,20 +59,16 @@ function read_xdatcar_npt(xdatcar="XDATCAR")
     for i in 1:(8+Nion):length(lines)
         a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[i:(i+6)])
         # add lattice to the lattice vector
-        push!(lattices ,lattice)
+        push!(lattices, lattice)
         # Parse the configurations
         positions_i = zeros(Float64, 3, Nion)
         for (q, j) in enumerate((i+8):(i+7+Nion))
-            println(lines[j])
             positions_i[:, q] = parse.(Float64, lines[j][1:3])
         end
         # add configurations to positions
         push!(positions, positions_i)
     end
-
-    lattices = hcat(lattices...)'
-    println(size(lattices))
-    @show lattices
-    println(lattices)
-    return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
+    positions = cat(positions..., dims=3)
+    lattices = cat(lattices..., dims=3)
+    return Structure(a, lattices, atom_names, atom_numbers, positions, atom_types)
 end
