@@ -39,8 +39,6 @@ function read_xdatcar(xdatcar="XDATCAR")
     return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
 end
 
-
-# TODO: + should return Xdatcar structure; + tests; + should use parse_structure_file_header from poscar.jl
 """
     read_xdatcar_npt(xdatcar::AbstractString) -> Tuple{Array{Float64, 3}, Array{Float64, 3}}
 
@@ -55,19 +53,26 @@ Read the configurations in the `xdatcar` file and return the lattice vectors and
 """
 function read_xdatcar_npt(xdatcar="XDATCAR")
     lines = split_lines(open_and_read(xdatcar))
-    Nconfig, config_inds = count_lines_with("Direct", lines)
-    Nion = sum(parse.(Int64, lines[7]))
-
-    lattice = zeros(3, 3, Nconfig)
-    configs = zeros(3, Nion, Nconfig)
-
-    @inbounds for (k, ind) in enumerate(config_inds)
-       a = parse(Float64, lines[ind-6][1])
-       lattice[:, :, k] = a .* parse_lines_as_array(lines[ind-5:ind-3], i1=1, i2=3)
-       for i in axes(configs, 2)
-           config = @view configs[:, i, k]
-           config .= parse.(Float64, lines[ind+i])
-       end
+    positions = []
+    lattices = []
+    a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[1:7])
+    for i in 1:(8+Nion):length(lines)
+        a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[i:(i+6)])
+        # add lattice to the lattice vector
+        push!(lattices ,lattice)
+        # Parse the configurations
+        positions_i = zeros(Float64, 3, Nion)
+        for (q, j) in enumerate((i+8):(i+7+Nion))
+            println(lines[j])
+            positions_i[:, q] = parse.(Float64, lines[j][1:3])
+        end
+        # add configurations to positions
+        push!(positions, positions_i)
     end
-    return lattice, configs # TODO: return XDATCAR
+
+    lattices = hcat(lattices...)'
+    println(size(lattices))
+    @show lattices
+    println(lattices)
+    return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
 end
