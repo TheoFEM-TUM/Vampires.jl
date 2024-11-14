@@ -13,15 +13,14 @@ If the Structure represents an XDATCAR file, the `positions` field holds more th
 - `positions::Array{Float64, 3}`: A 3D array of shape (3, Nion, Nconfig), where each 3xNion slice represents the atomic positions in a configuration;
     ! Nconfig = 1 for POSCAR files
 """
-struct Structure
-    a :: Float64
-    lattice :: Array{Float64, 2}
+struct Structure{A, L, P}
+    a :: A
+    lattice :: L
     atom_names :: Array{String, 1}
     atom_numbers :: Array{Int64, 1}
-    positions :: Array{Float64, 3}
+    positions :: P
     atom_types :: Array{String, 1}
 end
-
 
 """
     parse_structure_file_header(lines::Vector{String}) -> Tuple
@@ -48,28 +47,28 @@ This separate function is designed to handle both POSCAR and XDATCAR formats, wh
 
 """
 function parse_structure_file_header(lines)
-        # Scaling parameter
-        a = parse(Float64, lines[2][1])
+    # Scaling parameter
+    a = parse(Float64, lines[2][1])
 
-        # Lattice vectors
-        lattice = zeros(Float64, 3, 3)
-        for i in 1:3
-            lattice[:, i] = @. a * parse(Float64, lines[2+i])
-        end
+    # Lattice vectors
+    lattice = zeros(Float64, 3, 3)
+    for i in 1:3
+        lattice[:, i] = @. a * parse(Float64, lines[2+i])
+    end
 
-        # Atom names and numbers
-        if length(lines[6]) ≠ length(lines[7])
-            throw("Length of atom_names and atom_numbers not equal, check your POSCAR!")
-        end
-        atom_names = lines[6]
-        atom_numbers = parse.(Int64, lines[7])
+    # Atom names and numbers
+    if length(lines[6]) ≠ length(lines[7])
+        throw("Length of atom_names and atom_numbers not equal, check your POSCAR!")
+    end
+    atom_names = lines[6]
+    atom_numbers = parse.(Int64, lines[7])
 
-        atom_types = String[]
-        for (k, atom_number) in enumerate(atom_numbers), _ in 1:atom_number
-            push!(atom_types, atom_names[k])
-        end
+    atom_types = String[]
+    for (k, atom_number) in enumerate(atom_numbers), _ in 1:atom_number
+        push!(atom_types, atom_names[k])
+    end
 
-        # Atom positions and types
-        Nion = sum(atom_numbers)
-        return (a, lattice, atom_names, atom_numbers, atom_types, Nion)
+    # Atom positions and types
+    Nion = sum(atom_numbers)
+    return (a, lattice, atom_names, atom_numbers, atom_types, Nion)
 end

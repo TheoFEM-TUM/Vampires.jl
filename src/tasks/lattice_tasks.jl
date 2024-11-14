@@ -55,13 +55,12 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp supercell sample --N <size,minimum_index> [--poscar <file>] [--xdatcar <file>] [--method <method>] [--p <path>]
+    vamp supercell sample --N <size,minimum_index> [--xdatcar <file>] [--method <method>] [--p <path>]
 
 Sample configurations from a XDATCAR file and create a folder for each one. Copy VASP input files into each folder if present.
 
 # Arguments
 - `N`: Defines the sample size, and the minimum index (in the XDATCAR) that can be sampled, e.g., `-N 10, 1000` results in a sample size of 10 with the minimum index being 1000. If only one value is provided, `Nmin` is set to 1.
-- `poscar`: Path to the POSCAR file. Needed for atomic information (optional; default is "POSCAR").
 - `xdatcar`: Path to the XDATCAR file that contains the atomic positions for sampling (optional; default is "XDATCAR").
 - `method`: Method used for sampling configurations (optional; default is `random`). Alternatively, uniform sampling may be used.
 - `p`: Sets the path where the supercell and sample configurations will be created (optional).
@@ -72,13 +71,12 @@ Sample configurations from a XDATCAR file and create a folder for each one. Copy
 vamp supercell sample --N 10
 
 # Example 2: Sample 100 configurations from a custom XDATCAR file using a custom POSCAR file, with the "uniform" sampling method.
-vamp supercell sample --N 100,4000 --poscar custom_POSCAR --xdatcar custom_XDATCAR --method uniform
+vamp supercell sample --N 100,4000 --xdatcar custom_XDATCAR --method uniform
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
-    poscar = args["p"]*args["poscar"]
     xdatcar = args["p"]*args["xdatcar"]
     Ns = parse.(Int64, split_line(args["N"], char=','))
     N, Nmin = length(Ns) > 1 ? Ns : (Ns[1], 1)
-    supercell_create_subdirectories(args["p"], xdatcar, poscar, N, method=args["method"], Nmin=Nmin)
+    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin)
 end
