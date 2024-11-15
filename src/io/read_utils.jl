@@ -152,13 +152,13 @@ function write_key_to_hdf5(file, data_key, data_value::Number)
             new_data_value = Array{eltype(data_value)}(undef, 2)
             new_data_value[1] = read(file[data_key])
             new_data_value[2] = data_value
-            delete_object(file, data_key)                    
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         else
             new_data_value = Array{eltype(data_value)}(undef, current_size[1]+1)
             new_data_value[1:end-1] .= read(file[data_key])
             new_data_value[end] = data_value
-            delete_object(file, data_key) 
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         end
     else
@@ -189,7 +189,7 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractVector)
             new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2]+1)
             new_data_value[:, 1:end-1] = read(file[data_key])
             new_data_value[:, end] .= data_value
-            delete_object(file, data_key) 
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         end
     else
@@ -214,13 +214,13 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractMatrix)
             new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], 2)
             new_data_value[:, :, 1] = read(file[data_key])
             new_data_value[:, :, 2] .= data_value
-            delete_object(file, data_key)                    
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         else
             new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3]+1)
             new_data_value[:, :, 1:end-1] = read(file[data_key])
             new_data_value[:, :, end] .= data_value
-            delete_object(file, data_key) 
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         end
     else
@@ -245,14 +245,14 @@ function write_key_to_hdf5(file, data_key, data_value::AbstractArray{T, 3}) wher
             new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3], 2)
             new_data_value[:, :, :, 1] = read(file[data_key])
             new_data_value[:, :, :, 2] .= data_value
-            delete_object(file, data_key)                    
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         else
             new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3], current_size[4]+1)
             new_data_value[:, :, :, 1:end-1] = read(file[data_key])
             copyto!(new_data_value[:, :, :, 1:end-1], file[data_key])
             new_data_value[:, :, :, end] .= data_value
-            delete_object(file, data_key) 
+            delete_object(file, data_key)
             file[data_key] = new_data_value
         end
     else

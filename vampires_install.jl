@@ -43,7 +43,7 @@ function parse_commandline()
 end
 
 #Check if Vampires can be imported
-try 
+try
     cd("..")
     using Vampires
     cd(vampires_path)

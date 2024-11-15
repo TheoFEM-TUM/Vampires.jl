@@ -34,8 +34,8 @@ Retrieve the default value associated with a given key from the `VASP_DEFAULTS` 
 If the key is not found in either dictionary, an empty string is returned.
 """
 function get_default_for_keyword(key)
-    if haskey(VASP_DEFAULTS, key) 
-        return VASP_DEFAULTS[key] 
+    if haskey(VASP_DEFAULTS, key)
+        return VASP_DEFAULTS[key]
     elseif haskey(WANNIER90_DEFAULTS, key)
         return WANNIER90_DEFAULTS[key]
     else

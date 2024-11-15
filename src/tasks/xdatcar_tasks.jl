@@ -4,6 +4,7 @@ list of available tasks:
 
 xdatcar:
     read: read the atomic configurations from the XDATCAR file.
+    merge: merge multiple XDATCAR into one single file.
 """
 
 
@@ -12,6 +13,7 @@ xdatcar:
 
 Available commands:
 * `vamp xdatcar read`: read the data from the XDATCAR file.
+* `vamp xdatcar merge`: merge multiple XDATCAR into one single file.
 """
 run_task(::Type{Val{:xdatcar}}, ::Type{Val{:none}}, args) = nothing
 
@@ -52,4 +54,29 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
     end
 
     return ["lattice", "configs"], [lattice, configs]
+end
+
+"""
+    vamp [-r] xdatcar merge [--xdatcar <file0, file1, ...>] [--p <path>] [--o <file>]
+
+Merges atomic configurations from several XDATCARs in the given order and writes them to an output file.
+
+# Arguments
+- `xdatcar`: The name of the XDATCAR files from an molecular dynamics simulation in the order they should be merged.
+- `p`: The path where the XDATCAR files are located.
+- `o`: The name of the output file.
+
+# Examples
+```bash
+# Example 1: Merge two XDATCAR_* files to a single XDATCAR
+vamp xdatcar merge --xdatcar XDATCAR_0-100,XDATCAR_101-200 --out XDATCAR
+```
+"""
+function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
+    structure_n = read_xdatcar.(joinpath.(args["p"], split(args["xdatcar"], ",")))
+    output_filename = args["o"] == "none" ? "XDATCAR_merged" : args["o"]
+    open(joinpath(args["p"], output_filename), "w") do file
+        write_combined_xdatcar(file, structure_n)
+    end
+    return nothing
 end

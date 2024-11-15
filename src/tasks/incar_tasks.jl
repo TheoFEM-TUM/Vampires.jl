@@ -146,7 +146,7 @@ Read a given incar file and add or change a tag to a certain value. Can also be 
 
 # Arguments
 - `r`: Task is applied recursively to INCAR files in all subfolders.
-- `par`: Name of the tag(s). Multiple tags are separated by commas. 
+- `par`: Name of the tag(s). Multiple tags are separated by commas.
 - `val`: Value of the tag(s). Multiple tags are separated by commas.
 - `p`: Sets the path where the command is executed.
 - `incar`: Name of the INCAR file.
