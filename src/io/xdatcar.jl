@@ -7,7 +7,7 @@ Read the configurations in the `xdatcar` file and return the lattice vectors and
 - `xdatcar::AbstractString`: The path to the XDATCAR file.
 
 # Returns
-- `Poscar`: A `Poscar` struct containing all the extracted data from the POSCAR file, including:
+- `XDATCAR`: A `Xdatcar` struct containing all the extracted data from the Xdatcar file, including:
     - `a`: The scaling factor.
     - `lattice`: The 3x3 array of lattice vectors.
     - `atom_names`: An array of atom names.
@@ -48,13 +48,16 @@ Read the configurations in the `xdatcar` file and return the lattice vectors and
 - `xdatcar::AbstractString`: The path to the XDATCAR file.
 
 # Returns
-- `lattice::Array{Float64, 3}`: A 3x3xNconfig array where each slice `lattice[:, :, k]` represents the lattice vectors for configuration `k`.
-- `configs::Array{Float64, 3}`: A 3xNionxNconfig array where each slice `configs[:, :, k]` represents the atomic positions for configuration `k`.
+- `XDATCAR`: A `Xdatcar` struct containing all the extracted data from the Xdatcar file, including:
+    - `a`: The scaling factor.
+    - `lattice`: The 3x3xNconfig array of lattice vectors for each Nconfig.
+    - `atom_names`: An array of atom names.
+    - `atom_numbers`: An array of the number of each type of atom.
+    - `positions::Array{Float64, 3}`: 3xNionxNconfig, with Nconfig configurations represented by 3xNion coordinates
+    - `atom_types`: An array of atom types corresponding to each atom position.
 """
 function read_xdatcar_npt(xdatcar="XDATCAR")
     lines = split_lines(open_and_read(xdatcar))
-    # positions = []
-    # lattices = []
     positions = Vector{Array{Float64, 2}}()
     lattices = Vector{Array{Float64, 2}}()
     a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[1:7])
@@ -133,4 +136,5 @@ function write_combined_xdatcar(iostream, structure_n::Array{Structure{A, L, P}}
     for structure in structure_n
         running_index = write_xdatcar_body(iostream, structure, running_index)
     end
+    return iostream
 end

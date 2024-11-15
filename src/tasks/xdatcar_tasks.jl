@@ -74,12 +74,7 @@ vamp xdatcar merge --xdatcar XDATCAR_0-100,XDATCAR_101-200 --out XDATCAR
 ```
 """
 function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
-    structure_n = Structure[]
-    for xdatcar_file_i in split(args["xdatcar"], ",")
-        println(xdatcar_file_i)
-        structure = read_xdatcar(joinpath(args["p"], xdatcar_file_i))
-        push!(structure_n, structure)
-    end
+    structure_n = read_xdatcar.(joinpath.(args["p"], split(args["xdatcar"], ",")))
     output_filename = args["o"] == "none" ? "XDATCAR_merged" : args["o"]
     open(joinpath(args["p"], output_filename), "w") do file
         write_combined_xdatcar(file, structure_n)
