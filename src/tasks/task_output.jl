@@ -127,7 +127,7 @@ Prints a formatted output message displaying the `key`, `value`, optional `folde
 - `key`: A string representing the name or label associated with the `value`.
 - `value`: The value to be displayed alongside the `key`.
 - `folder`: (Optional) A string specifying a folder or grouping identifier. Defaults to `"none"`, which omits folder information from the message.
-- `err
+- `error` (Optional) Specifies the error of `value`, only printed if not zero.
 """
 function print_output(key, value; folder="none", error=0.)
     out = "The value for $key "
