@@ -54,6 +54,15 @@ split_line(line; char=" ") = filter(!isempty, split(line, char))
 
 Parse `lines` as a 2d array of `type` starting from index `i1` ending at `i2` in
 each line.
+
+# Arguments
+- `lines::AbstractVector{<:AbstractString}`: A collection of strings to be parsed.
+- `i1::Int`: The starting column index for substrings. Defaults to `1`.
+- `i2::Int`: The ending column index for substrings. Defaults to `3`.
+- `type::Type`: The type to which substrings are converted. Defaults to `Float64`.
+
+# Returns
+- `Array{type, 2}`: A 2D array where each row corresponds to a parsed line, and columns represent the converted substrings.
 """
 function parse_lines_as_array(lines; i1=1, i2=3, type=Float64)
     Nj = length(lines); Ni = length(i1:i2)
