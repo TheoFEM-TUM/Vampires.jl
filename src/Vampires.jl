@@ -1,12 +1,13 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful
+import PhysicalConstants.CODATA2018: ħ, m_e
 import Documenter: @doc
 
 include("io/read_utils.jl")
 
 # input
-include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
+include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
 include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
 include("io/outcar.jl"); include("io/settings.jl")
 include("io/w90_hr.jl")
@@ -18,7 +19,7 @@ include("io/output/kpoints.jl")
 # calculations
 include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl"); include("calculations/lattice/supercell.jl")
 include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
-include("calculations/wannier90/hamiltonian.jl")
+include("calculations/wannier90/hamiltonian.jl"); include("calculations/lattice/dynamics.jl")
 
 # plotting
 include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl")
@@ -29,7 +30,7 @@ include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("tasks/poscar_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
-include("tasks/w90_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl")
+include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl")
 
 include("cli_interface.jl")
 
@@ -42,7 +43,7 @@ export plot_bandstructure, plot_value_convergence
 export read_hrdat
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
-export get_bandgap, get_vbm_and_cbm, get_fermi_energy
+export get_bandgap, get_vbm_and_cbm, get_fermi_energy, get_effective_mass
 export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell
 export compute_dos, convert_kspacing_to_kgrid
 
