@@ -21,13 +21,13 @@ function read_value_from_outcar(param, file; type=Float64, line_mode="first")::V
     param_values = type[]
     for line in lines
         if occursin(param, line)
-            
+
             # Replace some symbols with space
             line_ = line
             for special_char in [':', '=']
                 line_ = replace(line_, special_char => ' ')
             end
-            
+
             # Split the line at param
             line_split = split_line(line_, char=param)
 
@@ -36,7 +36,7 @@ function read_value_from_outcar(param, file; type=Float64, line_mode="first")::V
                 line_after_param = split_line(line_, char=param)[2]
 
                 line_elements_of_type = filter(x->x≠nothing, tryparse.(type, split_line(line_after_param)))
-            
+
                 if line_mode == "first" && length(line_elements_of_type) > 0
                     push!(param_values, line_elements_of_type[1])
                 elseif line_mode == "last" && length(line_elements_of_type) > 0
@@ -89,7 +89,7 @@ function read_eigenvalues_from_outcar(file; line_jump=6)
                 empty_count = 0
                 Es_k = Float64[]
                 occ_k = Float64[]
-                
+
                 while !isempty(lines[l])
                     if "k-point" in lines[l]
                         k⃗ = parse.(Float64, lines[l][end-2:end])
@@ -141,7 +141,7 @@ function read_forces_from_outcar(file)
     n_ions = Int(read_value_from_outcar("NIONS", file, type=Int64)[1])
     forces = Float64[]  # Store the forces for all ions
     positions = Float64[]
-    
+
     recording = false
     found_configs = 0
     counted_ions = 0

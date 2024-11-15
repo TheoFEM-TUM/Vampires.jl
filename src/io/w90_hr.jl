@@ -17,17 +17,17 @@ function read_hrdat(file="wannier90_hr.dat")
 
     NR = parse(Int64, lines[3])
     num_wann = parse(Int64, lines[2])
-    
+
     lines = split_lines(lines)
 
     Rs = zeros(3, NR)
-    Hᴿ = zeros(ComplexF64, num_wann, num_wann, NR); 
-    
+    Hᴿ = zeros(ComplexF64, num_wann, num_wann, NR);
+
     # Up to 15 degeneracy values are written per line
     Ldeg = Int(ceil(NR / 15))
     deg = collect(Iterators.flatten([parse.(Int64, lines[k]) for k in 4:3+Ldeg]))
     if length(deg) ≠ NR; throw("Invalid number of degeneracy values found!"); end
-    
+
     Rind = 0
     hr_start = 4+Ldeg
     Rvec = rand(Int64, 3)

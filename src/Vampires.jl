@@ -34,7 +34,8 @@ include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks
 
 include("cli_interface.jl")
 
-export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar
+export Structure
+export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt
 export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
 export add_incar_block!, rm_incar_block!
 export read_value_from_outcar

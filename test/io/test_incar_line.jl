@@ -25,7 +25,7 @@ read_incar_line = Vampires.read_incar_line
     line5 = "   ALGO = Fast   ! Algorithm choice    "
     result5 = read_incar_line(line5)
     @test result5 == ["ALGO", "Fast", "Algorithm choice"]
-    
+
     # Test case 6: Line with only key and no value
     line6 = "NCORE ="
     @test_throws ArgumentError read_incar_line(line6)
@@ -52,10 +52,10 @@ end
 end
 
 @testset "Wannier90 keys" begin
-    for key in ["num_wann", "projAs", "write_hr"] 
+    for key in ["num_wann", "projAs", "write_hr"]
         @test Vampires.iswannier90key(key)
     end
-    for key in ["ENCUT", "ML_MODE", "LWANNIER90"] 
+    for key in ["ENCUT", "ML_MODE", "LWANNIER90"]
         @test Vampires.iswannier90key(key) == false
     end
 end

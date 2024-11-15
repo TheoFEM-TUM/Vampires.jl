@@ -6,7 +6,7 @@ const settings_file = joinpath(settings_folder, "settings")
 
 Reads key-value pairs from a settings file and updates the `args` dictionary with these values.
 
-If `settings_file` exists, each line is read, split by the `=` character, and the resulting key-value pairs 
+If `settings_file` exists, each line is read, split by the `=` character, and the resulting key-value pairs
 are stored in the `args` dictionary. The function modifies `args` in-place.
 
 # Arguments
