@@ -7,9 +7,17 @@ any_task
 
 """
 
+"""
+    readfolders(path=".")
 
+Returns a list of folder names in the specified directory.
 
+# Arguments
+- `path::AbstractString`: The directory path to search. Defaults to the current directory (`"."`).
 
+# Returns
+- `Vector{String}`: A vector containing the names of subdirectories in the given path.
+"""
 readfolders(path=".") = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
 
 """
