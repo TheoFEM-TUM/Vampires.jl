@@ -58,26 +58,22 @@ Read the configurations in the `xdatcar` file and return the lattice vectors and
 """
 function read_xdatcar_npt(xdatcar="XDATCAR")
     lines = split_lines(open_and_read(xdatcar))
-    positions = Vector{Array{Float64, 2}}()
-    lattices = Vector{Array{Float64, 2}}()
+    positions = Float64[]
+    lattices = Float64[]
     a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[1:7])
     for i in 1:(8+Nion):length(lines)
         a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[i:(i+6)])
         # add lattice to the lattice vector
-        push!(lattices, lattice)
+        push!(lattices, lattice...)
         # Parse the configurations
-        positions_i = zeros(Float64, 3, Nion)
-        for (q, j) in enumerate((i+8):(i+7+Nion))
-            positions_i[:, q] = parse.(Float64, lines[j][1:3])
+        for j in (i+8):(i+7+Nion)
+            push!(positions, parse.(Float64, lines[j][1:3])...)
         end
-        # add configurations to positions
-        push!(positions, positions_i)
     end
-    positions = cat(positions..., dims=3)
-    lattices = cat(lattices..., dims=3)
+    positions = reshape(positions, (3, Nion, :))
+    lattices = reshape(lattices, (3, 3, :))
     return Structure(a, lattices, atom_names, atom_numbers, positions, atom_types)
 end
-
 
 
 """
