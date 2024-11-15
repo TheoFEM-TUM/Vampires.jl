@@ -4,6 +4,7 @@ list of available tasks:
 
 xdatcar:
     read: read the atomic configurations from the XDATCAR file.
+    merge: merge multiple XDATCAR into one single file.
 """
 
 
@@ -12,6 +13,7 @@ xdatcar:
 
 Available commands:
 * `vamp xdatcar read`: read the data from the XDATCAR file.
+* `vamp xdatcar merge`: merge multiple XDATCAR into one single file.
 """
 run_task(::Type{Val{:xdatcar}}, ::Type{Val{:none}}, args) = nothing
 
@@ -64,9 +66,6 @@ Merges atomic configurations from several XDATCARs in the given order and writes
 - `p`: The path where the XDATCAR files are located.
 - `o`: The name of the output file.
 
-# Returns
-- Otherwise: Returns the lattice vectors and configurations from the XDATCAR file.
-
 # Examples
 ```bash
 # Example 1: Merge two XDATCAR_* files to a single XDATCAR
@@ -79,4 +78,5 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
     open(joinpath(args["p"], output_filename), "w") do file
         write_combined_xdatcar(file, structure_n)
     end
+    return nothing
 end
