@@ -1,5 +1,24 @@
 """
 Define colorblind perceivable colors based on https://jfly.uni-koeln.de/color/#pdf
+
+# List of color names
+- `orange`
+- `blue`
+- `yellow`
+- `green`
+- `purple`
+- `sky_blue`
+- `vermilion`
+- `black`
+
+# Example
+```julia
+mycolor = vcolors.blue
+```
+or
+```
+mycolor = vcolors[:yellow]
+```
 """
 const vcolors = (
     orange = RGB(0.90, 0.60, 0.0),
@@ -18,9 +37,9 @@ const vcolors = (
 Creates a color-cycling mechanism that iterates through a given list of colors in `vcolors`.
 
 This function returns two closures:
-1. `autocolor`: Retrieves the next color from the list in sequence. It wraps around to the 
+1. `autocolor`: Retrieves the next color from the list in sequence. It wraps around to the
    beginning after reaching the last color, ensuring infinite cycling.
-2. `resetcolor`: Resets the sequence so that the next call to `get_color` starts from the 
+2. `resetcolor`: Resets the sequence so that the next call to `get_color` starts from the
    first color in the list.
 
 # Returns
@@ -29,13 +48,13 @@ This function returns two closures:
 """
 function create_color_getter()
     index = 0
-    function autocolor() 
-        index = mod(index, length(vcolors)) + 1 
+    function autocolor()
+        index = mod(index, length(vcolors)) + 1
         return vcolors[index]
-    end 
-    function resetcolor() 
-        index = 0 
-    end 
+    end
+    function resetcolor()
+        index = 0
+    end
     return autocolor, resetcolor
 end
 
