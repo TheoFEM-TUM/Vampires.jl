@@ -26,3 +26,24 @@ function get_msd(r₀, rᵢ, lattice)
     end
     return msd, err
 end
+
+
+
+function compute_velocities(x::AbstractArray, timestep::Float64, cell::AbstractMatrix)
+    cellsize = norm.(eachcol(cell))
+
+    # Compute differences between timesteps
+    v = diff(x, dims=3)
+
+    # Take care of periodic boundary conditions
+    for (i, j, k) in IterTools.product(1:size(v, 1), 1:size(v, 2), 1:size(v, 3))
+        if v[i, j, k] > cellsize[j]
+            v[i, j, k] -= cellsize[j]
+        elseif v[i, j, k] < -cellsize[j]
+            v[i, j, k] += cellsize[j]
+        end
+    end
+
+    # Divide by the timestep to get the actual velocity
+    return v / timestep
+end

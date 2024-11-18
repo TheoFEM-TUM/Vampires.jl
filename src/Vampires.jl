@@ -17,6 +17,7 @@ include("io/output/folder_management.jl"); include("io/output/bash_and_submissio
 include("io/output/kpoints.jl")
 
 # calculations
+include("calculations/numerics.jl")
 include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl"); include("calculations/lattice/supercell.jl")
 include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
 include("calculations/wannier90/hamiltonian.jl"); include("calculations/lattice/dynamics.jl")
