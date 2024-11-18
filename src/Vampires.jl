@@ -22,6 +22,7 @@ include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); 
 include("calculations/wannier90/hamiltonian.jl"); include("calculations/lattice/dynamics.jl")
 
 # plotting
+include("plotting/vamp_colors.jl")
 include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl")
 
 # tasks
@@ -40,6 +41,7 @@ export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
 export add_incar_block!, rm_incar_block!
 export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
+export vamp_colors
 export plot_bandstructure, plot_value_convergence
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
