@@ -41,7 +41,7 @@ export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
 export add_incar_block!, rm_incar_block!
 export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
-export vamp_colors
+export vcolors
 export plot_bandstructure, plot_value_convergence
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
