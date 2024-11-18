@@ -2,4 +2,5 @@
 
 ```@autodocs
 Modules = [Vampires]
+Filter = x -> !(startswith(string(x), "_"))
 ```
