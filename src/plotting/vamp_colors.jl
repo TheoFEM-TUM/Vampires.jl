@@ -11,4 +11,3 @@ vamp_colors = Dict(
     "Vermilion" => RGB(0.80, 0.40, 0.0),
     "Reddish Purple" => RGB(0.80, 0.60, 0.70)
 )
-
