@@ -1,4 +1,4 @@
-using Vampires, Test, LinearAlgebra, HDF5
+using Vampires, Test, LinearAlgebra, HDF5, Plots
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
@@ -12,6 +12,7 @@ include("io/test_read_utils.jl")
     include("io/input/test_poscar.jl")
     include("io/input/test_xdatcar.jl")
     include("io/input/test_outcar.jl")
+    include("io/plotting/test_colors.jl")
 end
 
 @testset "io/output" begin
