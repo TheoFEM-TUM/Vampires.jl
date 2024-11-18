@@ -9,7 +9,7 @@ include("io/read_utils.jl")
 # input
 include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
 include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
-include("io/outcar.jl"); include("io/settings.jl")
+include("io/outcar.jl"); include("io/settings.jl"); include("io/output/error_reduce_funcs.jl")
 include("io/w90_hr.jl")
 
 # output
