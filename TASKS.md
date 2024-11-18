@@ -65,12 +65,31 @@ any_task
 ```
 
 ```
-run_script
+runscript
     make: creates a bash script that runs vasp in a specific folder
+job
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
+```
+
+```
+settings
+    set: set a new setting in the settings file
+    rm: remove a setting from the settings file
+    read: read a setting from the settings file
 ```
 
 ```
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
+```
+
+```
+
+xdatcar:
+    read: read the atomic configurations from the XDATCAR file.
+    merge: merge multiple XDATCAR into one single file.
 ```
 

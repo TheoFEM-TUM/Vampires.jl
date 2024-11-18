@@ -5,10 +5,10 @@ A mutable struct representing the input parameters for VASP and Wannier90 calcul
 
 # Fields
 
-- `vasp::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing VASP input parameters. 
+- `vasp::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing VASP input parameters.
 The keys are category names (strings), and the values are ordered dictionaries of parameters within each category.
-  
-- `w90::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing Wannier90 input parameters. 
+
+- `w90::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing Wannier90 input parameters.
 The keys are category names (strings), and the values are ordered dictionaries of parameters within each category.
 """
 mutable struct Incar{S1,S2,S3,S4<:AbstractString, IV1,IV2<:IncarValue}
@@ -54,18 +54,18 @@ Reads an INCAR file and returns an `Incar` object containing the parsed paramete
 """
 function read_incar(file::AbstractString)
     lines = open_and_read(file)
-    
+
     # Begin a new line at each semicolon
     check_for_semicolon!(lines)
 
-    incar = get_empty_incar()    
+    incar = get_empty_incar()
     block_label = "unknown"
     isW90 = false; isprojection = false
 
     for line in lines
         if occursin("begin projections", line); isprojection = true; end
         if occursin("end", line) && isprojection; isprojection = false; end
-        if isblock_label(line) 
+        if isblock_label(line)
             block_label = get_block_label(line)
         elseif iscomment(line)
             @warn "Ignoring comment"
@@ -152,7 +152,7 @@ end
 """
     find_value_and_comment(incar::Incar, key::String)
 
-Retrieves the value associated with a specified key from an `Incar` object, which may contain different formats for `w90` or `vasp`. 
+Retrieves the value associated with a specified key from an `Incar` object, which may contain different formats for `w90` or `vasp`.
 If the key is not found, an error is thrown.
 
 # Arguments
@@ -180,7 +180,7 @@ findcomment(incar::Incar, key) = find_value_and_comment(incar, key).comment
 """
     set_key!(incar::Incar, key, value; comment=get_comment(key), block_label="", verbose=true, isW90=false)
 
-Sets the value associated with a given key in the `Incar` object. This function handles both VASP and Wannier90 input data structures 
+Sets the value associated with a given key in the `Incar` object. This function handles both VASP and Wannier90 input data structures
 and updates the relevant section based on the key.
 
 # Arguments

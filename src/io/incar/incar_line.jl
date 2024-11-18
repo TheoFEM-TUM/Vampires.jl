@@ -21,7 +21,7 @@ Parses a line from an INCAR file into its key, value, and comment components.
 # Arguments
 
 - `line::String`: The line from the INCAR file to be parsed.
-- `chars::Vector{Char}=['=', '!', '#']`: A vector of characters to split the line by. 
+- `chars::Vector{Char}=['=', '!', '#']`: A vector of characters to split the line by.
 The default characters are '=', '!', and '#'.
 
 # Returns

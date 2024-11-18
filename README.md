@@ -14,9 +14,9 @@
 ```bash
 git clone <git_clone_link>
 ```
-* Then, run the install packages script form the main package folder
+* Then, run the install packages script form the main package folder (assuming your `.bashrc` file is located at `$HOME`).
 ```bash
-path=<path_to_your_bashrc> && julia vampires_install.jl --bashrc $path && source $path
+julia vampires_install.jl && source $HOME/.bashrc
 ```
 You can then call the `Vampires` CLI interface using `vamp`.
 
@@ -61,7 +61,7 @@ vamp convergence make -par ENCUT --val 300,350,400
 
 This command creates three subfolders and copies all necessary input files into each one. Next, a bash script is needed to run VASP in each subfolder. The `-r` flag (recursive mode) instructs `Vampires.jl` to execute the specified task within each subfolder. Recursive mode is supported for various tasks, making it ideal for methods that require batch execution, like convergence tests.
 ```bash
-vamp -r run_script make --vasp_exe vasp_std
+vamp -r runscript make --exe vasp_std
 ```
 Finally, once the calculations are complete, we can plot the results—such as the total energy versus the cut-off energy—providing a clear visualization of the convergence behavior.
 ```bash

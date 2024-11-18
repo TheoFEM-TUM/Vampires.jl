@@ -11,7 +11,7 @@ include("io/test_read_utils.jl")
     include("io/input/test_doscar.jl")
     include("io/input/test_poscar.jl")
     include("io/input/test_xdatcar.jl")
-    include("io/input/test_outcar.jl")    
+    include("io/input/test_outcar.jl")
 end
 
 @testset "io/output" begin
@@ -24,7 +24,7 @@ end
 end
 
 @testset "calculations" begin
-    include("calculations/test_bandgap.jl")
+    include("calculations/test_bandstructure.jl")
     include("calculations/test_vectors.jl")
     include("calculations/test_supercell.jl")
     include("calculations/test_kspace.jl")
