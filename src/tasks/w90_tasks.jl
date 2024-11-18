@@ -38,11 +38,6 @@ vamp w90_hr read --w90_hr /path/to/w90_hr.dat --o /path/to/output.h5
 """
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["w90_hr"])
-    output_filename = args["o"] == "none" ? "w90_hr.h5" : args["o"]
     Hr, Rs, deg = read_hrdat(input_filename)
-    if occursin("h5", output_filename)
-        write_data_to_hdf5(output_filename, ["Hr", "Rs", "degeneracies"], [Hr, Rs, deg])
-    else
-        throw("Unknown output file format.")
-    end
+    return (Hr = Hr, Rs = Rs, degeneracies = deg)
 end

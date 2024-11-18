@@ -50,10 +50,10 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
     if lowercase(args["par"]) == "msd"
         poscar = read_poscar(joinpath(args["p"], args["poscar"]))
         msd, err = get_msd(poscar.positions, configs, lattice)
-        return ["msd", "deviation"], [msd, err]
+        return (msd = msd, deviation = err)
     end
 
-    return ["lattice", "configs"], [lattice, configs]
+    return (lattice = lattice, configs = configs)
 end
 
 """

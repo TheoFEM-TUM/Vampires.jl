@@ -7,7 +7,7 @@
     @test get_bandgap(test_file_path*"EIGENVAL_gaas", printit=false) == 0.5953680000000001
     @test occs[ivbm, kvbm] > 0.9
     @test occs[ivbm+1, kvbm+1] < 0.1
-    @test get_fermi_energy(Es, occs, printit=true) == 3.060283
+    @test get_fermi_energy(Es, occs, printit=false) == 3.060283
 end
 
 @testset "FDM coefficients" begin

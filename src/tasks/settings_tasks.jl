@@ -38,6 +38,7 @@ function run_task(::Type{Val{:settings}}, ::Type{Val{:set}}, args)
     keys = split_line(args["par"], char=',')
     values = split_line(args["val"], char=',')
     write_settings(keys, values)
+    return nothing
 end
 
 """
@@ -57,6 +58,7 @@ vamp settings rm --par exe
 function run_task(::Type{Val{:settings}}, ::Type{Val{:rm}}, args)
     keys = split_line(args["par"], char=',')
     remove_setting.(keys)
+    return nothing
 end
 
 """
@@ -73,5 +75,5 @@ vamp settings read
 function run_task(::Type{Val{:settings}}, ::Type{Val{:read}}, args)
     settings = OrderedDict{String, String}()
     read_settings!(settings)
-    return keys(settings), values(settings)
+    return NamedTuple(zip(Symbol.keys(settings), values(settings)))
 end

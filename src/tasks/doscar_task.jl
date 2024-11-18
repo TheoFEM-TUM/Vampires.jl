@@ -40,8 +40,8 @@ vamp doscar read --par pdos --o pdos.h5
 function run_task(::Type{Val{:doscar}}, ::Type{Val{:read}}, args)
     doscar = joinpath(args["p"], args["doscar"])
     dos, _ = read_doscar(doscar)
-    keys = String["energy", "total_dos", "integrated_dos"]
-    values = Vector{Float64}[dos[:, 1], dos[:, 2], dos[:, 3]]
+    dos_keys = ["energy", "total_dos", "integrated_dos"]
+    dos_values = [dos[:, 1], dos[:, 2], dos[:, 3]]
     if args["par"] == "pdos"
         # Read atom types from POSCAR
         atom_types = read_poscar(joinpath(args["p"], args["poscar"])).atom_types
@@ -57,11 +57,12 @@ function run_task(::Type{Val{:doscar}}, ::Type{Val{:read}}, args)
 
         _, pdos, _ = read_doscar_with_pdos(doscar)
         for (i, type) in enumerate(atom_types), (j, orbital) in enumerate(orbitals)
-            push!(keys, "$type"*"_"*"$orbital")
-            push!(values, pdos[i][1+j, :])
+            dos_output[] = pdos[i][1+j, :]
+            push!(dos_keys, "$type"*"_"*"$orbital")
+            push!(dos_values, pdos[i][1+j, :])
         end
     end
-    return keys, values
+    return NamedTuple(zip(Symbol.(dos_keys), dos_values))
 end
 
 """

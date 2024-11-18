@@ -7,9 +7,17 @@ any_task
 
 """
 
+"""
+    readfolders(path=".")
 
+Returns a list of folder names in the specified directory.
 
+# Arguments
+- `path::AbstractString`: The directory path to search. Defaults to the current directory (`"."`).
 
+# Returns
+- `Vector{String}`: A vector containing the names of subdirectories in the given path.
+"""
 readfolders(path=".") = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
 
 """
@@ -28,31 +36,19 @@ This function scans the current directory for subdirectories. For each subdirect
 The function assumes that the `task` function accepts the `subtask` function and an `args` dictionary as parameters, and that the `args` dictionary should include the path to the current subdirectory.
 """
 function run_task_recursive(task, subtask, args)
-    param = args["par"]
     base_path = args["p"]
-    values = map(readfolders(base_path)) do folder
-        args["p"] = joinpath(base_path, folder * "/")
-        value = run_task(task, subtask, args)
-        if typeof(value) <: AbstractVector
-            if args["method"] == "mean"
-                mean_val = mean(value)
-                std_val = std(value)
-                println("The mean value of $param is: $mean_val ± $std_val.")
-            else
-                index = parse(Int64, args["N"])
-                if index == 0 # The default should be end
-                    println("The value in $folder is: ", value[end])
-                else
-                    println("The value in $folder is: ", value[index])
-                end
-            end
+    out = map(readfolders(base_path)) do folder
+        args["p"] = joinpath(base_path, folder)
+        run_task(task, subtask, args)
+    end
+    args["p"] = base_path
+    if out[1] ≠ nothing
+        out_keys = keys(out[1])
+        out_values = map(out_keys) do key
+            _concat_values([pair[key] for pair in out])
         end
-        value
+        return NamedTuple(zip(out_keys, out_values))
+    else
+        return nothing
     end
-    if args["method"] == "mean"
-        mean_val = mean(values)
-        std_val = std(values)
-        println("The mean value of $param is: $mean_val ± $std_val.")
-    end
-    return values
 end
