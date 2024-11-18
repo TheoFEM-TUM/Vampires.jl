@@ -37,19 +37,18 @@ The function assumes that the `task` function accepts the `subtask` function and
 """
 function run_task_recursive(task, subtask, args)
     base_path = args["p"]
-    keys = Vector{String}[]
-    values = map(readfolders(base_path)) do folder
-        args["p"] = joinpath(base_path, folder * "/")
-        out = run_task(task, subtask, args)
-        if out ≠ nothing
-            key, value = out
-            push!(keys, key)
-            return value
-        end
+    out = map(readfolders(base_path)) do folder
+        args["p"] = joinpath(base_path, folder)
+        run_task(task, subtask, args)
     end
     args["p"] = base_path
-    if length(keys) > 0
-        keys = keys[1]
+    if out[1] ≠ nothing
+        out_keys = keys(out[1])
+        out_values = map(out_keys) do key
+            _concat_values([pair[key] for pair in out])
+        end
+        return NamedTuple(zip(out_keys, out_values))
+    else
+        return nothing
     end
-    return keys, values
 end

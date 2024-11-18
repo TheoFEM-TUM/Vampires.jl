@@ -53,4 +53,5 @@ function run_task(::Type{Val{:kpoints}}, ::Type{Val{:make}}, args)
         Ns = parse.(Int64, split_line(args["N"], char=','))
         write_kpoints(Ns, out=joinpath(args["p"], out), gamma_centered=gamma_centered)
     end
+    return nothing
 end

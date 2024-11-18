@@ -24,5 +24,5 @@ vamp poscar read --poscar SOME_POSCAR --o poscar.h5
 function run_task(::Type{Val{:poscar}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["poscar"])
     poscar = read_poscar(input_filename)
-    return ["lattice", "positions", "atom_types"], [poscar.lattice, poscar.positions, poscar.atom_types]
+    return (lattice = poscar.lattice, positions = poscar.positions, atom_types = poscar.atom_types)
 end

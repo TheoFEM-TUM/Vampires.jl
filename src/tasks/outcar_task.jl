@@ -60,17 +60,17 @@ function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
 
     if param == "eigenvalues"
         kp, Es, occs = read_eigenvalues_from_outcar(input_file)
-        return ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs]
+        return (kpoints = kp, eigenvalues => Es, occupations = occs)
     elseif param == "forces"
         positions, forces = read_forces_from_outcar(input_file)
-        return ["positions", "forces"], [positions, forces]
+        return (positions = positions, forces = forces)
     elseif param == "bandgap"
         kp, Es, occs = read_eigenvalues_from_outcar(input_file)
         ΔEs = to_scalar_if_single([get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)])
-        return ["bandgap"], [ΔEs]
+        return (bandgap = ΔEs,)
     else
         values = to_scalar_if_single(read_value_from_outcar(param, input_file))
-        return [param], [values]
+        return NamedTuple(zip([Symbol(param)], [values]))
     end
 end
 

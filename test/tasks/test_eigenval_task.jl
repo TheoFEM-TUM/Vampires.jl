@@ -5,18 +5,18 @@
     args["eigenval"] = "EIGENVAL_gaas"
     args["par"] = "none"
     kp, Es, occs = read_eigenval(joinpath(args["p"], args["eigenval"]))
-    keys, values = run_task(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
-    @test values[1] == kp
-    @test values[2] == Es
-    @test values[3] == occs
+    out = run_task(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
+    @test out.kpoints == kp
+    @test out.eigenvalues == Es
+    @test out.occupations == occs
 
     # Test 2: Test recursive mode
     args["r"] = true
     args["v"] = false
     args["o"] = "eigenvals.h5"
-    args["method"] = "none"
-    keys, values = run_task_recursive(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
-    Vampires.task_output(keys, values, args)
+    args["reduce"] = "none"
+    out = run_task_recursive(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
+    Vampires.task_output(out, args)
     data_correct_in_file = map(1:3) do i
         [h5read("eigenvals.h5", "kpoints")[:, :, i] == kp,
         h5read("eigenvals.h5", "eigenvalues")[:, :, i] == Es,
@@ -27,15 +27,15 @@
 
     # Test 3: Test bandgap read
     args["par"] = "bandgap"
-    keys, values = run_task(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
-    @test values[1] == 0.5953680000000001
+    out = run_task(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
+    @test out.bandgap == 0.5953680000000001
 
     # Test 4 Test recursive bandgap read
-    args["method"] = "mean"
+    args["reduce"] = "mean"
     args["o"] = "bandgap.h5"
-    keys, values = run_task_recursive(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
-    @test values == [[0.5953680000000001], [0.5953680000000001], [0.5953680000000001]]
-    Vampires.task_output(keys, values, args)
+    out = run_task_recursive(Val{Symbol("eigenval")}, Val{Symbol("read")}, args)
+    @test out.bandgap == [0.5953680000000001, 0.5953680000000001, 0.5953680000000001]
+    Vampires.task_output(out, args)
     @test h5read("bandgap.h5", "mean_bandgap") == 0.5953680000000001 
     rm("bandgap.h5")
 end
