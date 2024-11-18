@@ -12,7 +12,7 @@
     # Should start at blue again
     @test autocolor() == RGB(0.0, 0.45, 0.70)
     resetcolor()
-    # Should still be blu
+    # Should still be blue
     @test autocolor() == RGB(0.0, 0.45, 0.70)
     resetcolor()
 end
