@@ -127,6 +127,22 @@ function to_scalar_if_single(x::AbstractVector)
 end
 
 """
+    concat_values(vals::Vector{<:AbstractArray}) -> AbstractArray
+
+Concatenates a collection of arrays along a new dimension, appending the arrays 
+along a dimension that is one higher than the highest dimension of the input arrays.
+
+# Arguments
+- `vals::Vector{<:AbstractArray}`: A vector of arrays to concatenate. All arrays 
+  in `vals` must have the same size and dimensionality.
+
+# Returns
+- A new array that contains all input arrays concatenated along a new dimension.
+"""
+_concat_values(vals) = cat(vals..., dims=ndims.(vals)[1]+1)
+_concat_values(vals::Vector{<:AbstractString}) = vals
+
+"""
     write_data_to_hdf5(output_filename::String, data_keys::Vector{String}, data_values::Vector)
 
 Write multiple datasets to an HDF5 file, associating each dataset with a corresponding key.
@@ -147,120 +163,22 @@ end
 """
     write_key_to_hdf5(file::HDF5.File, data_key::String, data_value::Number)
 
-Append or write a dataset in an HDF5 file with a new number.
+Append or write a dataset to an HDF5 file.
 
 # Arguments
 - `file::HDF5.File`: An open HDF5 file where the data will be written.
 - `data_key::String`: The name (key) for the dataset in the HDF5 file.
-- `data_value::Number`: A number containing the new value to be written under the `data_key`.
+- `data_value`: A dataset containing the new value(s) to be written under the `data_key`.
 """
-function write_key_to_hdf5(file, data_key, data_value::Number)
+function write_key_to_hdf5(file, data_key, data_value)
     if haskey(file, data_key)
         current_size = size(file[data_key])
-        if length(current_size) == 0
-            new_data_value = Array{eltype(data_value)}(undef, 2)
-            new_data_value[1] = read(file[data_key])
-            new_data_value[2] = data_value
+        if length(current_size) == ndims(data_value)
+            new_data_value = cat(read(file[data_key]), data_value, dims=ndims(data_value)+1)
             delete_object(file, data_key)
             file[data_key] = new_data_value
         else
-            new_data_value = Array{eltype(data_value)}(undef, current_size[1]+1)
-            new_data_value[1:end-1] .= read(file[data_key])
-            new_data_value[end] = data_value
-            delete_object(file, data_key)
-            file[data_key] = new_data_value
-        end
-    else
-        file[data_key] = data_value
-    end
-end
-
-"""
-    write_key_to_hdf5(file::HDF5.File, data_key::String, data_value::AbstractVector)
-
-Append or write a dataset in an HDF5 file with a new vector or matrices.
-
-# Arguments
-- `file::HDF5.File`: An open HDF5 file where the data will be written.
-- `data_key::String`: The name (key) for the dataset in the HDF5 file.
-- `data_value::AbstractVector`: A vector containing the new data to be written under the `data_key`.
-"""
-function write_key_to_hdf5(file, data_key, data_value::AbstractVector)
-    if haskey(file, data_key)
-        current_size = size(file[data_key])
-        if length(current_size) == 1
-            new_data_value = Array{eltype(data_value)}(undef, current_size[1], 2)
-            new_data_value[:, 1] = read(file[data_key])
-            new_data_value[:, 2] .= data_value
-            delete_object(file, data_key)
-            file[data_key] = new_data_value
-        else
-            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2]+1)
-            new_data_value[:, 1:end-1] = read(file[data_key])
-            new_data_value[:, end] .= data_value
-            delete_object(file, data_key)
-            file[data_key] = new_data_value
-        end
-    else
-        file[data_key] = data_value
-    end
-end
-
-"""
-    write_key_to_hdf5(file::HDF5.File, data_key::String, data_value::AbstractMatrix)
-
-Append or write a dataset in an HDF5 file with a new 2D matrix or stack of matrices.
-
-# Arguments
-- `file::HDF5.File`: An open HDF5 file where the data will be written.
-- `data_key::String`: The name (key) for the dataset in the HDF5 file.
-- `data_value::AbstractMatrix`: A 2D matrix containing the new data to be written under the `data_key`.
-"""
-function write_key_to_hdf5(file, data_key, data_value::AbstractMatrix)
-    if haskey(file, data_key)
-        current_size = size(file[data_key])
-        if length(current_size) == 2
-            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], 2)
-            new_data_value[:, :, 1] = read(file[data_key])
-            new_data_value[:, :, 2] .= data_value
-            delete_object(file, data_key)
-            file[data_key] = new_data_value
-        else
-            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3]+1)
-            new_data_value[:, :, 1:end-1] = read(file[data_key])
-            new_data_value[:, :, end] .= data_value
-            delete_object(file, data_key)
-            file[data_key] = new_data_value
-        end
-    else
-        file[data_key] = data_value
-    end
-end
-
-"""
-    write_key_to_hdf5(file::HDF5.File, data_key::String, data_value::AbstractArray{T, 3}) where {T}
-
-Append or overwrite a 3D array dataset in an HDF5 file, allowing for the creation of a 4D array if necessary.
-
-# Arguments
-- `file::HDF5.File`: An open HDF5 file where the data will be written.
-- `data_key::String`: The name (key) for the dataset in the HDF5 file.
-- `data_value::AbstractArray{T, 3}`: A 3D array of type `T` to be written to the HDF5 file under `data_key`.
-"""
-function write_key_to_hdf5(file, data_key, data_value::AbstractArray{T, 3}) where {T}
-    if haskey(file, data_key)
-        current_size = size(file[data_key])
-        if length(current_size) == 3
-            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3], 2)
-            new_data_value[:, :, :, 1] = read(file[data_key])
-            new_data_value[:, :, :, 2] .= data_value
-            delete_object(file, data_key)
-            file[data_key] = new_data_value
-        else
-            new_data_value = Array{eltype(data_value)}(undef, current_size[1], current_size[2], current_size[3], current_size[4]+1)
-            new_data_value[:, :, :, 1:end-1] = read(file[data_key])
-            copyto!(new_data_value[:, :, :, 1:end-1], file[data_key])
-            new_data_value[:, :, :, end] .= data_value
+            new_data_value = cat([selectdim(x, ndims(x), i) for i in axes(x, ndims(x))]..., data_value, dims=ndims(x))
             delete_object(file, data_key)
             file[data_key] = new_data_value
         end
