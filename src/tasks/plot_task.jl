@@ -28,50 +28,49 @@ Call the read task to read the contents from `task` and plot them. If output fil
 - `xlabel`: (Optional) Label for the x-axis of the plot. If not provided, defaults to the name of the x-data column.
 - `ylabel`: (Optional) Label for the y-axis of the plot. If not provided, defaults to the name of the y-data column.
 - `o`: (Optional) Output file name for saving the plot. Accepted formats are `png` and `pdf`. If omitted, the plot will be printed directly to stdout.
+- `reduce`: (Optional) Specifies a method that is applied to the data an in task output.
 
 # Examples
+```bash
+# Example 1: Plot the temperature for each time step of an MD run
+vamp outcar plot --par temperature --xlabel Iteration --ylabel "Temperature (eV)" --o temp_vs_iter
+
+# Example 2: Plot the pDOS for all orbitals projected onto Pb
+vamp doscar plot --par pdos --ydata Pb --xdata energy --xlabel "Energy (eV)" --ylabel "pDOS (arb. u.)" --o pb_pdos
+
+# Example 3: From a convergence run, plot the total energy versus ENCUT
+vamp outcar plot --par "free  energy" --xlabel "ENCUT (eV)" --ylabel "Total energy (eV)"
+```
 """
 function run_task(task, ::Type{Val{:plot}}, args)
     output_filename = args["o"]
     set_backend(output_filename)
 
-    keys, values = run_task(task, Val{Symbol("read")}, args)
-    # TODO: add reduce output
-    
-    y_data_index = findfirst(x->x==args["ydata"], keys)
-    ydata = values[y_data_index]
-
-    if length(args["xdata"]) > 0
-        x_data_index = findfirst(x->x==args["xdata"], keys)
-        xdata = values[x_data_index]
-    end
-
-    fig = make_plot(xdata, ydata, title=args["title"], xlabel=args["xlabel"], ylabel=args["ylabel"])
-    
+    out = run_task(task, Val{Symbol("read")}, args)
+    broadcasted = args["reduce"][end] == '.' ? Val{Symbol("broadcasted")} : nothing
+    out = reduce_output(out, Val{Symbol(strip(args["reduce"], '.'))}, broadcasted)
+    xdata, ydata, xlabel, ylabel = get_plotting_data(out, args)
+    fig = make_plot(xdata, ydata, title=args["title"], xlabel=xlabel, ylabel=ylabel)
     output_plot(fig, output_filename)
+    return nothing
 end
 
-function run_task_recursive(task, ::Type{Val{plot}}, args)
+function run_task_recursive(task, ::Type{Val{:plot}}, args)
     output_filename = args["o"]
     set_backend(output_filename)
 
-    keys, values = run_task_recursive(task, Val{Symbol("read")}, args)
-    # TODO: add reduce output
+    out = run_task_recursive(task, Val{Symbol("read")}, args)
+    broadcasted = args["reduce"][end] == '.' ? Val{Symbol("broadcasted")} : nothing
+    out = reduce_output(out, Val{Symbol(strip(args["reduce"], '.'))}, broadcasted)
+    xdata, ydata, xlabel, ylabel = get_plotting_data(out, args)
+    fig = make_plot(xdata, ydata, title=args["title"], xlabel=xlabel, ylabel=ylabel)
     
-    y_data_index = findfirst(x->x==args["ydata"], keys)
-    ydata = values[y_data_index]
-
-    if length(args["xdata"]) > 0
-        x_data_index = findfirst(x->x==args["xdata"], keys)
-        xdata = values[x_data_index]
-    else
-        folders = readfolders(args["p"])
-        xdata = parse.(Float64, [split_line(folder, char=',')[2] for folder in folders])
-        xlabel = split_line(folders[1], char=',')[1]
-    end
-    xlabel = args["xlabel"] == "" ? xlabel : args["xlabel"]
-
-    fig = make_plot(xdata, ydata, title=args["title"], xlabel=xlabel, ylabel=args["ylabel"])
-
     output_plot(fig, output_filename)
+    return nothing
 end
+
+function run_task(::Type{Val{:h5}}, ::Type{Val{:plot}}, args)
+    # TODO
+    return nothing
+end
+
