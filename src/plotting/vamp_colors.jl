@@ -21,10 +21,10 @@ mycolor = vcolors[:yellow]
 ```
 """
 const vcolors = (
-    orange = RGB(0.90, 0.60, 0.0),
     blue = RGB(0.0, 0.45, 0.70),
-    yellow = RGB(0.95, 0.90, 0.25),
+    orange = RGB(0.90, 0.60, 0.0),
     green = RGB(0.0, 0.60, 0.50),
+    yellow = RGB(0.95, 0.90, 0.25),
     purple = RGB(0.80, 0.60, 0.70),
     sky_blue = RGB(0.35, 0.70, 0.90),
     vermilion = RGB(0.80, 0.40, 0.0),
@@ -32,7 +32,7 @@ const vcolors = (
 )
 
 """
-    create_color_getter(vcolors::Vector)
+    create_color_getter(vcolors::NamedTuple)
 
 Creates a color-cycling mechanism that iterates through a given list of colors in `vcolors`.
 
@@ -46,8 +46,8 @@ This function returns two closures:
 - `autocolor::Function`: A function that returns the next color in sequence.
 - `resetcolor::Function`: A function to reset the sequence to start from the first color.
 """
-function create_color_getter()
-    index = 0
+function create_color_getter(vcolors::NamedTuple)
+    index::Int = 0
     function autocolor()
         index = mod(index, length(vcolors)) + 1
         return vcolors[index]
@@ -59,4 +59,4 @@ function create_color_getter()
 end
 
 # Assign the closure to a global constant
-const autocolor, resetcolor = create_color_getter()
+const autocolor, resetcolor = create_color_getter(vcolors)
