@@ -101,7 +101,8 @@ function _write_xdatcar_block(iostream, positions, running_index)
     num_digits = floor(Int, log10(running_index) + 1)
     println(iostream, "Direct configuration=$(repeat(" ", 6-num_digits))$(running_index)")
     for (x, y, z) in eachcol(positions)
-        println(iostream, "    $(rpad(x, 10, '0'))    $(rpad(y, 10, '0'))    $(rpad(z, 10, '0'))")
+        println(iostream, @sprintf "    %.8f    %.8f    %.8f" x y z)
+        # println(iostream, "    $(rpad(x, 10, '0'))    $(rpad(y, 10, '0'))    $(rpad(z, 10, '0'))")
     end
     return running_index + 1
 end

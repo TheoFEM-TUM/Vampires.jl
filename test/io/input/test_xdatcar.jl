@@ -21,6 +21,7 @@ end
 
 # Create test data
 positions = reshape([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], 3, 3, 1)
+positions_scientific = reshape([1e-1, 1e-3, 3e-5, 0.4, 0.5, 0.00004, 0.2200001, 0.000001, 0.9], 3, 3, 1)
 lattice = reshape([4.0 0.0 0.0 0.0 2.0 0.0 0.0 0.0 1.0], 3, 3)
 lattice_npt = reshape(repeat([4.0, 0.0, 0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0], 4), 3, 3, 4)
 positions_npt = reshape(repeat([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], 4), 3, 3, 4)
@@ -29,6 +30,7 @@ atom_types = ["Si", "Ga", "Ga", "B", "B", "B", "B"]
 atom_numbers = [1, 2, 4]
 a = 3.4
 structure = Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
+structure_scientific = Structure(a, lattice, atom_names, atom_numbers, positions_scientific, atom_types)
 structure_npt = Structure(a, lattice_npt, atom_names, atom_numbers, positions_npt, atom_types)
 structure_array = repeat([structure], 17)
 
@@ -52,7 +54,25 @@ structure_array = repeat([structure], 17)
 
         @test String(take!(io)) == expected_output
     end
+    @testset "write_xdatcar scientific notation" begin
+        io = IOBuffer()
+        Vampires.write_xdatcar(io, structure_scientific)
+        expected_output = """
+        unknown structure
+                   3.4
+             4.000000    0.000000    0.000000
+             0.000000    2.000000    0.000000
+             0.000000    0.000000    1.000000
+           Si   Ga   B
+             1     2     4
+        Direct configuration=     1
+            0.10000000    0.00100000    0.00003000
+            0.40000000    0.50000000    0.00004000
+            0.22000010    0.00000100    0.90000000
+        """
 
+        @test String(take!(io)) == expected_output
+    end
     @testset "write_xdatcar multiple structures" begin
         io = IOBuffer()
         Vampires.write_xdatcar(io, structure_array)
