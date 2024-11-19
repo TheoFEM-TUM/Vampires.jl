@@ -73,7 +73,7 @@ function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp run job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>]
+    vamp job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>]
                       [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>]
 
 Creates and submits a Slurm job script to run the specified executable with customized job settings.

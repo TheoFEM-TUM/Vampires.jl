@@ -42,12 +42,14 @@ run_task(::Type{Val{:doscar}}, ::Type{Val{:none}}, ::Any)
 run_task(::Type{Val{:xdatcar}}, ::Type{Val{:none}}, ::Any)
 ```
 
-```@docs
-run_task(::Type{Val{:w90_hr}}, ::Type{Val{:none}}, ::Any)
-```
-
 ## Bash/Slurm scripts
 
 ```@docs
 run_task(::Type{Val{:job}}, ::Type{Val{:none}}, ::Any)
+```
+
+## Wannier90
+
+```@docs
+run_task(::Type{Val{:w90}}, ::Type{Val{:none}}, ::Any)
 ```
