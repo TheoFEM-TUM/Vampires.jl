@@ -43,6 +43,7 @@ vamp w90_hr read --w90_hr /path/to/w90_hr.dat
 
 # Example 2: Read data from 
 vamp w90_hr read --w90_hr /path/to/w90_hr.dat --o /path/to/output.h5
+```
 """
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["w90_hr"])

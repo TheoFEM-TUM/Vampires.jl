@@ -36,6 +36,7 @@ vamp doscar read --doscar DOSCAR --o dos.h5
 
 # Example 2: Read the pdos from the DOSCAR file and save it to an HDF5 file.
 vamp doscar read --par pdos --o pdos.h5
+```
 """
 function run_task(::Type{Val{:doscar}}, ::Type{Val{:read}}, args)
     doscar = joinpath(args["p"], args["doscar"])
@@ -83,6 +84,7 @@ Reads the density of states (DOS) data from a DOSCAR file and generates a plot o
 ```bash
 # Example 1: Plot DOS data from a DOSCAR file and save it to an image file.
 vamp doscar plot --p /path/to/files --doscar DOSCAR --o dos_plot
+```
 """
 function run_task(::Type{Val{:doscar}}, ::Type{Val{:plot}}, args)
     input_filename = args["p"] * args["doscar"]

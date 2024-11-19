@@ -7,7 +7,6 @@ makedocs(
     format = Documenter.HTML(;
     # Use clean URLs, unless built as a "local" build
     prettyurls=get(ENV, "CI", nothing) == "true",
-    canonical="https://docs.dftk.org/stable/",
     edit_link="master",
     size_threshold=nothing,  # do not fail build if large HTML outputs
     ),
@@ -15,12 +14,22 @@ makedocs(
         "Home" => "index.md",
         "Manual" => [
             "man/install.md",
-            "man/cli_interface.md",
             "man/examples.md",
-            "man/library.md"
+        ],
+        "CLI Interface" => [
+            "cli_docs/cli_interface.md",
+            "cli_docs/settings.md",
+            "cli_docs/input.md",
+            "cli_docs/output.md",
+            "cli_docs/structure.md",          
+            "cli_docs/workflows.md",
+            "cli_docs/job.md",
         ],
         "Tutorials" => [
             "tutorials/silicon.md"
         ],
+        "Library Mode" => [
+            "man/library.md"
+        ]
     ]
 )
