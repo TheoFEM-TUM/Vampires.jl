@@ -108,4 +108,4 @@ Rounds a given value or array of values to the specified number of decimal place
 """
 round_value(value::Number; digits=8) = round(value, digits=digits)
 round_value(value::AbstractArray{<:Number}; digits=8) = round.(value, digits=digits)
-rounded_value(value; digits=8) = value
+round_value(value; digits=8) = value
