@@ -2,7 +2,7 @@
 list of available tasks:
 
 
-file:
+<task>:
     plot: call the read task for `file` and create a plot.
 """
 
@@ -68,9 +68,3 @@ function run_task_recursive(task, ::Type{Val{:plot}}, args)
     output_plot(fig, output_filename)
     return nothing
 end
-
-function run_task(::Type{Val{:h5}}, ::Type{Val{:plot}}, args)
-    # TODO
-    return nothing
-end
-
