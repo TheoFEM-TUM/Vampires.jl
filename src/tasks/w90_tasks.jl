@@ -91,6 +91,7 @@ vamp w90_hr test --method rmse --N 14
 
 # Example 2: Calculate the MAE between Wannier90 and DFT in every subfolder for custom filenames.
 vamp -r w90_hr test --w90_hr custom_hr.dat --eigenval custom_EIGENVAL
+```
 """
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:test}}, args)
     bandmin = parse(Int64, args["N"]) == 0 ? 1 : parse(Int64, args["N"])
@@ -120,6 +121,7 @@ Set parameters in the INCAR file for a Wannier90 calculation based on the specif
 ```bash
 # Example 1: Set energy windows in the INCAR file with a tolerance of 0.15, starting from band index 10.
 vamp w90 set --par windows --tol 0.15 --N 10 --p /path/to/dir --incar INCAR --eigenval EIGENVAL_bands
+```
 """
 function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
     tol = parse(Float64, args["tol"])
@@ -157,6 +159,7 @@ Prepare subdirectories and scripts for a non-self-consistent field (NSCF) Wannie
 ```bash
 # Example: Set up an NSCF Wannier90 calculation with specific INCAR and KPOINTS, and exclude certain files.
 vamp w90_nscf make --p /path/to/calc --exe vasp_std --kpoints KPOINTS,KPOINTS_W90 --incar INCAR,INCAR_W90 --exclude WAVECAR,XDATCAR
+```
 """
 function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     nscf_create_subdirectories(args["p"], args["kpoints"], args["incar"])
@@ -164,7 +167,7 @@ function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     bandmin = args["N"] == "0" ? 1 : parse(Int64, args["N"])
     cb = get_exclude_callback(args["exclude"])
     if length(cb) > 0; cb *= "\n"; end
-    cb *= "    if [[ \"\$folder\" == \"scf\" ]]; then\n      ln -f CHGCAR ../nscf/CHGCAR\n      vamp w90 set --N $bandmin --par windows --eigenval EIGENVAL --incar ../nscf/INCAR\n    fi"
+    cb *= "if [[ \"\$folder\" == \"scf\" ]]; then\n      ln -f CHGCAR ../nscf/CHGCAR\n      vamp w90 set --N $bandmin --par windows --eigenval EIGENVAL --incar ../nscf/INCAR\n    fi"
     write_run_script(args["exe"], "./", cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
 
