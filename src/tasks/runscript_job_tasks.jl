@@ -269,7 +269,6 @@ end
 Removes selected VASP output files in the specified directory.
 
 # Arguments
-
 - `p`: Path to the directory containing files to be removed. Defaults to the current directory if not provided.
 - `include`: (Optional) A comma-separated list of additional files (or file patterns) to include in the deletion, beyond the default VASP outputs.
 - `exclude`: (Optional) A comma-separated list of files (or file patterns) to exclude from deletion, even if they match the default VASP outputs or `--include` list.
