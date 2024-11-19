@@ -11,15 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Julia ${{ matrix.julia-version }}
-      uses: julia-actions/setup-julia@v1
+      uses: julia-actions/setup-julia@v2
       with:
         julia-version: ${{ matrix.julia-version }}
         arch: x64
-    - name: Install dependencies
-      run: |
-          julia --project=. -e '
-            using Pkg
-            Pkg.instantiate()'
-    - name: Run tests
-      run: |
-        julia --project=. -e 'using Pkg; Pkg.test()'
+    - name: Build pkg
+      uses: julia-actions/julia-buildpkg@v1
+
+    - name: Run test
+      uses: julia-actions/julia-runtest@v1
