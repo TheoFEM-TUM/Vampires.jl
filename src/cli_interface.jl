@@ -125,6 +125,7 @@ function get_default_args()
         "method" => "none",
         "reduce" => "none",
         "exclude"=>"",
+        "include" => "",
         "incar" => "INCAR",
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
