@@ -136,6 +136,7 @@ function get_default_args()
         "kpoints" => "KPOINTS",
         "w90_hr" => "wannier90_hr.dat",
         "exe" => "vasp_std",
+        "h5" => "",
         "account" => "none",
         "hostname" => "none",
         "ext_par_file" => "none",
@@ -143,6 +144,11 @@ function get_default_args()
         "nsim" => "none",
         "kpar" => "none",
         "super_cell_vector" => "none",
+        "title" => "",
+        "xdata" => "",
+        "ydata" => "",
+        "xlabel" => "",
+        "ylabel" => ""
         "partition" => "batch",
         "time" => "1",
         "nodes" => "1",
@@ -183,6 +189,7 @@ function get_arg_description()
             "xdatcar" => "set the name of the XDATCAR file",
             "outcar" => "set the name of the OUTCAR file",
             "kpoints" => "set the name of the kpoints file",
+            "h5" => "set the name of an h5 file",
             "exclude" => "task dependent exclude parameter",
             "include" => "task dependent include parameter",
             "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
@@ -200,7 +207,12 @@ function get_arg_description()
             "nodes" => "the number of requested nodes (slurm script)",
             "mail" => "the mail address to mail job updates to (slurm script)",
             "module_list" => "the module names to be imported in a slurm script",
-            "module_paths" => "additional paths where modules may be located (slurm script)"
+            "module_paths" => "additional paths where modules may be located (slurm script)",
+            "title" => "specifies the title of a plot",
+            "xdata" => "specifies the xdata for a plot",
+            "ydata" => "specifies the ydata for a plot",
+            "xlabel" => "specifies the label of the x axis",
+            "ylabel" => "specifies the label of the y axis"
         )
     )
     return arg_descriptions

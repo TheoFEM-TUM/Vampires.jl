@@ -24,7 +24,7 @@ include("calculations/lattice/dynamics.jl")
 
 # plotting
 include("plotting/vamp_colors.jl")
-include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl")
+include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl"); include("plotting/make_plot.jl")
 
 # tasks
 # recursive.jl has to be the first include as it defines the @rcalc macro
@@ -32,7 +32,8 @@ include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("tasks/poscar_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
-include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl")
+include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl"); include("tasks/plot_task.jl")
+include("tasks/file_task.jl")
 
 include("cli_interface.jl")
 

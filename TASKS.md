@@ -52,6 +52,12 @@ outcar
 ```
 
 ```
+
+file:
+    plot: call the read task for `file` and create a plot.
+```
+
+```
 poscar
     read: read the POSCAR file
 ```
