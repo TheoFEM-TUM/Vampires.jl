@@ -167,7 +167,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
         scratch_path = "\$SCRATCH_$account/\$USER/"
         path_on_host = split_path_at_folder(pwd(), hostname)
         total_path = joinpath(scratch_path, path_on_host)
-        run(`ssh $hostname "sbatch -A $account $total_path/\*.job"`)
+        run(`ssh $hostname "cd $total_path && echo \"Submitting job at \$(pwd)\" && sbatch -A $account *.job"`)
     end
     cd(original_working_directory)
     return nothing

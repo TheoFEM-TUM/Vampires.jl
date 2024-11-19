@@ -221,8 +221,6 @@ function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, 
         echo "Running on hosts: \$SLURM_NODELIST"
         echo "Running on \$SLURM_NNODES nodes."
         echo "Running on \$SLURM_NPROCS processors."
-        echo "Ensuring working directory is job file location."
-        cd \$0
         echo "Work directory is \$(pwd)"
         echo "VASP binary at " \$exe
 
