@@ -8,7 +8,7 @@ kpoints
 
 
 """
-# CLI Commands to work with the INCAR file
+# CLI Commands to work with the KPOINTS file
 The following command can be used to work with the KPOINTS file.
 
 Available commands:
