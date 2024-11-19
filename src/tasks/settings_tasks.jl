@@ -75,5 +75,5 @@ vamp settings read
 function run_task(::Type{Val{:settings}}, ::Type{Val{:read}}, args)
     settings = OrderedDict{String, String}()
     read_settings!(settings)
-    return NamedTuple(zip(Symbol.keys(settings), values(settings)))
+    return NamedTuple(zip(Symbol.(keys(settings)), values(settings)))
 end
