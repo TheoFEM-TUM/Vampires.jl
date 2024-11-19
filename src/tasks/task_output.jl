@@ -84,11 +84,28 @@ Prints a formatted output message displaying the `key`, `value`, optional `folde
 - `folder`: (Optional) A string specifying a folder or grouping identifier. Defaults to `"none"`, which omits folder information from the message.
 - `error` (Optional) Specifies the error of `value`, only printed if not zero.
 """
-function print_output(key, value; folder="none", error=0.)
+function print_output(key, value; folder="none", error=0., digits=8)
+    rounded_value = round_value(value, digits=digits)
     out = "The value for $key "
     if folder ≠ "none"; out *= "in $folder "; end
-    out *= "is: $value"
+    out *= "is: $rounded_value"
     if error ≠ 0.; out *= " ± $error"; end
     out *= "."
     println(out)
 end
+
+"""
+    round_value(value; digits=7)
+
+Rounds a given value or array of values to the specified number of decimal places (default is 7). 
+
+# Arguments
+- `value`: The value or array of values to be rounded. 
+- `digits`: The number of digits to round to. Default is 7.
+
+# Returns
+- The rounded value, which can be a scalar or an array, depending on the input type.
+"""
+round_value(value::Number; digits=8) = round(value, digits=digits)
+round_value(value::AbstractArray{<:Number}; digits=8) = round.(value, digits=digits)
+rounded_value(value; digits=8) = value
