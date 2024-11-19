@@ -21,6 +21,12 @@ eigenval:
 ```
 
 ```
+
+h5:
+    read: call the read task for `file` and create a plot.
+```
+
+```
 incar
     set/add: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
     rm: remove a certain tag or block from the INCAR file.
@@ -53,7 +59,7 @@ outcar
 
 ```
 
-file:
+<task>:
     plot: call the read task for `file` and create a plot.
 ```
 
