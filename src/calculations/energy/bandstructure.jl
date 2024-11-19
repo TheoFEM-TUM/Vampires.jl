@@ -144,7 +144,7 @@ function get_effective_mass(kp, Es, lattice; method="parabola")
         fit = curve_fit(f, xs, Es, [0.])
         d2E_dk2 = coef(fit)[1]
     elseif method[1] == 'f'
-        c_i = get_finite_difference_coef(length(Es))
+        c_i = _get_finite_difference_coef(length(Es))
         d2E_dk2 = (c_i ⋅ Es) / xs[2]^2
         d2E_dk2
     end

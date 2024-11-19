@@ -1,4 +1,4 @@
-function vdos(v::AbstractArray, timestep::Float64, method::String)
+function compute_vdos(v::Array{Float64}, timestep::Float64, method::String)
     # Compute frequencies in cm^-1
     c = 299792458.0 # Speed of light in m/s # TODO: use PhysicalConstants
     omega = rfftfreq(size(v, 3), timestep * 1e-15) ./ c ./ 100
@@ -17,15 +17,11 @@ function vdos(v::AbstractArray, timestep::Float64, method::String)
     else
         error("Method $method not implemented")
     end
-
+    # TODO: mass weighting; use PeriodicTable.jl
     # Average over atoms and coordinates
     return omega, mean(hcat(vac...), dims=2) |> vec
 end
 
-
-
-
-# Placeholder functions for methods not defined in the input
 function autocorr_zero_padding(v::AbstractVector)
     error("autocorr_zero_padding method not implemented")
 end

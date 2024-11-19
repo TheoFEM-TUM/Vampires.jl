@@ -19,7 +19,7 @@ function get_msd(r₀, rᵢ, lattice)
     err = Float64[]
     @views msd = map(axes(rᵢ, 3)) do t
         sum_square_displacements = map(axes(r₀, 2)) do i
-            minimum([sum((r₀[:, i] .- rᵢ[:, i, t] .+ T⃗).^2) for T⃗ in eachcol(Ts)])
+            minimum([sum((r₀[:, i] .- rᵢ[:, i, t] .+ T).^2) for T in eachcol(Ts)])
         end
         push!(err, std(sum_square_displacements))
         mean(sum_square_displacements)
@@ -28,21 +28,16 @@ function get_msd(r₀, rᵢ, lattice)
 end
 
 
-
-function compute_velocities(x::AbstractArray, timestep::Float64, cell::AbstractMatrix)
+function compute_velocities(x::Array{Float64}, timestep::Float64, cell::Matrix{Float64})
     cellsize = norm.(eachcol(cell))
-
     # Compute differences between timesteps
     v = diff(x, dims=3)
 
+    println(size(cellsize))
     # Take care of periodic boundary conditions
-    for (i, j, k) in IterTools.product(1:size(v, 1), 1:size(v, 2), 1:size(v, 3))
-        if v[i, j, k] > cellsize[j]
-            v[i, j, k] -= cellsize[j]
-        elseif v[i, j, k] < -cellsize[j]
-            v[i, j, k] += cellsize[j]
-        end
-    end
+    v = sign.(v) .* abs(v) + cellsize * Int(1 > (abs.(v) / cellsize))
+
+    println(size(v))
 
     # Divide by the timestep to get the actual velocity
     return v / timestep

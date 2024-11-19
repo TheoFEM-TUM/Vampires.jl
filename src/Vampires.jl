@@ -1,6 +1,6 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful, AbstractFFTs
 import PhysicalConstants.CODATA2018: ħ, m_e
 import Documenter: @doc
 
@@ -19,7 +19,7 @@ include("io/output/kpoints.jl")
 # calculations
 include("calculations/numerics.jl")
 include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl"); include("calculations/lattice/supercell.jl")
-include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); # include("calculations/xdos/jdos.jl")
+include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl"); include("calculations/xdos/vdos.jl")  # include("calculations/xdos/jdos.jl")
 include("calculations/wannier90/hamiltonian.jl"); include("calculations/lattice/dynamics.jl")
 
 # plotting
@@ -47,8 +47,9 @@ export plot_bandstructure, plot_value_convergence
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy, get_effective_mass
+export get_msd
 export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell
-export compute_dos, convert_kspacing_to_kgrid
+export compute_dos, convert_kspacing_to_kgrid, compute_vdos
 
 export run_task, run_task_recursive
 

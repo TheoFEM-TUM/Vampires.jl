@@ -14,7 +14,7 @@ function autocorr_fft(v::AbstractVector)
 end
 
 """
-    get_finite_difference_coef(N)
+    _get_finite_difference_coef(N)
 
 Returns the finite difference coefficients for the second derivative, given a stencil of `N` points. These coefficients can be used to approximate the second derivative in numerical methods, where the accuracy improves with larger stencil sizes (see, e.g., https://en.wikipedia.org/wiki/Finite_difference_coefficient).
 

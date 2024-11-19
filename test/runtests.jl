@@ -30,6 +30,7 @@ end
     include("calculations/test_supercell.jl")
     include("calculations/test_kspace.jl")
     include("calculations/test_hamiltonian.jl")
+    include("calculations/test_dynamics.jl")
 end
 
 @testset "xdos" begin
