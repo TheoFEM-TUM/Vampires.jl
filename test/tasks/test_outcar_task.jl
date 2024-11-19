@@ -57,8 +57,8 @@
     args["par"] = "free  energy"
     args["o"] = "toten.h5"
     args["reduce"] = "none"
-    keys, values = run_task_recursive(Val{Symbol("outcar")}, Val{Symbol("read")}, args)
-    Vampires.task_output(keys, values, args)
+    out = run_task_recursive(Val{Symbol("outcar")}, Val{Symbol("read")}, args)
+    Vampires.task_output(out, args)
     @test h5read("toten.h5", "free  energy") == [-8.25135668, -8.25135668, -8.25135668]
     rm("toten.h5")
 end
