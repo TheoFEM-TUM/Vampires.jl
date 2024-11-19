@@ -75,41 +75,39 @@ function read_xdatcar_npt(xdatcar="XDATCAR")
     return Structure(a, lattices, atom_names, atom_numbers, positions, atom_types)
 end
 
-
 """
-    write_xdatcar_body(iostream, structure::Structure, running_index=1) -> Int
+    _write_xdatcar_block(iostream, positions, running_index)
 
-Writes the atomic positions of a given `Structure` to an open `iostream` in XDATCAR format, starting with a specific running index for configurations.
-Each configuration is labeled in a zero-padded format to align labels for easy reading.
+Writes a block of atomic positions to an open `iostream` in XDATCAR format, labeled with a running configuration index.
 
 # Arguments
-- `iostream`: The IO stream to write to, such as a file or standard output.
-- `structure::Structure`: A `Structure` object containing atomic positions to be written. The object should have a `positions` field as a 3D array with dimensions for each atom's x, y, z coordinates.
-- `running_index`: The starting integer index for labeling configurations in the XDATCAR file. Defaults to 1.
+- `iostream`: The IO stream to write to, such as an open file or standard output.
+- `positions::AbstractMatrix{<:Number}`: A 3xN matrix where each column represents the x, y, z coordinates of an atom.
+- `running_index::Int`: The current configuration index to label the block. This index is incremented for subsequent configurations.
 
 # Returns
-- `Int`: The updated running index after writing all configurations for this structure.
+- `Int`: The updated running index after writing the block.
 
 # Example
 ```julia
+# Example usage of write_xdatcar_block
+positions = [0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.8 0.9]
 open("XDATCAR", "w") do io
-    running_index = write_xdatcar_body(io, structure, 1)
+    next_index = write_xdatcar_block(io, positions, 1)
 end
+```
 """
-function write_xdatcar_body(iostream, structure::Structure{A, L, P}, running_index=1) where {A, L, P}
-    for pos in axes(structure.positions, 3)
-        num_digits = floor(Int, log10(running_index) + 1)
-        println(iostream, "Direct configuration=$(repeat(" ", 6-num_digits))$(running_index)")
-        for (x, y, z) in eachcol(structure.positions[:, :, pos])
-            println(iostream, "    $(rpad(x, 10, '0'))    $(rpad(y, 10, '0'))    $(rpad(z, 10, '0'))")
-        end
-        running_index += 1
+function _write_xdatcar_block(iostream, positions, running_index)
+    num_digits = floor(Int, log10(running_index) + 1)
+    println(iostream, "Direct configuration=$(repeat(" ", 6-num_digits))$(running_index)")
+    for (x, y, z) in eachcol(positions)
+        println(iostream, "    $(rpad(x, 10, '0'))    $(rpad(y, 10, '0'))    $(rpad(z, 10, '0'))")
     end
-    return running_index
+    return running_index + 1
 end
 
 """
-    write_combined_xdatcar(iostream, structure_n::Array{Structure})
+    write_xdatcar(iostream, structure_n::Array{Structure})
 
 Writes multiple atomic configurations from an array of `Structure` objects to an open `iostream` in XDATCAR format.
 The function writes a header based on the first structure in the array and then appends each structure's atomic positions sequentially.
@@ -123,14 +121,56 @@ A running index is maintained to label each configuration for clear identificati
 ```julia
 # Open a file to write combined XDATCAR data from multiple structures
 open("XDATCAR_combined", "w") do io
-    write_combined_xdatcar(io, structure_array)
+    write_xdatcar(io, structure_array)
 end
+```
 """
-function write_combined_xdatcar(iostream, structure_n::Array{Structure{A, L, P}}) where {A, L, P}
+function write_xdatcar(iostream, structure_n::Array{Structure{A, L, P}}) where {A, L, P}
     running_index = 1 # to keep track of the total amount of configurations
-    write_structure_file_header(iostream, structure_n[1])
-    for structure in structure_n
-        running_index = write_xdatcar_body(iostream, structure, running_index)
+    if length(size(structure_n[1].lattice)) == 3
+        for structure in structure_n, pos in axes(structure.positions, 3)
+            write_structure_file_header(iostream, structure, index=pos)
+            running_index = _write_xdatcar_block(iostream, structure.positions[:, :, pos], running_index)
+        end
+    else
+        write_structure_file_header(iostream, structure_n[1])
+        for structure in structure_n, pos in axes(structure.positions, 3)
+            running_index = _write_xdatcar_block(iostream, structure.positions[:, :, pos], running_index)
+        end
+    end
+    return iostream
+end
+
+
+"""
+    write_xdatcar(iostream, structure::Structure)
+
+Writes an atomic configurations from a `Structure` object to an open `iostream` in XDATCAR format.
+
+# Arguments
+- `iostream`: The IO stream to write to, such as an open file or standard output.
+- `structure_n::Array{Structure}`: An array of `Structure` objects, each containing atomic positions to be written. The first structure in the array is used to generate the file header, with subsequent structures following in sequence.
+
+# Example
+```julia
+# Open a file to write combined XDATCAR data from multiple structures
+open("XDATCAR_combined", "w") do io
+    write_xdatcar(io, structure_array)
+end
+```
+"""
+function write_xdatcar(iostream, structure::Structure{A, L, P}) where {A, L, P}
+    running_index = 1 # to keep track of the total amount of configurations
+    if length(size(structure.lattice)) == 3
+        for pos in axes(structure.positions, 3)
+            write_structure_file_header(iostream, structure, index=pos)
+            running_index = _write_xdatcar_block(iostream, structure.positions[:, :, pos], running_index)
+        end
+    else
+        write_structure_file_header(iostream, structure)
+        for pos in axes(structure.positions, 3)
+            running_index = _write_xdatcar_block(iostream, structure.positions[:, :, pos], running_index)
+        end
     end
     return iostream
 end

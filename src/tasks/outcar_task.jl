@@ -53,6 +53,7 @@ vamp outcar read --par bandgap
 # Example 6: Read the effective mass at the Gamma point from each configuration in the OUTCAR
 using third-order finite differences
 vamp outcar read --par effective_mass --kpoints 0,0,0 --N 3 --method fdm
+```
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
     param = args["par"]
@@ -117,6 +118,7 @@ vamp outcar plot --par temperature --p /path/to/ --outcar OUTCAR
 
 # Example 2: Plot the total energy for each subfolder (e.g., convergence testing).
 vamp -r outcar plot --par TOTEN
+```
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
     param = args["par"]

@@ -76,7 +76,7 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
     structure_n = read_xdatcar.(joinpath.(args["p"], split(args["xdatcar"], ",")))
     output_filename = args["o"] == "none" ? "XDATCAR_merged" : args["o"]
     open(joinpath(args["p"], output_filename), "w") do file
-        write_combined_xdatcar(file, structure_n)
+        write_xdatcar(file, structure_n)
     end
     return nothing
 end
