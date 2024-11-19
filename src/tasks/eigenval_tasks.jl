@@ -43,15 +43,23 @@ vamp eigenval read -r --eigenval EIGENVAL_custom --o eigenval.h5
 
 # Example 3: Read the bandgap from the EIGENVAL file.
 vamp eigenval read --par bandgap
+
+# Example 4: Read the effective mass at the Gamma point from the EIGENVAL
+by fitting a parabola through four points
+vamp eigenval read --par effective_mass --kpoints 0,0,0 --N 4 --method parabola
 """
 function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["eigenval"])
     kp, Es, occs = read_eigenval(input_filename)
     if args["par"] == "bandgap"
         ΔE = get_bandgap(Es, occs, printit=args["v"])
-        return ["bandgap"], [ΔE]
+        return (bandgap = ΔE,)
+    elseif args["par"] == "effective_mass"
+        N, k_ind, lattice = parse_effective_mass_parameters(args, kp)
+        meffs = get_effective_mass(kp[:, k_ind:k_ind+N], E[:, k_ind:k_ind+N], lattice, method=args["method"])
+        return (effective_mass = meffs,)
     else
-        return ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs]
+        return (kpoints = kp, eigenvalues = Es, occupations = occs)
     end
 end
 

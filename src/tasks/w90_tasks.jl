@@ -52,7 +52,7 @@ function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
     if args["par"] == "eigenvalues"
         ks, _, _ = read_eigenval(eigenval)
         Es, _ = get_wannier90_eigenvalues(Hr, Rs, deg, ks)
-        return ["eigenvalues"], [Es]
+        return (eigenvalues = Es,)
     elseif args["par"] == "bandgap"
         num_wann = parse(Int64, findvalue(read_incar(incar), "num_wann"))
         bandmin = parse(Int64, args["N"])
@@ -60,9 +60,9 @@ function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
         ks, _, occs = read_eigenval(eigenval)
         Es, _ = get_wannier90_eigenvalues(Hr, Rs, deg, ks)
         ΔE = get_bandgap(Es, occs[bandmin:bandmax, :])
-        return ["bandgap"], [ΔE]
+        return (bandgap = ΔE,)
     else
-        return ["Hr", "Rs", "degeneracies"], [Hr, Rs, deg]
+        return (Hr = Hr, Rs = Rs, degeneracies = deg)
     end
 end
 

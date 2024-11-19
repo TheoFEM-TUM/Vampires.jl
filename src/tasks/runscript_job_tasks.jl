@@ -55,6 +55,7 @@ vamp -r runscript make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 function run_task(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
     cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
+    return nothing
 end
 
 function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
@@ -68,6 +69,7 @@ function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
             write_run_script(args["exe"], args["p"], cb=cb, out=script_name)
         end
     end
+    return nothing
 end
 
 """
@@ -123,6 +125,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     else
         write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
     end
+    return nothing
 end
 
 """

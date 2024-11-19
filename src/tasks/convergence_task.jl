@@ -46,6 +46,7 @@ function run_task(::Type{Val{:convergence}}, ::Type{Val{:make}}, args)
     path = args["p"]
     include_files = split_line(args["include"], char=',')
     convergence_create_subdirectories(param, param_range; path=path, method=args["method"], incar=args["incar"], include_files=include_files, kpoints=args["kpoints"], poscar=args["poscar"], potcar=args["potcar"])
+    return nothing
 end
 
 

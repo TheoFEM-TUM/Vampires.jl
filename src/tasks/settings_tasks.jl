@@ -38,6 +38,7 @@ function run_task(::Type{Val{:settings}}, ::Type{Val{:set}}, args)
     keys = split_line(args["par"], char=',')
     values = length(keys) > 1 ? split_line(args["val"], char=',') : [args["val"]]
     write_settings(keys, values)
+    return nothing
 end
 
 """
@@ -74,5 +75,5 @@ vamp settings read
 function run_task(::Type{Val{:settings}}, ::Type{Val{:read}}, args)
     settings = OrderedDict{String, String}()
     read_settings!(settings)
-    return collect(keys(settings)), collect(values(settings))
+    return NamedTuple(zip(Symbol.keys(settings), values(settings)))
 end

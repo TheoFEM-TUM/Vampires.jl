@@ -101,5 +101,6 @@ w90_nscf
 
 xdatcar:
     read: read the atomic configurations from the XDATCAR file.
+    merge: merge multiple XDATCAR into one single file.
 ```
 

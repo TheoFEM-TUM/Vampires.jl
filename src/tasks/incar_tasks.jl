@@ -65,6 +65,7 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:make}}, args)
         add_incar_block!(split_line(args["block"], char=','), incar)
     end
     write_incar(incar, joinpath(args["p"], args["incar"]))
+    return nothing
 end
 
 """
@@ -99,7 +100,7 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
     values = map(keys) do key
         findvalue(incar, key)
     end
-    return keys, values
+    return NamedTuple(zip(Symbol.(keys), values))
 end
 
 """
@@ -136,6 +137,7 @@ function run_task(::Type{Val{:incar}}, ::Type{Val{:whatis}}, args)
     else
         println("The $param keyword ", get_comment(param), " (see https://www.vasp.at/wiki/index.php/$param for more info).")
     end
+    return nothing
 end
 run_task(::Type{Val{:whatis}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("whatis")}, args)
 
@@ -146,7 +148,7 @@ Read a given incar file and add or change a tag to a certain value. Can also be 
 
 # Arguments
 - `r`: Task is applied recursively to INCAR files in all subfolders.
-- `par`: Name of the tag(s). Multiple tags are separated by commas. 
+- `par`: Name of the tag(s). Multiple tags are separated by commas.
 - `val`: Value of the tag(s). Multiple tags are separated by commas.
 - `p`: Sets the path where the command is executed.
 - `incar`: Name of the INCAR file.
@@ -174,11 +176,12 @@ vamp -r incar set --par EDIFF --val 1e-5
 * `vamp addincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
-    if length(args["par"]) > 0
+    if length(args["par"]) > 0 
         set_key_in_incar(split_line(args["par"], char=','), split_line(args["val"], char=','), joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]), block_label=args["block"])
     elseif length(args["block"]) > 0
         add_block_to_incar(split_line(args["block"], char=','), joinpath(args["p"], args["incar"]))
     end
+    return nothing
 end
 run_task(::Type{Val{:setincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 run_task(::Type{Val{:incar}}, ::Type{Val{:add}}, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
@@ -216,10 +219,11 @@ vamp -r incar rm --par EDIFF
 * `vamp rmincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:rm}}, args)
-    if length(args["par"]) > 0
+    if length(args["par"]) > 0 
         remove_key_from_incar(args["par"], joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]))
     elseif length(args["block"]) > 0
         remove_block_from_incar(args["block"], joinpath(args["p"], args["incar"]))
     end
+    return nothing
 end
 run_task(::Type{Val{:rmincar}}, subtask, args) = run_task(Val{Symbol("rm")}, Val{Symbol("incar")}, args)
