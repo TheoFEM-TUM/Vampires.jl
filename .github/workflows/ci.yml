@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        julia-version: ["1.10.4"]
+        julia-version: ["1.11.1"]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Julia ${{ matrix.julia-version }}
@@ -15,6 +15,6 @@ jobs:
       with:
         julia-version: ${{ matrix.julia-version }}
         arch: x64
-    
+
     - name: Run test
       uses: julia-actions/julia-runtest@v1
