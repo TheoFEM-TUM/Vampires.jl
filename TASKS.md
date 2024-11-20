@@ -21,6 +21,12 @@ eigenval:
 ```
 
 ```
+
+h5:
+    read: call the read task for `file` and create a plot.
+```
+
+```
 incar
     set/add: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
     rm: remove a certain tag or block from the INCAR file.
@@ -49,6 +55,12 @@ nscf
 outcar
     read: read a certain value from the outcar file
     plot: plot a series of values from an OUTCAR file. If recursive, plot one value from an OUTCAR file in multiple folders.
+```
+
+```
+
+<task>:
+    plot: call the read task for `file` and create a plot.
 ```
 
 ```

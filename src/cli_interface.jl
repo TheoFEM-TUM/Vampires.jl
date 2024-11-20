@@ -133,6 +133,7 @@ function get_default_args()
         "kpoints" => "KPOINTS",
         "w90_hr" => "wannier90_hr.dat",
         "exe" => "vasp_std",
+        "h5" => "",
         "exclude" => "none",
         "account" => "none",
         "hostname" => "none",
@@ -141,6 +142,11 @@ function get_default_args()
         "nsim" => "none",
         "kpar" => "none",
         "super_cell_vector" => "none",
+        "title" => "",
+        "xdata" => "",
+        "ydata" => "",
+        "xlabel" => "",
+        "ylabel" => ""
     )
     read_settings!(args_dict)
     return args_dict
@@ -173,6 +179,7 @@ function get_arg_description()
             "xdatcar" => "set the name of the XDATCAR file",
             "outcar" => "set the name of the OUTCAR file",
             "kpoints" => "set the name of the kpoints file",
+            "h5" => "set the name of an h5 file",
             "exclude" => "task dependent exclude parameter",
             "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
             "account" => "set the account name for job submission on slurm system",
@@ -183,7 +190,12 @@ function get_arg_description()
             "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
             "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
             "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
-            "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)"
+            "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)",
+            "title" => "specifies the title of a plot",
+            "xdata" => "specifies the xdata for a plot",
+            "ydata" => "specifies the ydata for a plot",
+            "xlabel" => "specifies the label of the x axis",
+            "ylabel" => "specifies the label of the y axis"
         )
     )
     return arg_descriptions
