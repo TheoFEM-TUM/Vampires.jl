@@ -53,100 +53,24 @@ vamp outcar read --par bandgap
 # Example 6: Read the effective mass at the Gamma point from each configuration in the OUTCAR
 using third-order finite differences
 vamp outcar read --par effective_mass --kpoints 0,0,0 --N 3 --method fdm
+```
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
     param = args["par"]
-    output_filename = args["o"]
+    input_file = joinpath(args["p"], args["outcar"])
 
-    if occursin("h5", output_filename) && param == "eigenvalues"
-        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
-        write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
-        println("Data for $param was saved to $output_filename.")
-    elseif occursin("h5", output_filename) && param == "forces"
-        positions, forces = read_forces_from_outcar(args["p"]*args["outcar"])
-        write_data_to_hdf5(output_filename, ["positions", "forces"], [positions, forces])
-        println("Data for $param was saved to $output_filename.")
+    if param == "eigenvalues"
+        kp, Es, occs = read_eigenvalues_from_outcar(input_file)
+        return (kpoints = kp, eigenvalues => Es, occupations = occs)
+    elseif param == "forces"
+        positions, forces = read_forces_from_outcar(input_file)
+        return (positions = positions, forces = forces)
     elseif param == "bandgap"
-        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
-        ΔEs = [get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)]
-        if occursin("h5", output_filename)
-            write_data_to_hdf5(output_filename, ["bandgap"], [ΔEs])
-        else
-            for (n, ΔE) in enumerate(ΔEs)
-                println("The bandgap for configuration $n is: $ΔE eV.")
-            end
-        end
-    elseif param == "effective_mass"
-        kp, Es, occs = read_eigenvalues_from_outcar(joinpath(args["p"], args["outcar"]))
-        N, k_ind, lattice = parse_effective_mass_parameters(args, kp)
-        meffs = get_effective_mass(kp[:, k_ind:k_ind+N], Es[:, k_ind:k_ind+N, :], lattice, method=args["method"])
-        return ["effective_mass"], [meffs]
+        kp, Es, occs = read_eigenvalues_from_outcar(input_file)
+        ΔEs = to_scalar_if_single([get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)])
+        return (bandgap = ΔEs,)
     else
-        values = read_value_from_outcar(param, args["p"]*args["outcar"])
-        value = strip(string(values), ['[', ']'])
-        if !args["r"]
-            println("The value(s) for $param is $value")
-        end
-        if occursin("h5", output_filename)
-            write_data_to_hdf5(output_filename, [param], [values])
-        end
-        return values
+        values = to_scalar_if_single(read_value_from_outcar(param, input_file))
+        return NamedTuple(zip([Symbol(param)], [values]))
     end
-end
-
-"""
-    vamp [-r] outcar plot [--par <parameter>] [--p <path>] [--outcar <file>] [--o <figure_name>]
-
-Read specific data from the OUTCAR file and plot the values.
-
-# Arguments
-- `par`: The name of the parameter to read from the OUTCAR file.
-- `p`: Path to the OUTCAR file (optional, defaults to the current directory).
-- `outcar`: Name of the OUTCAR file to read (optional; default is "OUTCAR").
-- `o`: Name of the figure the plot is saved to.
-
-# Behavior
-- The function reads the specified parameter (`par`) from the OUTCAR file, retrieves its values, and plots them using a basic plot function.
-- If `-r`, assumes one value per OUTCAR and plots each value vs the name of the folder
-- If not `-r`, assumes multiple values and plots them vs their occurence (e.g., the iteration number or time step).
-
-# Examples
-```bash
-# Example 1: Plot the temperature from the OUTCAR file vs the iteration number.
-vamp outcar plot --par temperature --p /path/to/ --outcar OUTCAR
-
-# Example 2: Plot the total energy for each subfolder (e.g., convergence testing).
-vamp -r outcar plot --par TOTEN
-"""
-function run_task(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
-    param = args["par"]
-    output_filename = args["o"]
-    outcar_plot = plot(title="$param plot", xlabel="Iteration", ylabel="$param", legend=false)
-    if param == "bandgap"
-        kp, Es, occs = read_eigenvalues_from_outcar(args["p"]*args["outcar"])
-        ΔEs = [get_bandgap(Es[:, :, n], occs[:, :, n], printit=args["v"]) for n in axes(Es, 3)]
-        plot!(outcar_plot, ΔEs)
-        savefig(output_filename)
-    else
-        values = read_value_from_outcar(param, args["p"]*args["outcar"])
-        plot!(outcar_plot, values)
-        savefig(output_filename)
-    end
-end
-
-function run_task_recursive(::Type{Val{:outcar}}, ::Type{Val{:plot}}, args)
-    y_values = Float64[]
-    x_values = Float64[]
-    base_path = args["p"]
-    x_par_name = ""
-    param = args["par"]
-    for (i, folder) in enumerate(readfolders(base_path))
-        if i == 1; x_par_name = split(folder, "_")[1]; end
-        args["p"] = joinpath(base_path, folder * "/")
-        push!(x_values, parse(Float64, split(folder, "_")[2]))
-        y_value = read_value_from_outcar(param, args["p"]*args["outcar"])[end]
-        push!(y_values, y_value)
-    end
-    inds = sortperm(x_values)
-    plot_value_convergence(x_par_name, args["par"], x_values[inds], y_values[inds], args["o"])
 end

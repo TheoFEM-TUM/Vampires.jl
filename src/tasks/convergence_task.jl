@@ -45,6 +45,7 @@ function run_task(::Type{Val{:convergence}}, ::Type{Val{:make}}, args)
     param_range = split(args["val"], ",")
     path = args["p"]
     convergence_create_subdirectories(param, param_range; path=path, method=args["method"])
+    return nothing
 end
 
 

@@ -50,16 +50,17 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
     if lowercase(args["par"]) == "msd"
         poscar = read_poscar(joinpath(args["p"], args["poscar"]))
         msd, err = get_msd(poscar.positions, configs, lattice)
-        return ["msd", "deviation"], [msd, err]
+        return (msd = msd, deviation = err)
     elseif lowercase(args["par"]) == "vdos"
         δt = args["N"] == "none" ? read_value_from_outcar("POTIM", args["outcar"]) : parse(Float64, args["N"])
         # TODO: cut off equilibration run x=x[args["equilibration"]:,:,:]
         v = compute_velocities(xdatcar.positions, δt, xdatcar.lattice)
         vdos = compute_vdos(v, δt, "fourier")
         return ["energy", "vdos"], vdos'
+        return (energy = vdos'[1], vdos = vdos'[2])
     end
 
-    return ["lattice", "configs"], [lattice, configs]
+    return (lattice = lattice, configs = configs)
 end
 
 """
@@ -82,7 +83,7 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
     structure_n = read_xdatcar.(joinpath.(args["p"], split(args["xdatcar"], ",")))
     output_filename = args["o"] == "none" ? "XDATCAR_merged" : args["o"]
     open(joinpath(args["p"], output_filename), "w") do file
-        write_combined_xdatcar(file, structure_n)
+        write_xdatcar(file, structure_n)
     end
     return nothing
 end

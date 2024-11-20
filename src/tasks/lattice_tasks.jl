@@ -14,7 +14,7 @@ The following command can be used to create or work with supercells (i.e., POSCA
 
 Available commands:
 * `vamp supercell make`: Create an supercell POSCAR from a primitive cell poscar.
-* `vamp incar sample`: Sample configurations from an XDATCAR file and store them in individual POSCARs.
+* `vamp supercell sample`: Sample configurations from an XDATCAR file and store them in individual POSCARs.
 """
 run_task(::Type{Val{:supercell}}, ::Type{Val{:none}}, args) = nothing
 
@@ -46,12 +46,13 @@ vamp supercell make --N 1,2,3 --poscar structure/POSCAR
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
-    poscar = read_poscar(args["p"]*args["poscar"])
+    poscar = read_poscar(joinpath(args["p"], args["poscar"]))
     N = occursin(',', args["N"]) ? split_line(args["N"], char=',') : args["N"]
     N = parse.(Int64, N)
     sc_poscar = transform_primitive_cell(poscar, N)
     filename = args["o"] == "none" ? "SC_POSCAR" : args["o"]
     write_poscar(sc_poscar, filename=args["p"]*filename)
+    return nothing
 end
 
 """
@@ -75,8 +76,13 @@ vamp supercell sample --N 100,4000 --xdatcar custom_XDATCAR --method uniform
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
-    xdatcar = args["p"]*args["xdatcar"]
+    poscar = joinpath(args["p"], args["poscar"])
+    xdatcar = joinpath(args["p"], args["xdatcar"])
+    incar = joinpath(args["p"], args["incar"])
+    kpoints = joinpath(args["p"], args["kpoints"])
+    potcar = joinpath(args["p"], args["potcar"])
     Ns = parse.(Int64, split_line(args["N"], char=','))
     N, Nmin = length(Ns) > 1 ? Ns : (Ns[1], 1)
-    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin)
+    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar)
+    return nothing
 end

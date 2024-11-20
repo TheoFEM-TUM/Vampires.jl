@@ -2,10 +2,10 @@
 Define colorblind perceivable colors based on https://jfly.uni-koeln.de/color/#pdf
 
 # List of color names
-- `orange`
 - `blue`
-- `yellow`
+- `orange`
 - `green`
+- `yellow`
 - `purple`
 - `sky_blue`
 - `vermilion`
@@ -32,31 +32,35 @@ const vcolors = (
 )
 
 """
-    create_color_getter(vcolors::NamedTuple)
+    mutable struct ColorGetter
 
-Creates a color-cycling mechanism that iterates through a given list of colors in `vcolors`.
+A mutable struct designed to track the current position in a sequence of colors. 
 
-This function returns two closures:
-1. `autocolor`: Retrieves the next color from the list in sequence. It wraps around to the
-   beginning after reaching the last color, ensuring infinite cycling.
-2. `resetcolor`: Resets the sequence so that the next call to `get_color` starts from the
-   first color in the list.
-
-# Returns
-- `autocolor::Function`: A function that returns the next color in sequence.
-- `resetcolor::Function`: A function to reset the sequence to start from the first color.
+# Fields
+- `index::Int64`: The current position in the color sequence.
 """
-function create_color_getter(vcolors::NamedTuple)
-    index::Int = 0
-    function autocolor()
-        index = mod(index, length(vcolors)) + 1
-        return vcolors[index]
-    end
-    function resetcolor()
-        index = 0
-    end
-    return autocolor, resetcolor
+mutable struct ColorGetter
+    index :: Int64
 end
 
-# Assign the closure to a global constant
-const autocolor, resetcolor = create_color_getter(vcolors)
+"""
+    autocolor()
+
+Each call returns the next color in the sequence `vcolors`, restarting from the beginning once all colors are used.
+
+# Behavior
+- Increments the `index` field of the `ColorGetter` instance, cycling back to `1` after reaching the end of the color list.
+- Returns the color corresponding to the updated `index` from the global `vcolors` array.
+"""
+function (cg::ColorGetter)()
+    cg.index = mod(cg.index, length(vcolors)) + 1
+    return vcolors[cg.index]
+end
+const autocolor = ColorGetter(0)
+
+"""
+    resetcolor()
+
+Resets the `autocolor` cycle to its initial state.
+"""
+resetcolor() = autocolor.index = 0

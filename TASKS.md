@@ -21,6 +21,12 @@ eigenval:
 ```
 
 ```
+
+h5:
+    read: call the read task for `file` and create a plot.
+```
+
+```
 incar
     set/add: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
     rm: remove a certain tag or block from the INCAR file.
@@ -52,6 +58,17 @@ outcar
 ```
 
 ```
+
+<task>:
+    plot: call the read task for `file` and create a plot.
+```
+
+```
+poscar
+    read: read the POSCAR file
+```
+
+```
 ### recursive wrapper for all tasks:
 any_task
     any_subtask: if the option `-r` is specified, the subtask will run in every subfolder of `./`
@@ -73,6 +90,11 @@ settings
     set: set a new setting in the settings file
     rm: remove a setting from the settings file
     read: read a setting from the settings file
+```
+
+```
+"""
+list of available tasks
 ```
 
 ```

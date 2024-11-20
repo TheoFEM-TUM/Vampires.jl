@@ -95,7 +95,6 @@ Calculate the Fermi level of a system given the energy levels and their correspo
 - `E_fermi::Float64`: Fermi energy for semiconductor
 """
 function get_fermi_energy(Es, occ; occ_threshold=0.9, printit=false)
-    println(printit)
     vbm, cbm, _ = get_vbm_and_cbm(Es, occ; occ_threshold)
     E_fermi = cbm - abs(cbm - vbm) * 0.5
     if printit; @show E_fermi; end

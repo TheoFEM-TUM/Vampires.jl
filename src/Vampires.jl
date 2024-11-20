@@ -1,6 +1,6 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful, AbstractFFTs
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful, AbstractFFTs, Printf
 import PhysicalConstants.CODATA2018: ħ, m_e
 import Documenter: @doc
 
@@ -9,7 +9,7 @@ include("io/read_utils.jl")
 # input
 include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
 include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
-include("io/outcar.jl"); include("io/settings.jl")
+include("io/outcar.jl"); include("io/settings.jl"); include("io/output/error_reduce_funcs.jl")
 include("io/w90_hr.jl")
 
 # output
@@ -24,15 +24,16 @@ include("calculations/wannier90/hamiltonian.jl"); include("calculations/lattice/
 
 # plotting
 include("plotting/vamp_colors.jl")
-include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl")
+include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl"); include("plotting/make_plot.jl")
 
 # tasks
 # recursive.jl has to be the first include as it defines the @rcalc macro
 include("tasks/recursive.jl")
-include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl")
+include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("tasks/poscar_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
-include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/settings_tasks.jl")
+include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl"); include("tasks/plot_task.jl")
+include("tasks/file_task.jl")
 
 include("cli_interface.jl")
 
@@ -44,6 +45,7 @@ export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
 export vcolors, autocolor, resetcolor
 export plot_bandstructure, plot_value_convergence
+export read_hrdat
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy, get_effective_mass

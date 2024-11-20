@@ -74,7 +74,7 @@ function parse_structure_file_header(lines)
 end
 
 """
-    write_structure_file_header(iostream, structure::Structure, system_name="unknown structure")
+    write_structure_file_header(iostream, structure::Structure; system_name="unknown structure", index=1)
 
 Writes the header information for a structure to an open `iostream` in XDATCAR format.
 The header includes the system name, lattice scaling factor, lattice vectors, atomic species, and atom counts.
@@ -87,6 +87,7 @@ The header includes the system name, lattice scaling factor, lattice vectors, at
   - `atom_names`: An array of atomic species names (e.g., `["H", "O"]`).
   - `atom_numbers`: An array of integers representing the count of each atom type (e.g., `[2, 1]` for two H and one O).
 - `system_name`: An optional string specifying the name of the system. Defaults to `"unknown structure"` if not provided.
+- `index`: index of lattice in structure that is written in the header block (only required for NPT output)
 
 # Example
 ```julia
@@ -95,11 +96,11 @@ open("structure_header.txt", "w") do io
     write_structure_file_header(io, structure, "Water Molecule")
 end
 """
-function write_structure_file_header(iostream, structure::Structure, system_name="unknown structure")
+function write_structure_file_header(iostream, structure::Structure; system_name="unknown structure", index=1)
     println(iostream, system_name)
     println(iostream, "           $(structure.a)")
-    for (x, y, z) in eachcol(structure.lattice)
-        println(iostream, "     $(rpad(x, 8, '0'))    $(rpad(y, 8, '0'))    $(rpad(z, 8, '0'))")
+    for (x, y, z) in eachcol(structure.lattice[:, :, index])
+        println(iostream, @sprintf "    %s%.6f   %s%.6f   %s%.6f" (sign(x) == -1 ? '-' : ' ') abs(x) (sign(y) == -1 ? '-' : ' ') abs(y) (sign(z) == -1 ? '-' : ' ') abs(z))
     end
     for element in structure.atom_names
         print(iostream, "   $element")
