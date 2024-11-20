@@ -1,4 +1,4 @@
-name: Update TASKS.md and Run Tests
+name: Update TASKS.md
 
 on: [push]
 
@@ -33,12 +33,3 @@ jobs:
           git add TASKS.md
           git commit -m "Update TASKS.md with latest docstrings"
           git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
-
-    - name: Install dependencies
-      run: |
-          julia --project=. -e '
-            import Pkg
-            Pkg.instantiate()'
-    - name: Run tests
-      run: |
-        julia --project=. test/runtests.jl

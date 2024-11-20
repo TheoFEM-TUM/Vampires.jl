@@ -41,7 +41,7 @@ Read the Wannier90 `w90_hr.dat` file and export its data in HDF5 format.
 # Example 1: Read data from a w90_hr.dat file and save it to a default HDF5 file.
 vamp w90_hr read --w90_hr /path/to/w90_hr.dat
 
-# Example 2: Read data from 
+# Example 2: Read data from
 vamp w90_hr read --w90_hr /path/to/w90_hr.dat --o /path/to/output.h5
 ```
 """
