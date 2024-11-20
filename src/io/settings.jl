@@ -32,7 +32,7 @@ Appends key-value pairs from `keys` and `values` vectors to a settings file, whe
 """
 function write_settings(keys::Vector, values::Vector)
     if !isdir(settings_folder); mkdir(settings_folder); end
-    remove_setting.(keys)
+    remove_setting.(keys, printonfail=false)
     if length(values) == 0
         error("Argument \"--val\" is empty.")
     end
@@ -59,7 +59,7 @@ Removes a specific key-value pair from the `settings_file`, where each entry is 
 # Arguments
 - `key_to_remove::String`: The key whose corresponding entry should be removed from the settings file.
 """
-function remove_setting(key_to_remove)
+function remove_setting(key_to_remove; printonfail=true)
     if isfile(settings_file)
         lines = open_and_read(settings_file)
         N_1 = length(lines)
@@ -76,7 +76,7 @@ function remove_setting(key_to_remove)
         end
         if N_1 == N_2 + 1
             println("Default setting for \"$key_to_remove\" was removed.")
-        else
+        elseif printonfail
             println("No setting for $key_to_remove was found. Did you spell it correctly?")
         end
     end

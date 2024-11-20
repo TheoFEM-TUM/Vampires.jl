@@ -53,6 +53,7 @@ vamp -r runscript make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 function run_task(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
     cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
+    return nothing
 end
 
 function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
@@ -66,6 +67,7 @@ function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
             write_run_script(args["exe"], args["p"], cb=cb, out=script_name)
         end
     end
+    return nothing
 end
 
 """
@@ -123,6 +125,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     else
         write_slurm_script(args["exe"], args["p"], filename=args["o"])
     end
+    return nothing
 end
 
 """
@@ -165,7 +168,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
         scratch_path = "\$SCRATCH_$account/\$USER/"
         path_on_host = split_path_at_folder(pwd(), hostname)
         total_path = joinpath(scratch_path, path_on_host)
-        run(`ssh $hostname "sbatch -A $account $total_path/*.job"`)
+        run(`ssh $hostname "sbatch -A $account $total_path/\*.job"`)
     end
     cd(original_working_directory)
     return nothing
