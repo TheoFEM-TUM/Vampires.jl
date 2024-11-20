@@ -1,6 +1,6 @@
 # Misc
 
-This file contains all documentation for `run_task` so that the documenter never crashes even if new tasks are added.
+This file contains all documentation for `run_task` so that Documenter.jl does not crash even if new tasks are added.
 
 ```@docs
 run_task
