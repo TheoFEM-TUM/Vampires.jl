@@ -41,7 +41,7 @@ Compute particle velocities from their positions over time, taking into account 
 - `cell::Matrix{Float64}`: A matrix where each column represents a lattice vector of the simulation cell. This defines the periodic boundary conditions (PBC).
 
 # Returns
-- `Array{Float64, 3}`: A 3D array of velocities with the same shape as the input array `x`, except along the time dimension, which is reduced by one (i.e., shape `(n, d, t-1)`). Each velocity is computed as the finite difference of positions, adjusted for boundary crossings, divided by the timestep.
+- `Array{Float64, 3}`: A 3D array of velocities with the same shape as the input array `x`, except along the time dimension, which is reduced by one (i.e., shape `(d, n, t-1)`). Each velocity is computed as the finite difference of positions, adjusted for boundary crossings, divided by the timestep.
 """
 function compute_velocities(x::Array{Float64, 3}, timestep::Float64, cell::Matrix{Float64})
     cellsize = norm.(eachcol(cell))
