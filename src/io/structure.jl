@@ -100,7 +100,7 @@ function write_structure_file_header(iostream, structure::Structure; system_name
     println(iostream, system_name)
     println(iostream, "           $(structure.a)")
     for (x, y, z) in eachcol(structure.lattice[:, :, index])
-        println(iostream, "     $(rpad(x, 8, '0'))    $(rpad(y, 8, '0'))    $(rpad(z, 8, '0'))")
+        println(iostream, @sprintf "    %s%.6f   %s%.6f   %s%.6f" (sign(x) == -1 ? '-' : ' ') abs(x) (sign(y) == -1 ? '-' : ' ') abs(y) (sign(z) == -1 ? '-' : ' ') abs(z))
     end
     for element in structure.atom_names
         print(iostream, "   $element")
