@@ -49,7 +49,7 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
 
     if lowercase(args["par"]) == "msd"
         poscar = read_poscar(joinpath(args["p"], args["poscar"]))
-        msd, err = get_msd(poscar.positions, configs, lattice)
+        msd, err = compute_msd(poscar.positions, configs, lattice)
         return (msd = msd, deviation = err)
     elseif lowercase(args["par"]) == "vdos"
         δt = args["N"] == "none" ? read_value_from_outcar("POTIM", args["outcar"]) : parse(Float64, args["N"])

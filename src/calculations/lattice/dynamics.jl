@@ -1,5 +1,5 @@
 """
-    get_msd(r⃗₀, r⃗ᵢ, lattice)
+    compute_msd(r⃗₀, r⃗ᵢ, lattice)
 
 Calculates the mean-squared displacement (MSD) and its associated error over time from an initial atomic configuration (`r₀`) and a series of subsequent atomic configurations (`rᵢ`) in a molecular dynamics simulation, accounting for periodic boundary conditions.
 
@@ -13,7 +13,7 @@ Calculates the mean-squared displacement (MSD) and its associated error over tim
 - `err::Vector{Float64}`: The standard deviation of displacements for each time step, representing the error in the MSD calculation.
 
 """
-function get_msd(r₀, rᵢ, lattice)
+function compute_msd(r₀, rᵢ, lattice)
     Rs = hcat([[i, j, k] for i in -1:1, j in -1:1, k in -1:1]...)
     Ts = frac_to_cart(Rs, lattice)
     err = Float64[]
@@ -27,18 +27,31 @@ function get_msd(r₀, rᵢ, lattice)
     return msd, err
 end
 
+"""
+    compute_velocities(x::Array{Float64, 3}, timestep::Float64, cell::Matrix{Float64}) -> Array{Float64, 3}
 
-function compute_velocities(x::Array{Float64}, timestep::Float64, cell::Matrix{Float64})
+Compute particle velocities from their positions over time, taking into account periodic boundary conditions (PBC).
+
+# Arguments
+- `x::Array{Float64, 3}`: A 3D array representing particle positions. The array shape is `(d, n, t)`, where:
+    - `d` is the number of spatial dimensions,
+    - `n` is the number of particles,
+    - `t` is the number of timesteps.
+- `timestep::Float64`: The time interval between consecutive timesteps.
+- `cell::Matrix{Float64}`: A matrix where each column represents a lattice vector of the simulation cell. This defines the periodic boundary conditions (PBC).
+
+# Returns
+- `Array{Float64, 3}`: A 3D array of velocities with the same shape as the input array `x`, except along the time dimension, which is reduced by one (i.e., shape `(n, d, t-1)`). Each velocity is computed as the finite difference of positions, adjusted for boundary crossings, divided by the timestep.
+"""
+function compute_velocities(x::Array{Float64, 3}, timestep::Float64, cell::Matrix{Float64})
     cellsize = norm.(eachcol(cell))
-    # Compute differences between timesteps
+
+    # position differences between timesteps
     v = diff(x, dims=3)
+    # take care of PBC and add one cellsize if a particle has crossed the boundary
+    v .= ifelse.(v .> reshape(cellsize ./ 2, :, 1, 1), v .- reshape(cellsize, :, 1, 1),
+                 ifelse.(v .< reshape(-cellsize ./ 2, :, 1, 1), v .+ reshape(cellsize, :, 1, 1), v))
 
-    println(size(cellsize))
-    # Take care of periodic boundary conditions
-    v = sign.(v) .* abs(v) + cellsize * Int(1 > (abs.(v) / cellsize))
-
-    println(size(v))
-
-    # Divide by the timestep to get the actual velocity
-    return v / timestep
+    # calculate and return velocity
+    return v ./ timestep
 end
