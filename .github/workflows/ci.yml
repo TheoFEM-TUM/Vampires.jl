@@ -15,8 +15,6 @@ jobs:
       with:
         julia-version: ${{ matrix.julia-version }}
         arch: x64
-    - name: Build pkg
-      uses: julia-actions/julia-buildpkg@v1
-
+    
     - name: Run test
       uses: julia-actions/julia-runtest@v1
