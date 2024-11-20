@@ -27,10 +27,10 @@ incar_new = read_incar(test_file_path*"INCAR_new")
 end
 
 keywords = ["EDIFF", "POTIM", "LCHARG", "NWRITE"]
-values = ["1e-6", "10", "True", "1"]
+vals = ["1e-6", "10", "True", "1"]
 
 @testset "INCAR set/add/rm" begin
-    for (keyword, value) in zip(keywords, values)
+    for (keyword, value) in zip(keywords, vals)
         set_key!(incar, keyword, value, verbose=false)
         @test findvalue(incar, keyword) == value
     end
@@ -67,14 +67,14 @@ values = ["1e-6", "10", "True", "1"]
 
     write_incar(incar, test_file_path*"INCAR_prime")
     incar_prime = read_incar(test_file_path*"INCAR_prime")
-    for (keyword, value) in zip(keywords, values)
+    for (keyword, value) in zip(keywords, vals)
         @test findvalue(incar, keyword) == value
     end
 
     # Test multiple keywords and values
     incar2 = read_incar(test_file_path*"INCAR")
-    set_key!(incar2, keywords, values, verbose=false)
-    for (keyword, value) in zip(keywords, values)
+    set_key!(incar2, keywords, vals, verbose=false)
+    for (keyword, value) in zip(keywords, vals)
         @test findvalue(incar2, keyword) == value
     end
 
@@ -95,8 +95,8 @@ end
 @testset "INCAR W90" begin
     incar_w90 = read_incar(test_file_path*"INCAR_W90")
     keys = ["dis_win_max", "num_wann", "projAs"]
-    values = ["15", "8", "l=0;l=1"]
-    for (key, value) in zip(keys, values)
+    vals = ["15", "8", "l=0;l=1"]
+    for (key, value) in zip(keys, vals)
         @test findvalue(incar_w90, key) == value
     end
 

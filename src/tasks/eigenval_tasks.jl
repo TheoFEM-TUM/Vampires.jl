@@ -50,25 +50,17 @@ vamp eigenval read --par effective_mass --kpoints 0,0,0 --N 4 --method parabola
 ```
 """
 function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
-    input_filename = args["p"] * args["eigenval"]
-    output_filename = args["o"]
+    input_filename = joinpath(args["p"], args["eigenval"])
     kp, Es, occs = read_eigenval(input_filename)
     if args["par"] == "bandgap"
         ΔE = get_bandgap(Es, occs, printit=args["v"])
-        if occursin("h5", output_filename)
-            write_data_to_hdf5(output_filename, ["bandgap"], [ΔE])
-        else
-            if !args["r"]; println("The bandgap is: $ΔE eV."); end
-            return ΔE
-        end
-    elseif occursin("h5", output_filename)
-        write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
+        return (bandgap = ΔE,)
     elseif args["par"] == "effective_mass"
         N, k_ind, lattice = parse_effective_mass_parameters(args, kp)
         meffs = get_effective_mass(kp[:, k_ind:k_ind+N], E[:, k_ind:k_ind+N], lattice, method=args["method"])
-        return ["effective_mass"], [meffs]
+        return (effective_mass = meffs,)
     else
-        throw("Unknown output file format.")
+        return (kpoints = kp, eigenvalues = Es, occupations = occs)
     end
 end
 

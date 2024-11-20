@@ -60,4 +60,8 @@ import Vampires: parse_commandline
         return hasdescription
     end
     @test all(args_have_description)
+
+    # Test 14: Test that a value with '-' in it is parsed correctly
+    args14 = parse_commandline(["--par", "Silicon-bandgap"])
+    @test args14["par"] == "Silicon-bandgap"
 end

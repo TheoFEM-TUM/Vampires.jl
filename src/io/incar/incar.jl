@@ -193,7 +193,14 @@ and updates the relevant section based on the key.
 - `isW90::Bool`: Optional. If `true`, the function assumes the key belongs to Wannier90 input. If `false`, it infers the type based on the key.
 """
 function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comment=get_comment(key), block_label="", verbose=true, isW90=false)
-    if isW90 == false; isW90 = iswannier90key(key) ? true : false; end
+    if isW90 == false
+        isW90 = iswannier90key(key) ? true : false
+    end
+    
+    # Add Wannier90 block if Wannier90 key is added
+    if isW90 && !haskey(incar.vasp, "Wannier90") 
+        incar.vasp["Wannier90"] = OrderedDict{String, IncarValue}()
+    end
 
     if haskey(incar, key)
         old_comment = findcomment(incar, key)
@@ -205,6 +212,13 @@ function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comm
     end
 
     set_key!(incar, key, IncarValue(value, comment), block_label, isW90)
+    
+    # num_wann should be set as a VASP and a W90 keyword
+    if key == "num_wann"
+        set_key!(incar, "NUM_WANN", IncarValue(value, comment), "Wannier90", false)
+    elseif key == "NUM_WANN"
+        set_key!(incar, "num_wann", IncarValue(value, comment), get_block_label_for_keyword("num_wann"), true)
+    end
 
     if verbose
         print("Changed line: ")

@@ -4,6 +4,7 @@ using Vampires
 makedocs(
     modules = [Vampires],
     sitename = "Vampires.jl",
+    checkdocs = :exports,
     format = Documenter.HTML(;
     # Use clean URLs, unless built as a "local" build
     prettyurls=get(ENV, "CI", nothing) == "true",
