@@ -90,7 +90,6 @@ The function identifies `x` and `y` data for plotting based on keys in the `out`
 - `ylabel::String`: The label for the y-axis.
 """
 function get_plotting_data(out, args)
-    # TODO: Can one make this type stable?
     xdata = []
     ydata = []
 
