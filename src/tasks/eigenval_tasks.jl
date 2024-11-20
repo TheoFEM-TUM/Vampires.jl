@@ -47,6 +47,7 @@ vamp eigenval read --par bandgap
 # Example 4: Read the effective mass at the Gamma point from the EIGENVAL
 by fitting a parabola through four points
 vamp eigenval read --par effective_mass --kpoints 0,0,0 --N 4 --method parabola
+```
 """
 function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["eigenval"])
@@ -81,6 +82,7 @@ Reads the eigenvalues from an EIGENVAL file and generates a plot of the electron
 ```bash
 # Example 1: Plot band structure from an EIGENVAL file and save to an image file.
 vamp bands plot --p /path/to/files --eigenval EIGENVAL --o bandstructure.png
+```
 """
 function run_task(::Type{Val{:bands}}, ::Type{Val{:plot}}, args)
     output_filename = args["o"]

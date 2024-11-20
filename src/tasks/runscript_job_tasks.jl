@@ -102,6 +102,7 @@ vamp run job make --exe run_file --partition short --nodes 2 --time 4 --mail use
 
 # Example 3: Load specific modules and specify a module path before running `vasp_std`.
 vamp run job make --exe vasp_std --module_list module1,module2 --module_path /path/to/modules --p /path/to/dir
+```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     exe = args["exe"]
@@ -151,6 +152,7 @@ vamp -r job submit --account MYACCOUNT
 
 # Example 3: Submit `.job` files on a specific host and in a specific directory.
 vamp job submit --account MYACCOUNT --hostname target_host
+```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
     account = args["account"]
@@ -166,7 +168,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
         scratch_path = "\$SCRATCH_$account/\$USER/"
         path_on_host = split_path_at_folder(pwd(), hostname)
         total_path = joinpath(scratch_path, path_on_host)
-        run(`ssh $hostname "sbatch -A $account $total_path/*.job"`)
+        run(`ssh $hostname "sbatch -A $account $total_path/\*.job"`)
     end
     cd(original_working_directory)
     return nothing
@@ -189,6 +191,7 @@ vamp job status
 
 # Example 2: Check the status of all jobs for the current user on a remote host `target_host`.
 vamp job status --hostname target_host
+```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
     hostname = args["hostname"]
@@ -218,6 +221,7 @@ vamp job cancel --N 12345
 
 # Example 2: Cancel a job with job ID 12345 on a remote host.
 vamp job cancel --hostname remote_host --N 12345
+```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:cancel}}, args)
     hostname = args["hostname"]

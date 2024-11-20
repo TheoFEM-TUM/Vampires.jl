@@ -1,11 +1,30 @@
 """
 Define colorblind perceivable colors based on https://jfly.uni-koeln.de/color/#pdf
+
+# List of color names
+- `blue`
+- `orange`
+- `green`
+- `yellow`
+- `purple`
+- `sky_blue`
+- `vermilion`
+- `black`
+
+# Example
+```julia
+mycolor = vcolors.blue
+```
+or
+```
+mycolor = vcolors[:yellow]
+```
 """
 const vcolors = (
-    orange = RGB(0.90, 0.60, 0.0),
     blue = RGB(0.0, 0.45, 0.70),
-    yellow = RGB(0.95, 0.90, 0.25),
+    orange = RGB(0.90, 0.60, 0.0),
     green = RGB(0.0, 0.60, 0.50),
+    yellow = RGB(0.95, 0.90, 0.25),
     purple = RGB(0.80, 0.60, 0.70),
     sky_blue = RGB(0.35, 0.70, 0.90),
     vermilion = RGB(0.80, 0.40, 0.0),
@@ -13,31 +32,35 @@ const vcolors = (
 )
 
 """
-    create_color_getter(vcolors::Vector)
+    mutable struct ColorGetter
 
-Creates a color-cycling mechanism that iterates through a given list of colors in `vcolors`.
+A mutable struct designed to track the current position in a sequence of colors. 
 
-This function returns two closures:
-1. `autocolor`: Retrieves the next color from the list in sequence. It wraps around to the 
-   beginning after reaching the last color, ensuring infinite cycling.
-2. `resetcolor`: Resets the sequence so that the next call to `get_color` starts from the 
-   first color in the list.
-
-# Returns
-- `autocolor::Function`: A function that returns the next color in sequence.
-- `resetcolor::Function`: A function to reset the sequence to start from the first color.
+# Fields
+- `index::Int64`: The current position in the color sequence.
 """
-function create_color_getter()
-    index = 0
-    function autocolor() 
-        index = mod(index, length(vcolors)) + 1 
-        return vcolors[index]
-    end 
-    function resetcolor() 
-        index = 0 
-    end 
-    return autocolor, resetcolor
+mutable struct ColorGetter
+    index :: Int64
 end
 
-# Assign the closure to a global constant
-const autocolor, resetcolor = create_color_getter()
+"""
+    autocolor()
+
+Each call returns the next color in the sequence `vcolors`, restarting from the beginning once all colors are used.
+
+# Behavior
+- Increments the `index` field of the `ColorGetter` instance, cycling back to `1` after reaching the end of the color list.
+- Returns the color corresponding to the updated `index` from the global `vcolors` array.
+"""
+function (cg::ColorGetter)()
+    cg.index = mod(cg.index, length(vcolors)) + 1
+    return vcolors[cg.index]
+end
+const autocolor = ColorGetter(0)
+
+"""
+    resetcolor()
+
+Resets the `autocolor` cycle to its initial state.
+"""
+resetcolor() = autocolor.index = 0
