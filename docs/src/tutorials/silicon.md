@@ -59,7 +59,7 @@ vamp convergence make --par ENCUT --val 250,275,300,325,350,400
 ```
 Next you want to generate a run script that executes VASP in every subfolder you just created.
 ```bash
-vamp -r run_script make
+vamp -r runscript make
 ```
 After all runs have finished you can print out and plot the total energy for each cut-off energy.
 ```bash
