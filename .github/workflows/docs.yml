@@ -1,0 +1,20 @@
+name: docs
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  docs:
+      name: Documentation
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4.2.1
+        - uses: julia-actions/setup-julia@v2
+        - run: |
+            julia --project=docs -e '
+              using Pkg
+              Pkg.develop(PackageSpec(path=pwd()))
+              Pkg.instantiate()'
+        - run: julia --color=yes --project=docs docs/make.jl
