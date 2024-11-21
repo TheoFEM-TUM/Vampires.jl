@@ -4,6 +4,7 @@
 
 [![CI](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/TheoFEM-TUM/Vampires.jl/graph/badge.svg?token=LJT1XRIQBZ)](https://codecov.io/gh/TheoFEM-TUM/Vampires.jl)
+[![docs](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/docs.yml/badge.svg)](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/docs.yml)
 
 # VASP Analysis for Materials Properties In Realistic Energy Surfaces
 ## A Collection of Toolkits for VASP Postprocessing in Julia, currently named:
