@@ -20,7 +20,8 @@ include("io/output/kpoints.jl")
 include("calculations/numerics.jl")
 include("calculations/energy/bandstructure.jl"); include("calculations/lattice/vectors.jl"); include("calculations/lattice/supercell.jl")
 include("calculations/lattice/kspace.jl"); include("calculations/xdos/dos.jl") # include("calculations/xdos/vdos.jl")  include("calculations/xdos/jdos.jl")
-include("calculations/wannier90/hamiltonian.jl"); include("calculations/lattice/dynamics.jl")
+include("calculations/wannier90/hamiltonian.jl"); include("calculations/error_funcs.jl"); include("calculations/wannier90/w90_tools.jl")
+include("calculations/lattice/dynamics.jl")
 
 # plotting
 include("plotting/vamp_colors.jl")
@@ -64,7 +65,7 @@ using PrecompileTools: @compile_workload, @setup_workload
     v = Float64[1, 2, 3]
     task = Val{:incar}
     subtask = Val{:set}
-    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"")
+    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"", "o"=>"none")
     args_list = ["--help"]
     @compile_workload begin
         redirect_stdout(Base.DevNull()) do
