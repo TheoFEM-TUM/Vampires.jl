@@ -138,7 +138,7 @@ function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
         args["par"] = "dis_win_min,dis_win_max,dis_froz_min,dis_froz_max"
         args["val"] = "$dis_win_min,$dis_win_max,$dis_froz_min,$dis_froz_max"
     elseif args["par"] == "projections"
-        # TODO
+        error("The functionality to set projections automatically is not implemented yet.")
     end
     
     run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
