@@ -119,10 +119,13 @@ function get_default_args()
         "p" => "./",
         "o" => "none",
         "N" => "0",
+        "tol"=>"0.1",
+        "npar"=>"1",
         "npar"=>"1",
         "method" => "none",
         "reduce" => "none",
         "exclude"=>"",
+        "include" => "",
         "incar" => "INCAR",
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
@@ -134,7 +137,6 @@ function get_default_args()
         "w90_hr" => "wannier90_hr.dat",
         "exe" => "vasp_std",
         "h5" => "",
-        "exclude" => "none",
         "account" => "none",
         "hostname" => "none",
         "ext_par_file" => "none",
@@ -146,7 +148,13 @@ function get_default_args()
         "xdata" => "",
         "ydata" => "",
         "xlabel" => "",
-        "ylabel" => ""
+        "ylabel" => "",
+        "partition" => "batch",
+        "time" => "1",
+        "nodes" => "1",
+        "mail" => "",
+        "module_list" => "",
+        "module_paths" => ""
     )
     read_settings!(args_dict)
     return args_dict
@@ -167,7 +175,9 @@ function get_arg_description()
             "block" => "define the block that a parameter belongs to",
             "p" => "set the default path",
             "o" => "set the output (file-) name",
-            "N" => "general task dependent integer parameter",
+            "N" => "general task dependent integer (Int) parameter",
+            "npar" => "parallelization parameter",
+            "tol" => "a numerical tolerance parameter",
             "npar" => "general task dependent parallelization parameter",
             "method" => "general task dependent method parameter",
             "reduce" => "specifies a method to apply to the task output as post-processing",
@@ -181,6 +191,7 @@ function get_arg_description()
             "kpoints" => "set the name of the kpoints file",
             "h5" => "set the name of an h5 file",
             "exclude" => "task dependent exclude parameter",
+            "include" => "task dependent include parameter",
             "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
             "account" => "set the account name for job submission on slurm system",
             "hostname" => "set the hostname of a remote host",
@@ -191,6 +202,12 @@ function get_arg_description()
             "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
             "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
             "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)",
+            "partition" => "the partition the job should be run on (slurm script)",
+            "time" => "maximum walltime for a job (slurm script)",
+            "nodes" => "the number of requested nodes (slurm script)",
+            "mail" => "the mail address to mail job updates to (slurm script)",
+            "module_list" => "the module names to be imported in a slurm script",
+            "module_paths" => "additional paths where modules may be located (slurm script)",
             "title" => "specifies the title of a plot",
             "xdata" => "specifies the xdata for a plot",
             "ydata" => "specifies the ydata for a plot",
@@ -232,7 +249,7 @@ function parse_commandline(args)
             end
 
             args_dict[arg[3:end]] = new_arg
-        elseif occursin("-", arg)
+        elseif arg[1] == '-'
             args_dict[arg[2:end]] = true
         elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false) || args[k-1] == "--help"
             num_pos += 1

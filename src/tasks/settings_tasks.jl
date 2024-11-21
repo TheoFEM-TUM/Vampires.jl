@@ -36,7 +36,7 @@ vamp settings set --par exe --val run_file
 """
 function run_task(::Type{Val{:settings}}, ::Type{Val{:set}}, args)
     keys = split_line(args["par"], char=',')
-    values = split_line(args["val"], char=',')
+    values = length(keys) > 1 ? split_line(args["val"], char=',') : [args["val"]]
     write_settings(keys, values)
     return nothing
 end

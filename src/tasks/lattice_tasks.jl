@@ -81,8 +81,10 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
     incar = joinpath(args["p"], args["incar"])
     kpoints = joinpath(args["p"], args["kpoints"])
     potcar = joinpath(args["p"], args["potcar"])
+    include_files = split_line(args["include"], char=',')
+
     Ns = parse.(Int64, split_line(args["N"], char=','))
     N, Nmin = length(Ns) > 1 ? Ns : (Ns[1], 1)
-    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar)
+    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar, include_files=include_files)
     return nothing
 end

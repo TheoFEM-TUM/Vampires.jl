@@ -1,5 +1,9 @@
 # VASP input
 
+```@docs
+run_task(::Type{Val{:input}}, ::Type{Val{:cp}}, ::Any)
+```
+
 ## INCAR
 ```@docs
 run_task(::Type{Val{:incar}}, ::Type{Val{:make}}, ::Any)

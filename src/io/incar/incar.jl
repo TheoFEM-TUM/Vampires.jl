@@ -30,6 +30,7 @@ Set a key-value pair in the specified block of an `Incar` object, either in the 
 """
 function set_key!(incar::Incar, key::AbstractString, incar_value::IncarValue, block_label::AbstractString, isW90::Bool)
     key_dict = isW90 ? incar.w90 : incar.vasp
+    block_label = occursin("proj", key) ? "Projections" : block_label
     if haskey(key_dict, block_label)
         key_dict[block_label][key] = incar_value
     else
@@ -69,17 +70,17 @@ function read_incar(file::AbstractString)
             block_label = get_block_label(line)
         elseif iscomment(line)
             @warn "Ignoring comment"
-        elseif occursin('=', line)
+        elseif occursin('=', line) || (isprojection && occursin(':', line))
             key, value, comment = isprojection ? read_incar_line(line, [':', '!', '#']) : read_incar_line(line)
             comment = comment == "" ? get_comment(key) : comment
             key = isprojection ? "proj"*key : key
             if key ≠ "WANNIER90_WIN"
                 set_key!(incar, key, value, comment=comment, block_label=block_label, isW90=isW90, verbose=false)
-            elseif isW90 && occursin('\"', line)
-                isW90 = false
-            else
+            elseif key == "WANNIER90_WIN"
                 isW90 = true
             end
+        elseif isW90 && occursin('\"', line)
+            isW90 = false
         end
     end
     return incar
@@ -262,28 +263,29 @@ function write_incar(incar::Incar, filename="INCAR")
         for (key, incar_value) in block_lines
             write_line(key, incar_value, file)
         end
-        if block_label == "Wannier90"
+        if block_label == "Wannier90" && length(incar.w90) > 0
             isprojection = false
             println(file, " WANNIER90_WIN = \"")
             for (w90_label, w90_lines) in incar.w90
                 println(file, "  !"*w90_label)
                 for (w90_key, w90_value) in w90_lines
                     if occursin("proj", w90_key) && isprojection == false
-                        println(file, "  begin projection")
+                        println(file, "   begin projections")
                         isprojection = true
                     elseif !occursin("proj", w90_key) && isprojection == true
-                        println(file, "  end")
+                        println(file, "   end projections")
                         isprojection = false
                     end
                     w90_key = isprojection ? string(w90_key[5:end]) : w90_key
                     write_line(w90_key, w90_value, file, isW90=true, isprojection=isprojection)
                 end
+                if isprojection
+                    println(file, "   end projections")
+                    isprojection = false
+                end
                 if w90_label ≠ collect(keys(incar.w90))[end]; println(file, ""); end
             end
-            if isprojection
-                println(file, "  end")
-                isprojection = false
-            end
+            
             println(file, " \"")
         end
         if block_label ≠ collect(keys(incar.vasp))[end]; println(file, ""); end
