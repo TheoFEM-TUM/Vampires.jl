@@ -96,7 +96,33 @@ const INCAR_COMMENTS = Dict{String, String}(
     "LWRITE_UNK" => "decides whether the cell-periodic part of the relevant Bloch functions is written",
     "LWRITE_MMN_AMN" => "write the wannier90.mmn and wannier90.amn files",
     "LWRITE_SPN" => "Write wannier90.spn file for noncollinear calculations",
-    "WANNIER90_WIN" => "sets the content of the wannier90.win file"
+    "WANNIER90_WIN" => "sets the content of the wannier90.win file",
+    # A
+    "ADDGRID" => "determines whether an additional support grid is used for the evaluation of the augmentation charges",
+    "AEXX" => "specifies the fraction of exact exchange in a Hartree-Fock-type/hybrid-functional calculation",
+    "AGGAC" => "is a parameter that multiplies the gradient correction in the GGA correlation functional",
+    "AGGAX" => "is a parameter that multiplies the gradient correction in the GGA exchange functional",
+    "ALDAC" => "is a parameter that multiplies the LDA correlation functional or the LDA part of the GGA correlation functional",
+    "ALDAX" => "is a parameter that multiplies the LDA exchange functional or the LDA part of the GGA exchange functional",
+    "ALGO" => "is a convenient option to specify the electronic minimization algorithm (as of VASP.4.5) and/or to select the type of GW calculations",
+    "ALPHA_VDS" => "Specify α in vdW-DF3-opt1/vdW-DF3-opt2",
+    "AMGGAC" => "is a parameter that multiplies the meta-GGA correlation functional (available as of VASP.6.4.0)",
+    "AMGGAX" => "is a parameter that multiplies the meta-GGA exchange functional (available as of VASP.6.4.0)",
+    "AMIN" => "specifies the minimal mixing parameter in Kerker's initial approximation[1] to the charge-dielectric function used in the Broyden/Pulay mixing scheme (IMIX=4, INIMIX=1)",
+    "AMIX" => "specifies the linear mixing parameter",
+    "AMIX_MAG" => "Linear mixing parameter for the magnetization density",
+    "ANDERSEN_PROB" => "sets the collision probability for the Anderson thermostat (in case VASP was compiled with -Dtbdyn)",
+    "ANTIRES" => "determines whether the Tamm-Dancoff approximation is used or not",
+    "APACO" => "sets the maximum distance in the evaluation of the pair-correlation function (in Å)",
+    # B
+    "BANDGAP" => "determines the verbosity for reporting the bandgap to the OUTCAR file. Only the first character is significant",
+    "BEXT" => "Specifies an external magnetic field in eV",
+    "BMIX" => "sets the cutoff wave vector for Kerker mixing scheme (IMIX=1 and/or INIMIX=1)",
+    "BMIX_MAG" => "Sets the cutoff wave vector for Kerker mixing scheme (IMIX=1 and/or INIMIX=1) for the magnetization density",
+    "BPARAM" => "specifies the value of the parameter b in the kernel of the nonlocal rVV10 correlation functional",
+    "BSEELECTRON" => "sets the coordinates of the fixed electron of the exciton wavefunction",
+    "BSEHOLE" => "sets the coordinates of the fixed hole of the exciton wavefunction",
+    "BSEPREC" => "determines the precision of the time-evolution algorithm for solving the Bethe-Salpeter or Casida equations, i.e., the timestep and the number of steps",
 )
 
 const VASP_DEFAULTS = Dict{String, String}(
@@ -141,7 +167,34 @@ const VASP_DEFAULTS = Dict{String, String}(
     "LWRITE_UNK" => "False",
     "LWRITE_MMN_AMN" => "True",
     "LWRITE_SPN" => "False",
-    "WANNIER90_WIN" => "\"\""
+    "WANNIER90_WIN" => "\"\"",
+    # A
+    "ADDGRID" => "",
+    "AEXX" => "",
+    "AGGAC" => "",
+    "AGGAX" => "",
+    "ALDAC" => "",
+    "ALDAX" => "",
+    "ALGO" => "",
+    "ALPHA_VDS" => "",
+    "AMGGAC" => "",
+    "AMGGAX" => "",
+    "AMIN" => "",
+    "AMIX" => "",
+    "AMIX_MAG" => "",
+    "ANDERSEN_PROB" => "",
+    "ANTIRES" => "",
+    "APACO" => "",
+    # B
+    "BANDGAP" => "",
+    "BEXT" => "",
+    "BMIX" => "",
+    "BMIX_MAG" => "",
+    "BPARAM" => "",
+    "BSEELECTRON" => "",
+    "BSEHOLE" => "",
+    "BSEPREC" => "",
+
 )
 
 const WANNIER90_COMMENTS = Dict{String, String}(
