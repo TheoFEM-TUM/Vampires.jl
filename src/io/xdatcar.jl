@@ -25,16 +25,15 @@ function read_xdatcar(xdatcar="XDATCAR")
 
     # Calculate the number of configurations
     L = length(lines)
-    Nconfig = Int((L - i_start + 1) / (Nion + 1))
 
     # Initialize the configurations array
-    positions = zeros(Float64, 3, Nion, Nconfig)
-
+    positions = Float64[]
     # Parse the configurations
-    for j in 1:Nconfig, i in 1:Nion
-        k = j + i_start + Nion * (j - 1) + i - 1
-        positions[:, i, j] = parse.(Float64, lines[k][1:3])
+    for i in i_start+1:(Nion + 1):L, j in i:(i+Nion - 1)
+        push!(positions, parse.(Float64, lines[j])...)
     end
+
+    positions = reshape(positions, (3, Nion, :))
 
     return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
 end
