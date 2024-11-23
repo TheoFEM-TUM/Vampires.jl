@@ -58,15 +58,15 @@ This function takes in a flag `r_flag`, along with the task, subtask, and a dict
 - A quoted expression that, when evaluated, will call either `run_task` or `run_task_recursive` with the task, subtask, and arguments wrapped in `Val{Symbol()}`.
 """
 function _get_run_task_quote(r_flag, task, subtask, args_dict)
-    s1 = string(task)
-    s2 = string(subtask)
+    task_type = Val{task}
+    subtask_type = Val{subtask}
     if r_flag == :normal
         return quote
-            run_task($(esc(:(Val{Symbol($s1)}))), $(esc(:(Val{Symbol($s2)}))), $(esc(args_dict)))
+            run_task($task_type, $subtask_type, $(esc(args_dict)))
         end
     elseif r_flag == :recursive
         return quote
-            run_task_recursive($(esc(:(Val{Symbol($s1)}))), $(esc(:(Val{Symbol($s2)}))), $(esc(args_dict)))
+            run_task_recursive($task_type, $subtask_type, $(esc(args_dict)))
         end
     end
 end
