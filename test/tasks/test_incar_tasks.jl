@@ -17,12 +17,10 @@
         @test run_task(Val{Symbol("incar")}, Val{Symbol("read")}, args).ENCUT == "350"
 
         # Test 3: INCAR set with num_wann
-        args["par"] = "num_wann"
-        args["val"] = "8"
-        run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
-        @test run_task(Val{Symbol("incar")}, Val{Symbol("read")}, args).num_wann == "8"
+        @run_task incar set par=num_wann val=8
+        @test (@run_task incar read par=num_wann).num_wann == "8"
         args["par"] = "NUM_WANN"
-        @test run_task(Val{Symbol("incar")}, Val{Symbol("read")}, args).NUM_WANN == "8"
+        @test (@run_task incar read par=NUM_WANN).NUM_WANN == "8"
 
         # Test 4: Test INCAR rm
         args["par"] = "ENCUT"
