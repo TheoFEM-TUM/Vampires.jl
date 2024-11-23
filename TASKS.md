@@ -95,13 +95,45 @@ settings
 ```
 
 ```
-"""
-list of available tasks
+Processes and outputs data from a `read` task based on a specified method, handling recursive operations, broadcasting, and error reporting.
+
+# Parameters
+- `out`: A NamedTuple that associates a parameter `key` with an AbstractArray of values.
+- `args`: A dictionary of arguments with the following expected keys:
+  - `"o"`: The output file path where results will be written.
+  - `"reduce"`: A string specifying the processing method. If the last character is `"."`, broadcasting is applied to the method.
+  - `"r"`: A boolean flag indicating whether to apply recursive processing.
+  - `"v"`: A boolean flag to enable verbose output.
 ```
 
 ```
 """
-list of available tasks
+    @run_task(task, subtask, args...)
+    @run_task_recursive(task, subtask, args...)
+
+This macro provides a convenient way to call any `run_task` (or `run_task_recursive`) method without having to explicitly convert `task` and `subtask` into Val-types.
+Args can either be a dictionary or a set of `key = value` pairs.
+
+# Arguments
+- `task::Symbol`: The task name (e.g., incar).
+- `subtask::Symbol`: The subtask name (e.g., `set`).
+- `args`: A set of key-value pairs passed as arguments (e.g., `key1 = value1`) or a dictionary.
+
+# Returns
+- A quoted expression that, when evaluated, will call the `run_task` function with the `task`, `subtask`, and arguments packaged into a dictionary.
+
+# Example
+```julia
+# Example 1: Call the `incar set` task with arguments
+@run_task incar set par = ENCUT val = 250
+
+# Example 2: Call the `kpoints make` task with a dictionary that contains arguments
+args = get_default_args()
+@run_task kpoints make args
+
+# Example 3: Call the `runscript make` recursively.
+@run_task_recursive runscript make
+```
 ```
 
 ```
