@@ -19,8 +19,9 @@
         # Test 3: INCAR set with num_wann
         @run_task incar set par=num_wann val=8
         @test (@run_task incar read par=num_wann).num_wann == "8"
-        args["par"] = "NUM_WANN"
         @test (@run_task incar read par=NUM_WANN).NUM_WANN == "8"
+        @run_task incar set par=NUM_WANN val=12
+        @test (@run_task incar read par=num_wann).num_wann == "12"
 
         # Test 4: Test INCAR rm
         args["par"] = "ENCUT"
