@@ -14,7 +14,7 @@ function update_tasks_md(task_dir::String, output_file::String)
     for file in readdir(task_dir)
         if endswith(file, ".jl")
             docstring = extract_first_docstring(joinpath(task_dir, file))
-            if !isempty(docstring)
+            if !isempty(replace(docstring, "\""=>""))
                 docstring = chopsuffix(chopprefix(docstring, r"\"\"\"\X(.*?)\n\n"), r"\n\"\"\"")
                 docstring = "```\n" * docstring * "\n```" 
                 push!(task_docstrings, docstring)
