@@ -28,30 +28,32 @@ function compute_msd(r₀, rᵢ, lattice)
 end
 
 """
-    compute_velocities(x::Array{Float64, 3}, timestep::Float64, cell::Matrix{Float64}) -> Array{Float64, 3}
+    compute_velocities(x::Array{Float64, 3}, timestep<:Number, cell::Matrix{Float64}) -> Array{Float64, 3}
 
 Compute particle velocities from their positions over time, taking into account periodic boundary conditions (PBC).
+Input is assumed in units of Å (`x`) and fs (`timestep`). Output is in units of m/ps.
 
 # Arguments
-- `x::Array{Float64, 3}`: A 3D array representing particle positions. The array shape is `(d, n, t)`, where:
+- `x::Array{Float64, 3}`: A 3D array representing particle positions in Å. The array shape is `(d, n, t)`, where:
     - `d` is the number of spatial dimensions,
     - `n` is the number of particles,
     - `t` is the number of timesteps.
-- `timestep::Float64`: The time interval between consecutive timesteps.
+- `timestep::Float64`: The time interval between consecutive timesteps in fs.
 - `cell::Matrix{Float64}`: A matrix where each column represents a lattice vector of the simulation cell. This defines the periodic boundary conditions (PBC).
 
 # Returns
-- `Array{Float64, 3}`: A 3D array of velocities with the same shape as the input array `x`, except along the time dimension, which is reduced by one (i.e., shape `(d, n, t-1)`). Each velocity is computed as the finite difference of positions, adjusted for boundary crossings, divided by the timestep.
+- `Array{Float64, 3}`: A 3D array of velocities with the same shape as the input array `x` in units of m/s, except along the time dimension, which is reduced by one (i.e., shape `(d, n, t-1)`). Each velocity is computed as the finite difference of positions, adjusted for boundary crossings, divided by the timestep.
 """
-function compute_velocities(x::Array{Float64, 3}, timestep::Float64, cell::Matrix{Float64})
+function compute_velocities(x::Array{Float64, 3}, timestep::T, cell::Matrix{Float64}) where T <: Number
     cellsize = norm.(eachcol(cell))
-
+    # scale positions
+    # TODO: use frac_to_cart(x, cell)
+    @tensor x_scaled[i, j, k] := cell[i, m] * x[m, j, k]
+    # x_scaled = frac_to_cart(x, cell)
     # position differences between timesteps
-    v = diff(x, dims=3)
-    # take care of PBC and add one cellsize if a particle has crossed the boundary
-    v .= ifelse.(v .> reshape(cellsize ./ 2, :, 1, 1), v .- reshape(cellsize, :, 1, 1),
-                 ifelse.(v .< reshape(-cellsize ./ 2, :, 1, 1), v .+ reshape(cellsize, :, 1, 1), v))
-
+    dr = diff(x_scaled, dims=3)
+    dr_pbc = ifelse.(dr .> reshape(cellsize ./ 2, :, 1, 1), dr .- reshape(cellsize, :, 1, 1),
+                 ifelse.(dr .< reshape(-cellsize ./ 2, :, 1, 1), dr .+ reshape(cellsize, :, 1, 1), dr))
     # calculate and return velocity
-    return v ./ timestep
+    return (dr_pbc * 1e-7) ./ (timestep)  # factor 1e-7 to convert Å / fs -> m / ps
 end
