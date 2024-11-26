@@ -1,16 +1,60 @@
 """
-    autocorr_fft(v::AbstractVector) -> AbstractVector
+    compute_spectral_density(v::Array{Float64}, normalize::Bool) -> AbstractVector
 
 Computes the autocorrelation of a vector using the Fast Fourier Transform (FFT).
 
 # Arguments
+- `v::Array{Float64}`: The input vector for which the autocorrelation is to be computed.
+- `normalize::Bool`: if true, this returns an auto-covariance function
+
+# Returns
+- `AbstractVector`: A vector containing the spectral density values.
+"""
+function compute_spectral_density(v::Array{<:Number}; normalize=true)
+    return abs2.(rfft(v .- mean(v) .* Int(normalize)))
+end
+
+"""
+    compute_spectral_density(v::Array{Float64}, normalize::Bool) -> AbstractVector
+
+Computes the autocorrelation of a vector using the Fast Fourier Transform (FFT) using the Wiener–Khinchin Theorem with PBC.
+
+# Arguments
 - `v::AbstractVector`: The input vector for which the autocorrelation is to be computed.
+- `normalize::Bool`: if true, this returns an auto-covariance function
 
 # Returns
 - `AbstractVector`: A vector containing the autocorrelation values.
 """
-function autocorr_fft(v::AbstractVector)
-    return abs2.(rfft(v .- mean(v)))
+
+function compute_autocorr(v::Array{<:Number}; normalize=true)
+    return irfft(compute_spectral_density(v; normalize), size(v, 1))
+end
+
+"""
+    compute_full_autocorrelation(x::Vector{T}) -> Vector{Float64}
+
+Computes the full autocorrelation of the input vector `x`, returning a vector of length `2n - 1`, where `n` is the length of `x`.
+
+# Arguments
+- `x::Vector{T}`: A one-dimensional array of numerical values.
+
+# Returns
+- A vector of `Float64` values containing the autocorrelation values for all possible lags. The center value (at index `n`) corresponds to the zero-lag autocorrelation, and the values before and after correspond to negative and positive lags, respectively.
+
+# Notes
+- The calculation for each lag `k` (positive or negative) involves the dot product of overlapping segments of `x`, ensuring symmetric results.
+- The function ensures the autocorrelation is correctly calculated for all lags, including handling edge cases at both ends of the input vector.
+"""
+function compute_full_autocorrelation(x)
+    n = length(x)
+    result = Array{Float64}(undef, 2 * n - 1)
+    @inbounds for lag in 1:(n-1)
+        result[n + lag] = sum(x[1:(n - lag)] .* x[(1 + lag):n])
+        result[n - lag] = sum(x[(lag + 1):n] .* x[1:(n - lag)])
+    end
+    result[n] = sum(x .* x)
+    return result
 end
 
 """
