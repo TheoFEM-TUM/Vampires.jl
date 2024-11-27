@@ -45,15 +45,12 @@ Input is assumed in units of Å (`x`) and fs (`timestep`). Output is in units of
 - `Array{Float64, 3}`: A 3D array of velocities with the same shape as the input array `x` in units of m/s, except along the time dimension, which is reduced by one (i.e., shape `(d, n, t-1)`). Each velocity is computed as the finite difference of positions, adjusted for boundary crossings, divided by the timestep.
 """
 function compute_velocities(x::Array{Float64, 3}, timestep::T, cell::Matrix{Float64}) where T <: Number
-    cellsize = norm.(eachcol(cell))
+    cellsize = norm.(eachcol(cell))*u"Å"
     # scale positions
-    # TODO: use frac_to_cart(x, cell)
-    @tensor x_scaled[i, j, k] := cell[i, m] * x[m, j, k]
-    # x_scaled = frac_to_cart(x, cell)
-    # position differences between timesteps
+    x_scaled = frac_to_cart(x, cell)*u"Å"
     dr = diff(x_scaled, dims=3)
     dr_pbc = ifelse.(dr .> reshape(cellsize ./ 2, :, 1, 1), dr .- reshape(cellsize, :, 1, 1),
                  ifelse.(dr .< reshape(-cellsize ./ 2, :, 1, 1), dr .+ reshape(cellsize, :, 1, 1), dr))
     # calculate and return velocity
-    return (dr_pbc * 1e-7) ./ (timestep)  # factor 1e-7 to convert Å / fs -> m / ps
+    return ustrip(uconvert.(u"m/ps", (dr_pbc) ./ (timestep*u"fs")))  # convert Å / fs -> m / ps and return raw values
 end
