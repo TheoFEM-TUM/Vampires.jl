@@ -53,7 +53,6 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
         return (msd = msd, deviation = err)
     elseif lowercase(args["par"]) == "vdos"
         δt = args["N"] == "none" ? read_value_from_outcar("POTIM", args["outcar"]) : parse(Float64, args["N"])
-        # TODO: cut off equilibration run x=x[args["equilibration"]:,:,:]
         v = compute_velocities(xdatcar.positions, δt, xdatcar.lattice)
         vdos = compute_vdos(v, δt, "fourier")
         return ["energy", "vdos"], vdos'
