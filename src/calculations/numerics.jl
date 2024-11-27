@@ -1,10 +1,10 @@
 """
-    compute_spectral_density(v::Array{Float64}, normalize::Bool) -> AbstractVector
+    compute_spectral_density(v::Array{<:Number}, normalize::Bool) -> AbstractVector
 
 Computes the autocorrelation of a vector using the Fast Fourier Transform (FFT).
 
 # Arguments
-- `v::Array{Float64}`: The input vector for which the autocorrelation is to be computed.
+- `v::Array{<:Number}`: The input vector for which the autocorrelation is to be computed.
 - `normalize::Bool`: if true, this returns an auto-covariance function
 
 # Returns
@@ -15,12 +15,12 @@ function compute_spectral_density(v::Array{<:Number}; normalize=true)
 end
 
 """
-    compute_spectral_density(v::Array{Float64}, normalize::Bool) -> AbstractVector
+    compute_autocorr(v::Array{<:Number}, normalize::Bool) -> AbstractVector
 
 Computes the autocorrelation of a vector using the Fast Fourier Transform (FFT) using the Wiener–Khinchin Theorem with PBC.
 
 # Arguments
-- `v::AbstractVector`: The input vector for which the autocorrelation is to be computed.
+- `v::Array{<:Number}`: The input vector for which the autocorrelation is to be computed.
 - `normalize::Bool`: if true, this returns an auto-covariance function
 
 # Returns
