@@ -1,16 +1,20 @@
 """
     transform_basis(r⃗, Ê)
 
-Transform the basis of vector `r⃗` to the basis defined by `Ê`.
+Transform the basis of vector `r` to the basis defined by `Ê`.
 
 # Arguments
-- `r⃗::AbstractVector{T}`: The vector to be transformed.
-- `Ê::AbstractMatrix{T}`: The matrix defining the new basis.
+- `r::AbstractArray{T}`: The vector to be transformed.
+- `Ê::AbstractArray{U}`: The matrix defining the new basis.
 
 # Returns
-- The transformed vector `r⃗` in the new basis defined by `Ê`.
+- The transformed vector `r` in the new basis defined by `Ê`.
 """
-transform_basis(r⃗, Ê) = Ê * r⃗
+transform_basis(r::AbstractArray{T} , Ê::AbstractArray{U}) where {T<:Number, U<:Number} = Ê * r
+
+function transform_basis(r::AbstractArray{T, 3} , Ê::AbstractArray{U, 2}) where {T<:Number, U<:Number}
+    @tensor x_scaled[i, j, k] := Ê[i, m] * r[m, j, k]
+end
 
 """
     frac_to_cart(r⃗_frac, lattice)
