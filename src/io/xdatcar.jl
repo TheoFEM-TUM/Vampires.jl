@@ -29,7 +29,7 @@ function read_xdatcar(xdatcar="XDATCAR")
     # Initialize the configurations array
     positions = Float64[]
     # Parse the configurations
-    for i in (i_start+1):(Nion + 1):(L - 1), j in i:(i+Nion - 1)
+    for i in i_start+1:(Nion + 1):L, j in i:(i+Nion - 1)
         push!(positions, parse.(Float64, lines[j])...)
     end
 
