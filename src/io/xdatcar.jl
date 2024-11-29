@@ -25,7 +25,6 @@ function read_xdatcar(xdatcar="XDATCAR")
 
     # Calculate the number of configurations
     L = length(lines)
-    println(L)
 
     # Initialize the configurations array
     positions = Float64[]

@@ -46,9 +46,9 @@ Computes the full autocorrelation of the input vector `x`, returning a vector of
 - The calculation for each lag `k` (positive or negative) involves the dot product of overlapping segments of `x`, ensuring symmetric results.
 - The function ensures the autocorrelation is correctly calculated for all lags, including handling edge cases at both ends of the input vector.
 """
-function compute_full_autocorrelation(x)
+function compute_full_autocorrelation(x::AbstractArray{T, 1}) where T <: Number
     n = length(x)
-    result = Array{Float64}(undef, 2 * n - 1)
+    result = Array{Number}(undef, 2 * n - 1)
     @inbounds for lag in 1:(n-1)
         result[n + lag] = sum(x[1:(n - lag)] .* x[(1 + lag):n])
         result[n - lag] = sum(x[(lag + 1):n] .* x[1:(n - lag)])
@@ -86,9 +86,4 @@ function _get_finite_difference_coef(N, )
     else
         error("Finite difference method for order $N is not implemented.")
     end
-end
-
-function evaluate_finite_difference(x, dt, N=3)
-    coeffs = _get_finite_difference_coef(N)
-    (x ⋅ Es) ./ dt
 end

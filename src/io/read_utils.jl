@@ -12,7 +12,6 @@ Open a file, read all lines, and return them as a vector of strings.
 function open_and_read(file)
     f = open(file)
     lines = readlines(f)
-    println(length(lines))
     close(f)
     return lines
 end
