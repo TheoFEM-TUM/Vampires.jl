@@ -18,11 +18,12 @@ If `xdata` is non-empty, it is used as the x-axis data. If `xdata` is empty, `yd
 - `fig` : The plot object with the specified data and labels.
 """
 function make_plot(xdata, ydata; title="", xlabel="", ylabel="")
-    fig = plot(title=title, xlabel=xlabel, ylabel=ylabel, legend=false, framestyle=:box)
+    fig = plot(title=title, xlabel=xlabel, ylabel=ylabel, legend=false, framestyle=:box, tickfontsize=18, labelfontsize=18)
     if length(xdata) > 0
         if length(xdata) == length(ydata)
             for (x, y) in zip(xdata, ydata)
                 y = check_transpose_for_plotting(y)
+                x, y = check_sorting_for_plotting(x, y)
                 colors = get_colors(y)
                 plot!(fig, x, y, color=colors)
             end
@@ -108,7 +109,7 @@ function get_plotting_data(out, args)
     if args["r"] && length(xdata) == 0
         folders = readfolders(args["p"])
         xdata = push!(xdata, parse.(Float64, [split_line(folder, char='_')[end] for folder in folders]))
-        xlabel = split_line(folders[1], char=',')[1]
+        xlabel = args["xlabel"] == "" ? split_line(folders[1], char='_')[1] : xlabel
     end
     return xdata, ydata, xlabel, ylabel
 end
@@ -159,3 +160,9 @@ function check_transpose_for_plotting(A::AbstractMatrix)
     end
 end
 check_transpose_for_plotting(A) = A
+
+function check_sorting_for_plotting(x::AbstractVector, y::AbstractVector)
+    inds = sortperm(x)
+    return x[inds], y[inds]
+end
+check_sorting_for_plotting(x, y) = x, y

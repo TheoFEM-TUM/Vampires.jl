@@ -11,7 +11,7 @@ Writes a bash script to run a command in specified folders. If the script alread
 - `run_out::String`: The output filename for the executed `exe` command
 
 """
-function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.log")
+function write_run_script(exe, path; out="run_job.sh", cb="", run_out="vasp.log")
     if out in readdir()
         add_path_to_folders(out, path)
     else
@@ -26,11 +26,12 @@ function write_run_script(exe, path; out="run_job.sh", cb="none", run_out="vasp.
             println(runfile, "do")
             println(runfile, "    cd \$folder")
             if occursin(".sh", exe)
-                println(runfile, "    srun bash $exe > $run_out")
+                println(runfile, "    bash $exe > $run_out")
             else
                 println(runfile, "    srun $exe  > $run_out")
             end
-            if cb ≠ "none"; println(runfile, "    "*cb); end
+            if cb ≠ ""; println(runfile, "    "*cb); end
+            println(runfile, "    echo \"Calculation in \$folder completed.\"")
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
@@ -94,6 +95,7 @@ function add_path_to_folders(file::String, new_path::String)
             end
         end
     end
+    return nothing
 end
 
 """
@@ -140,7 +142,7 @@ write_slurm_script(
     script_filename="my_slurm_script.sh"
 )
 """
-function write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", filename="job")
+function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0, partition="batch", mail="", filename="job")
     out = filename*".job"
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
@@ -156,8 +158,8 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         ###
         #SBATCH --nodes=$nodes
         #SBATCH --time=$time_str
+        #SBATCH --ntasks-per-node=$ntasks
         #SBATCH --partition=$partition
-        #SBATCH --ntasks=$ntasks
         """)
         if num_gpu > 0
             print(outfile, """
@@ -167,14 +169,9 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             # GPU allocation (VASP specific; necessary?)
             #SBATCH --gpus-per-task=1       # num GPUs per process
             """)
-        elseif ntasks_per_core == 0
-            print(outfile, """
-            #SBATCH --partition=$partition
-            """)
-        else
+        elseif ntasks_per_core ≠ 1
             print(outfile, """
             #SBATCH --ntasks-per-core=$ntasks_per_core
-            #SBATCH --partition=$partition
             """)
         end
         print(outfile, """
@@ -186,17 +183,20 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             #SBATCH --mail-type=START,FAIL,END
             """)
         end
-        if length(module_path) > 0 || length(module_list) > 0
+        if length(module_paths) > 0 || length(module_list) > 0
             print(outfile, """
+
             #========================================#
             # module setup for VASP
             #========================================#
             """)
         end
-        if length(module_path) > 0
-            print(outfile, """
-            module use $module_path
-            """)
+        if length(module_paths) > 0
+            for mod_path in module_paths
+                print(outfile, """
+                module use $mod_path
+                """)
+            end
         end
         if length(module_list) > 0
             for mod in module_list
@@ -206,6 +206,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             end
         end
         print(outfile, """
+
         # ALL RUNS IN \$WORK !
         # ... better
         # start the jobs inside the correct directory
@@ -220,7 +221,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         echo "Running on hosts: \$SLURM_NODELIST"
         echo "Running on \$SLURM_NNODES nodes."
         echo "Running on \$SLURM_NPROCS processors."
-        echo "Work directory is `pwd`"
+        echo "Work directory is \$(pwd)"
         echo "VASP binary at " \$exe
 
         echo
@@ -230,6 +231,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         #========================================#
         # 4. Parallel execution
         #========================================#
+
         export OMP_NUM_THREADS=$omp_num_threads
         # make sure that MKL does not overwrite your OMP configuration
         export MKL_NUM_THREADS=$omp_num_threads
@@ -243,6 +245,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             """)
         end
         print(outfile, """
+
         #========================================#
         # 5. System info
         #========================================#
@@ -257,7 +260,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
         echo The VASP version is $exe >> host.info
 
         #========================================#
-        # 5. VASP run
+        # 5. Main job execution
         #========================================#
         """)
         if num_gpu == 0 && occursin("vasp", exe)
@@ -266,7 +269,7 @@ function write_slurm_script(exe, path; module_path="", module_list=[], time=1, n
             """)
         elseif num_gpu == 0 && occursin(".sh", exe)
             print(outfile, """
-            srun bash $exe
+            bash $exe
             """)
         else
             print(outfile, """

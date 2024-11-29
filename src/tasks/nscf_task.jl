@@ -43,8 +43,11 @@ vamp nscf make --kpoints KPOINTS,KPOINTS_bands --vasp_exe vasp_ncl
 """
 function run_task(::Type{Val{:nscf}}, ::Type{Val{:make}}, args)
     nscf_create_subdirectories(args["p"], args["kpoints"], args["incar"])
-    filename = args["p"]*"run_nscf.sh"
-    write_run_script(args["exe"], args["p"], cb="ln scf/CHGCAR nscf/CHGCAR", out=filename)
+    filename = joinpath(args["p"], "run_nscf.sh")
+    cb = get_exclude_callback(args["exclude"])
+    if length(cb) > 0; cb *= "\n"; end
+    cb *= "if [[ \"\$folder\" == \"scf\" ]]; then\n      ln CHGCAR ../nscf/CHGCAR\n    fi"
+    write_run_script(args["exe"], "./", cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
     return nothing
 end
