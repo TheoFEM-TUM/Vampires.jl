@@ -41,6 +41,12 @@ kpoints
 ```
 
 ```
+
+lammps:
+    read: read the atomic configurations from the LAMMPS dump output file.
+```
+
+```
 supercell
     make: create a supercell POSCAR file from an existing POSCAR file
     sample: create folders that each contains one snapshot from an XDATCAR file and other VASP input files
