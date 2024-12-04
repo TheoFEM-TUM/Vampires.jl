@@ -34,7 +34,7 @@ include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
 include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/lammps_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl"); include("tasks/plot_task.jl")
-include("tasks/file_task.jl")
+include("tasks/file_task.jl"); include("tasks/tasks_macro.jl")
 
 include("cli_interface.jl")
 
