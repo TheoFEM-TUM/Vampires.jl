@@ -6,7 +6,8 @@ lmp_elem = read_lammps(test_file_path*"position_elem.lammpstrj")
     @test lmp_elem.a == 1
     @test lmp_elem.atom_numbers == [15, 4, 4, 5, 24]
     @test lmp_elem.atom_names == ["I", "C", "N", "Pb", "H"]
-    @test lmp_elem.atom_types == ["Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I"]
+    #@test lmp_elem.atom_types == ["Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I", "H", "H", "H", "N", "C", "H", "H", "H", "Pb", "I", "I", "I"]
+    @test lmp_elem.atom_types == [split_line(repeat("Pb I I I H H H N C H H H ", 4)); "Pb"; "I"; "I"; "I"]
 end
 
 lmp_type = read_lammps(test_file_path*"position_type.lammpstrj")
@@ -17,5 +18,6 @@ lmp_type = read_lammps(test_file_path*"position_type.lammpstrj")
     @test lmp_type.a == 1
     @test lmp_type.atom_numbers == [8, 8, 24, 24, 6, 18, 8]
     @test lmp_type.atom_names == ["atom4", "atom7", "atom5", "atom6", "atom9", "atom8", "atom2"]
-    @test lmp_type.atom_types == ["atom9", "atom9", "atom9", "atom9", "atom9", "atom9", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom7", "atom7", "atom7", "atom7", "atom7", "atom7", "atom7", "atom7", "atom2", "atom2", "atom2", "atom2", "atom2", "atom2", "atom2", "atom2", "atom4", "atom4", "atom4", "atom4", "atom4", "atom4", "atom4", "atom4", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5"]
+    #@test lmp_type.atom_types == ["atom9", "atom9", "atom9", "atom9", "atom9", "atom9", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom8", "atom7", "atom7", "atom7", "atom7", "atom7", "atom7", "atom7", "atom7", "atom2", "atom2", "atom2", "atom2", "atom2", "atom2", "atom2", "atom2", "atom4", "atom4", "atom4", "atom4", "atom4", "atom4", "atom4", "atom4", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom6", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5", "atom5"]
+    @test lmp_type.atom_types == [split_line(repeat("atom9 ", 6)); split_line(repeat("atom8 ", 18)); split_line(repeat("atom7 ", 8)); split_line(repeat("atom2 ", 8)); split_line(repeat("atom4 ", 8)); split_line(repeat("atom6 ", 24)); split_line(repeat("atom5 ", 24))]
 end

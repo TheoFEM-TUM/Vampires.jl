@@ -154,7 +154,8 @@ function get_default_args()
         "nodes" => "1",
         "mail" => "",
         "module_list" => "",
-        "module_paths" => ""
+        "module_paths" => "",
+        "npt" => false
     )
     read_settings!(args_dict)
     return args_dict
@@ -212,7 +213,8 @@ function get_arg_description()
             "xdata" => "specifies the xdata for a plot",
             "ydata" => "specifies the ydata for a plot",
             "xlabel" => "specifies the label of the x axis",
-            "ylabel" => "specifies the label of the y axis"
+            "ylabel" => "specifies the label of the y axis",
+            "npt" => "specifies if MD input is an NPT ensemble"
         )
     )
     return arg_descriptions
