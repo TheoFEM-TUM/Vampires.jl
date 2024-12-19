@@ -155,7 +155,8 @@ function get_default_args()
         "mail" => "",
         "module_list" => "",
         "module_paths" => "",
-        "npt" => false
+        "npt" => false,
+        "lammps" => ""
     )
     read_settings!(args_dict)
     return args_dict
@@ -214,7 +215,8 @@ function get_arg_description()
             "ydata" => "specifies the ydata for a plot",
             "xlabel" => "specifies the label of the x axis",
             "ylabel" => "specifies the label of the y axis",
-            "npt" => "specifies if MD input is an NPT ensemble"
+            "npt" => "specifies if MD input is an NPT ensemble",
+            "lammps" => "set name of LAMMPS file"
         )
     )
     return arg_descriptions
