@@ -111,3 +111,27 @@ function write_structure_file_header(iostream, structure::Structure; system_name
     end
     println(iostream, "")
 end
+
+"""
+    adjust_pos_PBC!(positions::Array{Float64})
+
+Adjust atomic positions so that atom position are not shifted with respect to periodic boundary conditions between two snapshots
+
+# Arguments
+- 'positions::Array{Float64}': 3xNionxNconfig Array of atomic position (Nion = number of atoms, Nconfig=number of MD snapshots)
+"""
+function adjust_pos_PBC!(positions)
+    for t in 2:size(positions, 3)  
+        # Calculate difference in between positions between two snapshot
+        dX = positions[:, :, t] - positions[:, :, t - 1]
+        for i in 1:size(positions, 1)
+            for j in 1:size(positions, 2)
+                if dX[i, j] > 0.5
+                    positions[i, j, t] -= 1
+                elseif dX[i, j] < -0.5
+                    positions[i, j, t] += 1
+                end
+            end
+        end
+    end
+end

@@ -11,6 +11,7 @@ include("io/test_read_utils.jl")
     include("io/input/test_doscar.jl")
     include("io/input/test_poscar.jl")
     include("io/input/test_xdatcar.jl")
+    include("io/input/test_lammps.jl")
     include("io/input/test_outcar.jl")
     include("io/plotting/test_colors.jl")
 end
