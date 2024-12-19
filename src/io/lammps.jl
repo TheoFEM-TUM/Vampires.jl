@@ -112,7 +112,7 @@ function read_lammps(lammps_filename, npt=false)
                         push!(atom_types, "unknown")
                     end
                 end
-                positions[:, i, j] = parse.(Float64, line[index_pos : index_pos + 2])
+                positions[:, i - i_start, j] = parse.(Float64, line[index_pos : index_pos + 2])
             end
         end
     end
