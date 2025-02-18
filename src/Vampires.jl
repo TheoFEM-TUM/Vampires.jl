@@ -8,7 +8,7 @@ include("io/read_utils.jl")
 
 # input
 include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
-include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
+include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_blocks.jl"); include("io/incar/incar_tags.jl")
 include("io/outcar.jl"); include("io/settings.jl"); include("io/output/error_reduce_funcs.jl")
 include("io/w90_hr.jl")
 
@@ -51,7 +51,7 @@ export read_hrdat
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy, get_effective_mass
 export compute_msd, compute_velocities
-export compute_autocorr, compute_spectral_density
+export compute_autocorr, compute_spectral_density, lorentzian_broadening
 export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell
 export compute_dos, convert_kspacing_to_kgrid, compute_vdos
 

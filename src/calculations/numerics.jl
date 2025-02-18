@@ -57,6 +57,12 @@ function compute_full_autocorrelation(x::AbstractArray{T, 1}) where T <: Number
     return result
 end
 
+function compute_full_autocorrelation(x::AbstractArray{T, 3}, weights::AbstractArray{<:Number}=[]) where T <: Number
+    weights = size(weights) == 0 ? ones(size(x, 2)) : weights
+    t = hcat([weights[j] .* compute_full_autocorrelation(x[i, j, :]) for i in axes(x, 1), j in axes(x, 2)]...)
+    return reshape(t, :, size(x, 2), 3)
+end
+
 """
     _get_finite_difference_coef(N)
 
@@ -86,4 +92,33 @@ function _get_finite_difference_coef(N, )
     else
         error("Finite difference method for order $N is not implemented.")
     end
+end
+
+"""
+    lorentzian_broadening(x, y, γ=-1)
+
+Applies Lorentzian broadening to the input data `(x, y)` using a specified broadening parameter `γ`. This function convolves the input data with a Lorentzian function to broaden the data, often used in spectroscopy or signal processing.
+
+# Arguments
+- `x::Vector{Float64}`: The input x-values (e.g., the data points or the spectral axis).
+- `y::Vector{Float64}`: The input y-values corresponding to `x` (e.g., intensity or amplitude data).
+- `γ::Float64`: The full-width at half-maximum (FWHM) of the Lorentzian function. If not specified (`γ = -1`), it is set to the difference between consecutive `x` values.
+
+# Returns
+- `Tuple{Vector{Float64}, Vector{Float64}}`: A tuple containing:
+  - `x_out::Vector{Float64}`: The new x-values after broadening, ranging from 0 to the maximum of `x`, with spacing determined by `γ`.
+  - `y_out::Vector{Float64}`: The y-values after applying Lorentzian broadening to the input data.
+"""
+function lorentzian_broadening(x, y, γ=-1)
+    if γ == -1
+        γ = x[2] - x[1]
+    end
+    x_out = collect(0:γ:maximum(x))
+    y_out = zeros(length(x_out))
+
+    for i in eachindex(x)
+        u = (π * ((-x_out .+ x[i]).^2 .+ γ^2))
+        y_out += y[i] * γ ./ u
+    end
+    return (x_out, y_out)
 end

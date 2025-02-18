@@ -26,19 +26,20 @@ function compute_vdos(v::AbstractArray{Float64}, timestep::T ; method::String="f
         end
     end
     if method == "full"
-        # TODO: restructure code + dispatch depending on input shape
-        vac_ijn = hcat([masses[j] .* compute_full_autocorrelation(v[i, j, :]) for i in axes(v, 1), j in axes(v, 2)]...)
-        vac_in = sum(vac_ijn, dims=2)  # ensemble average
+        # calculate multidimensional autocorrelation -> returns 3xNionx(2*Nsteps-1)
+        vac_ijn = compute_full_autocorrelation(v, masses)
+        # calculate ensemble average over (x, y, z) and (atoms...)
+        vac_in = reduce(vcat, sum(vac_ijn, dims=(2, 3)))  # ensemble average
         vac_norm = vac_in ./ sum(reshape(hcat([masses[j] .* v[:, j, :].^2 for j in axes(v, 2)]...), size(v)...))  # normalization
         ω = uconvert.(u"cm^-1", rfftfreq(size(vac_norm, 1), 1/(ustrip(timestep)*u"fs")) ./ c_0)
         S = compute_spectral_density(vac_norm)
         S /= maximum(S)
         return ω, S
     elseif method == "zero_padding"
-        throw("Method $method not implemented")
+        error("Method $method not implemented")
     elseif method == "shrinking_window"
-        throw("Method $method not implemented")
+        error("Method $method not implemented")
     else
-        throw("Method $method not implemented")
+        error("Method $method not implemented")
     end
 end

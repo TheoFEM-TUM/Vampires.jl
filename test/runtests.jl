@@ -1,4 +1,4 @@
-using Vampires, Test, LinearAlgebra, HDF5, Plots
+using Vampires, Test, LinearAlgebra, HDF5, Plots, Unitful
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
