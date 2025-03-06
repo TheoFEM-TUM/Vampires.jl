@@ -61,7 +61,7 @@ function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
 
     if param == "eigenvalues"
         kp, Es, occs = read_eigenvalues_from_outcar(input_file)
-        return (kpoints = kp, eigenvalues => Es, occupations = occs)
+        return (kpoints = kp, eigenvalues = Es, occupations = occs)
     elseif param == "forces"
         positions, forces = read_forces_from_outcar(input_file)
         return (positions = positions, forces = forces)
