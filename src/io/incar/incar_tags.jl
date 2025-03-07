@@ -96,7 +96,10 @@ const INCAR_COMMENTS = Dict{String, String}(
     "LWRITE_UNK" => "decides whether the cell-periodic part of the relevant Bloch functions is written",
     "LWRITE_MMN_AMN" => "write the wannier90.mmn and wannier90.amn files",
     "LWRITE_SPN" => "Write wannier90.spn file for noncollinear calculations",
-    "WANNIER90_WIN" => "sets the content of the wannier90.win file"
+    "WANNIER90_WIN" => "sets the content of the wannier90.win file",
+    "MDALGO" => "specifies the molecular-dynamics-simulation protocol",
+    "ISYM" => "determines the way VASP treats symmetry",
+    "IVDW" => "specifies a vdW dispersion term of the atom-pairwise or many-body type"
 )
 
 const VASP_DEFAULTS = Dict{String, String}(
@@ -141,7 +144,10 @@ const VASP_DEFAULTS = Dict{String, String}(
     "LWRITE_UNK" => "False",
     "LWRITE_MMN_AMN" => "True",
     "LWRITE_SPN" => "False",
-    "WANNIER90_WIN" => "\"\""
+    "WANNIER90_WIN" => "\"\"",
+    "MDALGO" => "0",
+    "ISYM" => "2",
+    "IVDW" => "0"
 )
 
 const WANNIER90_COMMENTS = Dict{String, String}(
