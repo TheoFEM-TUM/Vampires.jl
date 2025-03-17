@@ -54,3 +54,4 @@ function compute_velocities(x::Array{Float64, 3}, timestep::T, cell::Matrix{Floa
     # calculate and return velocity
     return ustrip.(uconvert.(u"m/ps", (dr_pbc) ./ (timestep*u"fs")))  # convert Å / fs -> m / ps and return raw values
 end
+

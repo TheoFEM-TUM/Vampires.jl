@@ -199,9 +199,9 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
     current_hostname = readchomp(`hostname`)
 
     if hostname == "none" || occursin(hostname, current_hostname)
-        run(`squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.9S\"`)
+        run(`squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.16S\"`)
     else
-        run(`ssh $hostname "squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.9S\""`)
+        run(`ssh $hostname "squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.16S\""`)
     end
     return nothing
 end

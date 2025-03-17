@@ -121,6 +121,9 @@ const INCAR_COMMENTS = Dict{String, String}(
     "BSEELECTRON" => "sets the coordinates of the fixed electron of the exciton wavefunction.",
     "BSEHOLE" => "sets the coordinates of the fixed hole of the exciton wavefunction.",
     "BSEPREC" => "determines the precision of the time-evolution algorithm for solving the Bethe-Salpeter or Casida equations, i.e., the timestep and the number of steps.",
+    "MDALGO" => "specifies the molecular-dynamics-simulation protocol",
+    "ISYM" => "determines the way VASP treats symmetry",
+    "IVDW" => "specifies a vdW dispersion term of the atom-pairwise or many-body type"
 )
 
 const VASP_DEFAULTS = Dict{String, String}(
@@ -190,6 +193,9 @@ const VASP_DEFAULTS = Dict{String, String}(
     "BSEELECTRON" => "0 0 0",
     "BSEHOLE" => "0 0 0",
     "BSEPREC" => "\"Normal\"",
+    "MDALGO" => "0",
+    "ISYM" => "2",
+    "IVDW" => "0"
 )
 
 const WANNIER90_COMMENTS = Dict{String, String}(

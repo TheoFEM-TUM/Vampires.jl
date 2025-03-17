@@ -7,8 +7,8 @@ import Documenter: @doc
 include("io/read_utils.jl")
 
 # input
-include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl")
-include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_blocks.jl"); include("io/incar/incar_tags.jl")
+include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl"); include("io/lammps.jl")
+include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
 include("io/outcar.jl"); include("io/settings.jl"); include("io/output/error_reduce_funcs.jl")
 include("io/w90_hr.jl")
 
@@ -33,13 +33,13 @@ include("tasks/recursive.jl")
 include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("tasks/poscar_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
-include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl"); include("tasks/plot_task.jl")
+include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/lammps_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl"); include("tasks/plot_task.jl")
 include("tasks/file_task.jl"); include("tasks/tasks_macro.jl")
 
 include("cli_interface.jl")
 
 export Structure
-export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt
+export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt, read_lammps
 export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
 export add_incar_block!, rm_incar_block!
 export read_value_from_outcar
