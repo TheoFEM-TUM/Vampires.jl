@@ -9,7 +9,7 @@ Compute the vibrational density of states (VDOS) from velocity data.
 - `method::String="full"` (optional): The method to compute VDOS. Currently, only `"full"` is supported.
   - `"full"`: Computes the VDOS using the full velocity autocorrelation function (VACF).
   - Other methods such as `"zero_padding"` and `"shrinking_window"` are defined but not implemented.
-- `atom_names::Array{String}=[]` (optional): An array of strings specifying the names of atoms corresponding to the velocity data. Used to assign atomic masses for normalization. If empty, masses are not considered in the computation.
+- `atom_names::Array{String}=[]` (optional): same length as size(v, 1); An array of strings specifying the names of atoms corresponding to the velocity data. Used to assign atomic masses for normalization. If empty, masses are not considered in the computation.
 
 # Returns
 - `(ω, S)::Tuple{Vector{Float64}, Vector{Float64}}`: A tuple containing:
@@ -24,6 +24,9 @@ function compute_vdos(v::AbstractArray{Float64}, timestep::T ; method::String="f
         @inbounds for (i, s) in enumerate(atom_names)
             masses[i] = elements[Symbol(s)].atomic_mass
         end
+    else
+        println("Atom species not specified. Calculating VDOS without mass weighting.")
+        masses = ones(size(v, 1))
     end
     if method == "full"
         # calculate multidimensional autocorrelation -> returns 3xNionx(2*Nsteps-1)

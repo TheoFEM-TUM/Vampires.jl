@@ -40,4 +40,5 @@ end
 
 @testset "xdos" begin
     include("xdos/test_dos.jl")
+    include("xdos/test_vdos.jl")
 end

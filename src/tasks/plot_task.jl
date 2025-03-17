@@ -64,7 +64,7 @@ function run_task_recursive(task, ::Type{Val{:plot}}, args)
     out = reduce_output(out, Val{Symbol(strip(args["reduce"], '.'))}, broadcasted)
     xdata, ydata, xlabel, ylabel = get_plotting_data(out, args)
     fig = make_plot(xdata, ydata, title=args["title"], xlabel=xlabel, ylabel=ylabel)
-    
+
     output_plot(fig, output_filename)
     return nothing
 end
