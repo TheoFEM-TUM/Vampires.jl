@@ -24,7 +24,6 @@
         atom_names = String["H"]  # Single atom (Hydrogen)
 
         # Expected results
-        expected_ω = [0.0, 3333.333333, 6666.666667, 10000.0]  # Known frequencies in cm^-1
         expected_ω = [0.0, 4765.201360, 9530.40272, 14295.60408]
         expected_S = [0.0, 1.0, 0.011827, 0.017728]                      # Mock normalized spectral density
 
