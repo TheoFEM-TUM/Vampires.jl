@@ -46,11 +46,12 @@ Input is assumed in units of Å (`x`) and fs (`timestep`). Output is in units of
 """
 function compute_velocities(x::Array{Float64, 3}, timestep::T, cell::Matrix{Float64}) where T <: Number
     cellsize = norm.(eachcol(cell))*u"Å"
-    adjust_pos_PBC!(x)
     # scale positions
     x_scaled = frac_to_cart(x, cell)*u"Å"
     dr = diff(x_scaled, dims=3)
+    dr_pbc = ifelse.(dr .> reshape(cellsize ./ 2, :, 1, 1), dr .- reshape(cellsize, :, 1, 1),
+                 ifelse.(dr .< reshape(-cellsize ./ 2, :, 1, 1), dr .+ reshape(cellsize, :, 1, 1), dr))
     # calculate and return velocity
-    return ustrip(uconvert.(u"m/ps", (dr) ./ (timestep*u"fs")))  # convert Å / fs -> m / ps and return raw values
+    return ustrip.(uconvert.(u"m/ps", (dr_pbc) ./ (timestep*u"fs")))  # convert Å / fs -> m / ps and return raw values
 end
 

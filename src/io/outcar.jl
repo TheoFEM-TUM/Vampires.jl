@@ -77,7 +77,7 @@ function read_eigenvalues_from_outcar(file; line_jump=6)
         if "E-fermi" ∉ lines[l]
             l += 1
         else
-            found_config = true 
+            found_config = true
             Es_config = Vector{Float64}[]
             occs_config = Vector{Float64}[]
             # jump `line_jump` lines ahead to the first energy eigenvalue

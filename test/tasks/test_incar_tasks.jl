@@ -4,7 +4,7 @@
         args["par"] = "ENCUT,ISMEAR,EDIFF"
         args["val"] = "250,0,1e-5"
         run_task(Val{Symbol("incar")}, Val{Symbol("make")}, args)
-        
+
         # Test 1: Test INCAR generation
         out = run_task(Val{Symbol("incar")}, Val{Symbol("read")}, args)
         @test string.(keys(out)) == ("ENCUT", "ISMEAR", "EDIFF")

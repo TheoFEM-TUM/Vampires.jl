@@ -1,4 +1,4 @@
-using Vampires, Test, LinearAlgebra, HDF5, Plots
+using Vampires, Test, LinearAlgebra, HDF5, Plots, Unitful
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
@@ -37,8 +37,10 @@ end
     include("calculations/test_kspace.jl")
     include("calculations/test_hamiltonian.jl")
     include("calculations/test_dynamics.jl")
+    include("calculations/test_numerics.jl")
 end
 
 @testset "xdos" begin
     include("xdos/test_dos.jl")
+    include("xdos/test_vdos.jl")
 end
