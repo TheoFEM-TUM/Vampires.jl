@@ -221,7 +221,7 @@ vamp -r incar rm --par EDIFF
 * `vamp rmincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:rm}}, args)
-    if length(args["par"]) > 0 
+    if length(args["par"]) > 0
         remove_key_from_incar(args["par"], joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]))
     elseif length(args["block"]) > 0
         remove_block_from_incar(args["block"], joinpath(args["p"], args["incar"]))

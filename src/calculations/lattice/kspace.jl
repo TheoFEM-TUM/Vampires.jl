@@ -18,7 +18,7 @@ end
 """
     find_kpoint(kpoint, kpoints)
 
-Find the index of the first occurrence of a given k-point in an array of k-points and adjust the index 
+Find the index of the first occurrence of a given k-point in an array of k-points and adjust the index
 to point to the last of any consecutive duplicate k-points (as this sometimes happens for VASP bandstructures).
 
 # Arguments
