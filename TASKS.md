@@ -75,6 +75,12 @@ outcar
 ```
 
 ```
+plot
+    bandstructure: plots the bandstructure
+    dos: plots the density of states
+```
+
+```
 poscar
     read: read the POSCAR file
 ```
@@ -99,13 +105,6 @@ job
 ```
 
 ```
-settings
-    set: set a new setting in the settings file
-    rm: remove a setting from the settings file
-    read: read a setting from the settings file
-```
-
-```
 strong_scaling
     cpu: create a folder structure with slurm files to analyze CPU scaling in VASP
         example: `strong_scaling cpu --N 1 --ncore 24,24,24,24 --kpar 1,2,3,4 --p ./ --ext_par_file ./extended_parameter_file --block batch_file_cpu`
@@ -126,6 +125,13 @@ slurm_script
     prepare: creates a slurm submission script based on the extemded configuration file
     parallelization parameters are set to the default - individual tuning necessary
     #TODO: make this dependent on NCORE and KPAR and find best slurm configuration
+```
+
+```
+settings
+    set: set a new setting in the settings file
+    rm: remove a setting from the settings file
+    read: read a setting from the settings file
 ```
 
 ```
