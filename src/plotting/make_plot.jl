@@ -1,14 +1,14 @@
 """
     make_plot(xdata, ydata; title="", xlabel="", ylabel="")
 
-Creates a plot using the provided `xdata` and `ydata` arrays. 
+Creates a plot using the provided `xdata` and `ydata` arrays.
 
 If `xdata` is non-empty, it is used as the x-axis data. If `xdata` is empty, `ydata` will be plotted as a function of its index.
 
 # Arguments
 - `xdata` : Array of x-axis data points. If empty, `ydata` is plotted against its index.
 - `ydata` : Array of y-axis data points.
-  
+
 # Keyword Arguments
 - `title` : Title of the plot. Default is an empty string (`""`).
 - `xlabel` : Label for the x-axis. Default is an empty string (`""`).
@@ -53,7 +53,7 @@ Returns a set of colors based on the input `y`.
 
 # Arguments
 - `y::AbstractMatrix`: A matrix or multidimensional array, where each column is treated as a separate series.
-  
+
 # Returns
 - A `Matrix` of colors (for matrix input) or a single color (for non-matrix input).
 """
@@ -75,7 +75,7 @@ The function identifies `x` and `y` data for plotting based on keys in the `out`
 
 # Arguments
 - `out::Dict`: A dictionary where the keys represent data names, and the values are the corresponding data to be plotted. The function checks for keys matching `xdata` and `ydata` specified in `args` to assign the data to `xdata` and `ydata` arrays, respectively.
-  
+
 - `args::Dict`: A dictionary of parameters that control the data extraction and labeling:
   - `"xdata"`: A string representing the key for `x` data in `out` (default: `""`).
   - `"ydata"`: A string representing the key for `y` data in `out` (default: `""`).
@@ -142,7 +142,7 @@ end
 """
     check_transpose_for_plotting(A::AbstractMatrix)
 
-Ensures that a matrix `A` is oriented appropriately for plotting purposes. 
+Ensures that a matrix `A` is oriented appropriately for plotting purposes.
 
 If the number of rows in `A` is less than the number of columns, the matrix is transposed to make it taller rather than wider. Otherwise, the matrix is returned unchanged.
 
@@ -153,7 +153,7 @@ If the number of rows in `A` is less than the number of columns, the matrix is t
 - `AbstractMatrix`: The transposed matrix if `size(A, 1) < size(A, 2)`, otherwise the original matrix.
 """
 function check_transpose_for_plotting(A::AbstractMatrix)
-    if size(A, 1) < size(A, 2) 
+    if size(A, 1) < size(A, 2)
         return transpose(A)
     else
         return A

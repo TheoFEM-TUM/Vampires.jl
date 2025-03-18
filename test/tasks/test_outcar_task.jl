@@ -2,7 +2,7 @@
     args = Vampires.parse_commandline(ARGS)
     args["p"] = joinpath(@__DIR__, "test_files/")
     args["outcar"] = "OUTCAR_gaas"
-    
+
     # Test 1: test to read bandgap from OUTCAR
     args["par"] = "bandgap"
     out = run_task(Val{Symbol("outcar")}, Val{Symbol("read")}, args)
@@ -16,10 +16,10 @@
     # Test 2: test to read TOTEN from OUTCAR
     args["par"] = "free energy"
     args["o"] = "toten.h5"
-    
-    out = run_task(Val{Symbol("outcar")}, Val{Symbol("read")}, args) 
+
+    out = run_task(Val{Symbol("outcar")}, Val{Symbol("read")}, args)
     @test out.var"free energy" == [3.61103872, -8.30542697, -8.42796620, -8.42817101, -8.42817102, -8.28555592, -8.25135154, -8.25102197, -8.25125818, -8.25135131, -8.25135668]
-    
+
     args["reduce"] = "last"
     Vampires.task_output(out, args)
     @test h5read("toten.h5", "last_free energy") == -8.25135668

@@ -28,7 +28,7 @@ Prepare directories and create a script for non-self-consistent field (NSCF) cal
 # Behavior
 - The function creates subdirectories for NSCF calculations and copies necessary files.
 - The first k-point file is copied to `scf` and the second one to `nscf`.
-- Changes the tags `ICHARG=11` and `LCHARG=False` in the NSCF INCAR file. 
+- Changes the tags `ICHARG=11` and `LCHARG=False` in the NSCF INCAR file.
 - It generates a shell script (`run_nscf.sh`) to execute both calculations sequentially, including linking the charge density from the SCF run.
 - The script is created with the specified VASP executable and a command to link the `CHGCAR` file from the SCF directory to the NSCF directory.
 
