@@ -5,10 +5,10 @@ A mutable struct representing the input parameters for VASP and Wannier90 calcul
 
 # Fields
 
-- `vasp::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing VASP input parameters. 
+- `vasp::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing VASP input parameters.
 The keys are category names (strings), and the values are ordered dictionaries of parameters within each category.
 
-- `w90::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing Wannier90 input parameters. 
+- `w90::OrderedDict{String, OrderedDict{String, IncarValue}}`: An ordered dictionary containing Wannier90 input parameters.
 The keys are category names (strings), and the values are ordered dictionaries of parameters within each category.
 """
 mutable struct Incar{S1,S2,S3,S4<:AbstractString, IV1,IV2<:IncarValue}
@@ -30,6 +30,7 @@ Set a key-value pair in the specified block of an `Incar` object, either in the 
 """
 function set_key!(incar::Incar, key::AbstractString, incar_value::IncarValue, block_label::AbstractString, isW90::Bool)
     key_dict = isW90 ? incar.w90 : incar.vasp
+    block_label = occursin("proj", key) ? "Projections" : block_label
     if haskey(key_dict, block_label)
         key_dict[block_label][key] = incar_value
     else
@@ -69,17 +70,17 @@ function read_incar(file::AbstractString)
             block_label = get_block_label(line)
         elseif iscomment(line)
             @warn "Ignoring comment"
-        elseif occursin('=', line)
+        elseif occursin('=', line) || (isprojection && occursin(':', line))
             key, value, comment = isprojection ? read_incar_line(line, [':', '!', '#']) : read_incar_line(line)
             comment = comment == "" ? get_comment(key) : comment
             key = isprojection ? "proj"*key : key
             if key ≠ "WANNIER90_WIN"
                 set_key!(incar, key, value, comment=comment, block_label=block_label, isW90=isW90, verbose=false)
-            elseif isW90 && occursin('\"', line)
-                isW90 = false
-            else
+            elseif key == "WANNIER90_WIN"
                 isW90 = true
             end
+        elseif isW90 && occursin('\"', line)
+            isW90 = false
         end
     end
     return incar
@@ -152,7 +153,7 @@ end
 """
     find_value_and_comment(incar::Incar, key::String)
 
-Retrieves the value associated with a specified key from an `Incar` object, which may contain different formats for `w90` or `vasp`. 
+Retrieves the value associated with a specified key from an `Incar` object, which may contain different formats for `w90` or `vasp`.
 If the key is not found, an error is thrown.
 
 # Arguments
@@ -180,7 +181,7 @@ find_comment(incar::Incar, key) = find_value_and_comment(incar, key).comment
 """
     set_key!(incar::Incar, key, value; comment=get_comment(key), block_label="", verbose=true, isW90=false)
 
-Sets the value associated with a given key in the `Incar` object. This function handles both VASP and Wannier90 input data structures 
+Sets the value associated with a given key in the `Incar` object. This function handles both VASP and Wannier90 input data structures
 and updates the relevant section based on the key.
 
 # Arguments
@@ -193,7 +194,14 @@ and updates the relevant section based on the key.
 - `isW90::Bool`: Optional. If `true`, the function assumes the key belongs to Wannier90 input. If `false`, it infers the type based on the key.
 """
 function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comment=get_comment(key), block_label="", verbose=true, isW90=false)
-    if isW90 == false; isW90 = iswannier90key(key) ? true : false; end
+    if isW90 == false
+        isW90 = iswannier90key(key) ? true : false
+    end
+    
+    # Add Wannier90 block if Wannier90 key is added
+    if isW90 && !haskey(incar.vasp, "Wannier90") 
+        incar.vasp["Wannier90"] = OrderedDict{String, IncarValue}()
+    end
 
     if haskey(incar, key)
         old_comment = find_comment(incar, key)
@@ -205,6 +213,13 @@ function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comm
     end
 
     set_key!(incar, key, IncarValue(value, comment), block_label, isW90)
+    
+    # num_wann should be set as a VASP and a W90 keyword
+    if key == "num_wann"
+        set_key!(incar, "NUM_WANN", IncarValue(value, comment), "Wannier90", false)
+    elseif key == "NUM_WANN"
+        set_key!(incar, "num_wann", IncarValue(value, comment), get_block_label_for_keyword("num_wann"), true)
+    end
 
     if verbose
         print("Changed line: ")
@@ -248,28 +263,29 @@ function write_incar(incar::Incar, filename="INCAR")
         for (key, incar_value) in block_lines
             write_line(key, incar_value, file)
         end
-        if block_label == "Wannier90"
+        if block_label == "Wannier90" && length(incar.w90) > 0
             isprojection = false
             println(file, " WANNIER90_WIN = \"")
             for (w90_label, w90_lines) in incar.w90
                 println(file, "  !"*w90_label)
                 for (w90_key, w90_value) in w90_lines
                     if occursin("proj", w90_key) && isprojection == false
-                        println(file, "  begin projection")
+                        println(file, "   begin projections")
                         isprojection = true
                     elseif !occursin("proj", w90_key) && isprojection == true
-                        println(file, "  end")
+                        println(file, "   end projections")
                         isprojection = false
                     end
                     w90_key = isprojection ? string(w90_key[5:end]) : w90_key
                     write_line(w90_key, w90_value, file, isW90=true, isprojection=isprojection)
                 end
+                if isprojection
+                    println(file, "   end projections")
+                    isprojection = false
+                end
                 if w90_label ≠ collect(keys(incar.w90))[end]; println(file, ""); end
             end
-            if isprojection
-                println(file, "  end")
-                isprojection = false
-            end
+            
             println(file, " \"")
         end
         if block_label ≠ collect(keys(incar.vasp))[end]; println(file, ""); end

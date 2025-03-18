@@ -1,8 +1,8 @@
 params = ["ENCUT", "LOOP+", "TOTEN"]
-values = [250, 0.8263, -8.25135668]
+vals = [250, 0.8263, -8.25135668]
 
 @testset "OUTCAR params" begin
-    for (param, value) in zip(params, values)
+    for (param, value) in zip(params, vals)
         @test read_value_from_outcar(param, test_file_path*"OUTCAR_gaas")[end] == value
     end
     @test read_value_from_outcar("LOOP+", test_file_path*"OUTCAR_gaas", line_mode="last")[end] == 0.9085

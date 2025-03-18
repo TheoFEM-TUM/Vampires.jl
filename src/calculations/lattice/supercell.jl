@@ -18,7 +18,7 @@ accordingly.
   updated atomic positions (in fractional coordinates), and atomic types.
 """
 function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
-    Nion = size(poscar.rs_atom, 2)
+    Nion = size(poscar.positions, 2)
     Nion_sc = Nion*prod(Ns)
 
     Rs_sc = zeros(3, Nion_sc)
@@ -35,7 +35,7 @@ function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     for n1 in 1:Ns[1], n2 in 1:Ns[2], n3 in 1:Ns[3]
         ΔR⃗ = [n1, n2, n3] .- 1
         for i in 1:Nion
-            Rs_sc[:, k] = transform_basis(poscar.rs_atom[:, i] .+ ΔR⃗, diagm(1 ./ Ns))
+            Rs_sc[:, k] = transform_basis(poscar.positions[:, i] .+ ΔR⃗, diagm(1 ./ Ns))
             sc_ion_types[k] = poscar.atom_types[i]
             k += 1
         end
@@ -48,7 +48,7 @@ function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     Rs_sc = round.(Rs_sc[:, inds], digits=digits)
     unique_ion_types = unique(sc_ion_types)
     ion_numbers = [count(t->t==type, sc_ion_types) for type in unique_ion_types]
-    return Poscar(1., sc_lattice, unique_ion_types, ion_numbers, Rs_sc, sc_ion_types)
+    return Structure(1., sc_lattice, unique_ion_types, ion_numbers, Rs_sc, sc_ion_types)
 end
 
 transform_primitive_cell(poscar, N::Int64) = transform_primitive_cell(poscar, [N, N, N])

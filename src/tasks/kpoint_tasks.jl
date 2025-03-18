@@ -8,7 +8,7 @@ kpoints
 
 
 """
-# CLI Commands to work with the INCAR file
+# CLI Commands to work with the KPOINTS file
 The following command can be used to work with the KPOINTS file.
 
 Available commands:
@@ -48,9 +48,10 @@ function run_task(::Type{Val{:kpoints}}, ::Type{Val{:make}}, args)
     gamma_centered = lowercase(args["method"]) == 'm' ? false : true
     if args["par"] == "KSPACING"
         kspacing = parse(Float64, args["val"])
-        write_kpoints(kspacing, args["p"]*args["poscar"], out=args["p"]*out, gamma_centered=gamma_centered)
+        write_kpoints(kspacing, joinpath(args["p"], args["poscar"]), out=joinpath(args["p"], out), gamma_centered=gamma_centered)
     else
         Ns = parse.(Int64, split_line(args["N"], char=','))
-        write_kpoints(Ns, out=args["p"]*out, gamma_centered=gamma_centered)
+        write_kpoints(Ns, out=joinpath(args["p"], out), gamma_centered=gamma_centered)
     end
+    return nothing
 end

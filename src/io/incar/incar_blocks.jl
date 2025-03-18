@@ -48,7 +48,7 @@ Remove a block of settings from an INCAR object.
 function rm_incar_block!(incar::Incar, block_label::String)
     isVASP, isW90 = hasblock(incar, block_label)
     if isVASP
-        delete!(incar.vasp, block_label)     
+        delete!(incar.vasp, block_label)
     elseif isW90
         delete!(incar.w90, block_label)
     else

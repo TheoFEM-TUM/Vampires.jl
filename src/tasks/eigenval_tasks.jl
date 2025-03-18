@@ -43,28 +43,29 @@ vamp eigenval read -r --eigenval EIGENVAL_custom --o eigenval.h5
 
 # Example 3: Read the bandgap from the EIGENVAL file.
 vamp eigenval read --par bandgap
+
+# Example 4: Read the effective mass at the Gamma point from the EIGENVAL
+by fitting a parabola through four points
+vamp eigenval read --par effective_mass --kpoints 0,0,0 --N 4 --method parabola
+```
 """
 function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
-    input_filename = args["p"] * args["eigenval"]
-    output_filename = args["o"]
+    input_filename = joinpath(args["p"], args["eigenval"])
     kp, Es, occs = read_eigenval(input_filename)
     if args["par"] == "bandgap"
         ΔE = get_bandgap(Es, occs, printit=args["v"])
-        if occursin("h5", output_filename)
-            write_data_to_hdf5(output_filename, ["bandgap"], [ΔE])
-        else
-            if !args["r"]; println("The bandgap is: $ΔE eV."); end
-            return ΔE
-        end
-    elseif occursin("h5", output_filename)
-        write_data_to_hdf5(output_filename, ["kpoints", "eigenvalues", "occupations"], [kp, Es, occs])
+        return (bandgap = ΔE,)
+    elseif args["par"] == "effective_mass"
+        N, k_ind, lattice = parse_effective_mass_parameters(args, kp)
+        meffs = get_effective_mass(kp[:, k_ind:k_ind+N], E[:, k_ind:k_ind+N], lattice, method=args["method"])
+        return (effective_mass = meffs,)
     else
-        throw("Unknown output file format.")
+        return (kpoints = kp, eigenvalues = Es, occupations = occs)
     end
 end
 
 """
-    vamp eigenval plot [--p <path>] [--eigenval <file>] [--o <output_filename>]
+    vamp bands plot [--p <path>] [--eigenval <file>] [--o <output_filename>]
 
 Reads the eigenvalues from an EIGENVAL file and generates a plot of the electronic bandstructure.
 
@@ -80,9 +81,10 @@ Reads the eigenvalues from an EIGENVAL file and generates a plot of the electron
 # Examples
 ```bash
 # Example 1: Plot band structure from an EIGENVAL file and save to an image file.
-vamp eigenval plot --p /path/to/files --eigenval EIGENVAL --o bandstructure.png
+vamp bands plot --p /path/to/files --eigenval EIGENVAL --o bandstructure.png
+```
 """
-function run_task(::Type{Val{:eigenval}}, ::Type{Val{:plot}}, args)
+function run_task(::Type{Val{:bands}}, ::Type{Val{:plot}}, args)
     output_filename = args["o"]
     input_filename = args["p"] * args["eigenval"]
     kp, Es, _ = read_eigenval(input_filename)

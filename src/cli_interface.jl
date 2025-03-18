@@ -52,19 +52,35 @@ function main(cli_args)
         if args["p"][end] ≠ '/'; args["p"] *= "/"; end
         if args["help"]
             if args["task"] == "none" && args["subtask"] == "none"
-                task_file = joinpath(@__DIR__, "..", "TASKS.md")
-                tasks_md = read(task_file, String)
-                println("Welcome to")
+                println("********************************************************************************")
+                println("* Welcome to                                                                   *")
+                println("* __     ___    __  __ ____ ___ ____  _____                                    *")
+                println("* \\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___    VASP Analysis               *")
+                println("*  \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|     for Materials Properties  *")
+                println("*   \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\          In Realistic         *")
+                println("*    \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/         Energy Surfaces       *")
+                println("*                                                                              *")
+                println("********************************************************************************")
+                arg_descriptions = get_arg_description()
+                println("Positional arguments:")
+                for (key, value) in arg_descriptions["posargs"]
+                    println("   ", uppercasefirst(key), " : ", value)
+                end
                 println("")
-                println("__     ___    __  __ ____ ___ ____  _____")
-                println("\\ \\   / / \\  |  \\/  |  _ \\_ _|  _ \\| ____|___")
-                println(" \\ \\ / / _ \\ | |\\/| | |_) | || |_) |  _| / __|")
-                println("  \\ V / ___ \\| |  | |  __/| ||  _ <| |___\\__ \\")
-                println("   \\_/_/   \\_\\_|  |_|_|  |___|_| \\_\\_____|___/")
+                println("Optional arguments:")
+                for (key, value) in arg_descriptions["optargs"]
+                    println("   ", key, " : ", value)
+                end
                 println("")
-                print(replace(tasks_md, "```\n" => ""))
+                println("get more information by querying specific tasks and subtasks:")
+                println("   - vamp --help <task>")
+                println("   - vamp --help <task> <subtask>")
             else
-                println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+                if applicable(run_task, task, subtask, Any)
+                    println(@doc run_task(::Type{task}, ::Type{subtask}, ::Any))
+                else
+                    println("Please specify a valid task, subtask combination. Type `vamp --help`` for more information.")
+                end
             end
             return nothing
         end
@@ -73,10 +89,9 @@ function main(cli_args)
             task_string = args["task"]
             subtask_string = args["subtask"]
             println("Running task $task_string $subtask_string ...")
-            if args["r"]
-                run_task_recursive(task, subtask, args)
-            else
-                run_task(task, subtask, args)
+            out = args["r"] ? run_task_recursive(task, subtask, args) : run_task(task, subtask, args)
+            if out ≠ nothing
+                task_output(out, args)
             end
         catch e
             if e == ArgumentError
@@ -98,24 +113,113 @@ function get_default_args()
         "r" => false,
         "v" => false,
         "help" => false,
-        "par"=>"",
-        "val"=>"",
-        "block"=>"",
-        "p"=>"./",
-        "o"=>"none",
-        "N"=>"0",
-        "method"=>"",
-        "incar"=>"INCAR",
-        "eigenval"=>"EIGENVAL",
-        "doscar"=>"DOSCAR",
-        "poscar"=>"POSCAR",
-        "xdatcar"=>"XDATCAR",
-        "outcar"=>"OUTCAR",
-        "kpoints"=>"KPOINTS",
-        "w90_hr"=>"wannier90_hr.dat",
-        "vasp_exe"=>"vasp_std"
+        "par" => "",
+        "val" => "",
+        "block" => "",
+        "p" => "./",
+        "o" => "none",
+        "N" => "0",
+        "tol"=>"0.1",
+        "npar"=>"1",
+        "npar"=>"1",
+        "method" => "none",
+        "reduce" => "none",
+        "exclude"=>"",
+        "include" => "",
+        "incar" => "INCAR",
+        "eigenval" => "EIGENVAL",
+        "doscar" => "DOSCAR",
+        "poscar" => "POSCAR",
+        "potcar"=>"POTCAR",
+        "xdatcar" => "XDATCAR",
+        "outcar" => "OUTCAR",
+        "kpoints" => "KPOINTS",
+        "w90_hr" => "wannier90_hr.dat",
+        "exe" => "vasp_std",
+        "h5" => "",
+        "account" => "none",
+        "hostname" => "none",
+        "ext_par_file" => "none",
+        "ncore" => "none",
+        "nsim" => "none",
+        "kpar" => "none",
+        "super_cell_vector" => "none",
+        "title" => "",
+        "xdata" => "",
+        "ydata" => "",
+        "xlabel" => "",
+        "ylabel" => "",
+        "partition" => "batch",
+        "time" => "1",
+        "nodes" => "1",
+        "mail" => "",
+        "module_list" => "",
+        "module_paths" => "",
+        "npt" => false,
+        "lammps" => ""
     )
+    read_settings!(args_dict)
     return args_dict
+end
+
+function get_arg_description()
+    arg_descriptions = OrderedDict{String, OrderedDict{String, String}}(
+        "posargs" => OrderedDict{String, String}(
+            "task" => "positional argument 1: task defines which task is to be performed",
+            "subtask" => "positional argument 2: some tasks require further specification"
+        ),
+        "optargs" => OrderedDict{String, String}(
+            "r" => "if true, task will be applied recursively to all folders",
+            "v" => "if true, Vampires are verbos",
+            "help" => "print help output",
+            "par" => "define a parameter that is to be adapted",
+            "val" => "define the value of the parameter",
+            "block" => "define the block that a parameter belongs to",
+            "p" => "set the default path",
+            "o" => "set the output (file-) name",
+            "N" => "general task dependent integer (Int) parameter",
+            "npar" => "parallelization parameter",
+            "tol" => "a numerical tolerance parameter",
+            "npar" => "general task dependent parallelization parameter",
+            "method" => "general task dependent method parameter",
+            "reduce" => "specifies a method to apply to the task output as post-processing",
+            "incar" => "set the name of the INCAR file",
+            "eigenval" => "set the name of the EIGENVAL file",
+            "doscar" => "set the name of the DOSCAR file",
+            "poscar" => "set the name of the POSCAR file",
+            "potcar" => "set the name of the POTCAR file",
+            "xdatcar" => "set the name of the XDATCAR file",
+            "outcar" => "set the name of the OUTCAR file",
+            "kpoints" => "set the name of the kpoints file",
+            "h5" => "set the name of an h5 file",
+            "exclude" => "task dependent exclude parameter",
+            "include" => "task dependent include parameter",
+            "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
+            "account" => "set the account name for job submission on slurm system",
+            "hostname" => "set the hostname of a remote host",
+            "w90_hr" => "set the name of the *_hr.dat file",
+            "exe" => "set the name of the main executable",
+            "ext_par_file" => "Path to an extended parameter file that contains additional settings for the simulation",
+            "ncore" => "Vector of numbers of CPU cores to use for the simulation (scaling tasks only)",
+            "nsim" => "Vector of numbers of bands to work on concurrently (scaling tasks only)",
+            "kpar" => "Vector of numbers of k-point parallel divisions for the simulation. Determines the parallelization over k-points (scaling tasks only)",
+            "super_cell_vector" => "Vector of the first supercell in weak scaling. Nth supercell is then created according to n*super_cell_vector (weak scaling tasks only)",
+            "partition" => "the partition the job should be run on (slurm script)",
+            "time" => "maximum walltime for a job (slurm script)",
+            "nodes" => "the number of requested nodes (slurm script)",
+            "mail" => "the mail address to mail job updates to (slurm script)",
+            "module_list" => "the module names to be imported in a slurm script",
+            "module_paths" => "additional paths where modules may be located (slurm script)",
+            "title" => "specifies the title of a plot",
+            "xdata" => "specifies the xdata for a plot",
+            "ydata" => "specifies the ydata for a plot",
+            "xlabel" => "specifies the label of the x axis",
+            "ylabel" => "specifies the label of the y axis",
+            "npt" => "specifies if MD input is an NPT ensemble",
+            "lammps" => "set name of LAMMPS file"
+        )
+    )
+    return arg_descriptions
 end
 
 """
@@ -141,7 +245,7 @@ function parse_commandline(args)
         if arg == "-h" || arg == "--help"
             args_dict["help"] = true
         elseif occursin("--", arg)
-            new_arg = (length(args) > k && !occursin("-", args[k+1])) ? args[k+1] : true
+            new_arg = (length(args) > k && args[k+1][1] ≠ '-') ? args[k+1] : true
             j = 0
             while k+j+1 < length(args) && args[k+1+j][end] == ','
                 new_arg *= args[k+2+j]
@@ -149,7 +253,7 @@ function parse_commandline(args)
             end
 
             args_dict[arg[3:end]] = new_arg
-        elseif occursin("-", arg)
+        elseif arg[1] == '-'
             args_dict[arg[2:end]] = true
         elseif k == 1 || (k > 1 ? !occursin("--", args[k-1]) : false) || args[k-1] == "--help"
             num_pos += 1
@@ -159,5 +263,3 @@ function parse_commandline(args)
     end
     return args_dict
 end
-
-run_task(task, subtask, args) = println("Task is none. Exiting ...")

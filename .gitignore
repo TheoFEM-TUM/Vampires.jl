@@ -52,8 +52,12 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.pdf
 MANIFEST
 playground.jl
+playground*
+settings
+vamp
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

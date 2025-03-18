@@ -1,19 +1,17 @@
 """
-    write_run_script(vasp_exe, path; out="run_job.sh")
+    write_run_script(exe, path; out="run_job.sh")
 
-Writes a bash script to run VASP in specified folders. If the script already exists, it adds the new folder path to the `folders` array.
+Writes a bash script to run a command in specified folders. If the script already exists, it adds the new folder path to the `folders` array.
 
 # Arguments
-- `vasp_exe::String`: The command to execute the VASP program.
+- `exe::String`: The command to execute in each subfolder.
 - `path::String`: The path to add to the `folders` array in the script.
 - `out::String`: The output file name for the script. Defaults to `"run_job.sh"`.
+- `cb::String`: callback function to be executed after the `exe` run in each subdirectory
+- `run_out::String`: The output filename for the executed `exe` command
 
-# Description
-This function creates a bash script named `run_job.sh` (or the name specified by `out`). If the file already exists, the function adds the specified `path` to the `folders` array within the existing script. 
-If the file does not exist, it creates a new script with the necessary structure to run VASP in each folder specified in the `folders` array.
-The script will iterate over each folder in the `folders` array, change to that directory, execute the VASP command, and then return to the parent directory.
 """
-function write_run_script(vasp_exe, path; out="run_job.sh", cb="none")
+function write_run_script(exe, path; out="run_job.sh", cb="", run_out="vasp.log")
     if out in readdir()
         add_path_to_folders(out, path)
     else
@@ -27,8 +25,13 @@ function write_run_script(vasp_exe, path; out="run_job.sh", cb="none")
             println(runfile, "for folder in \"\${folders[@]}\"")
             println(runfile, "do")
             println(runfile, "    cd \$folder")
-            println(runfile, "    srun $vasp_exe  > vasp.log")
-            if cb ≠ "none"; println(runfile, "    "*cb); end
+            if occursin(".sh", exe)
+                println(runfile, "    bash $exe > $run_out")
+            else
+                println(runfile, "    srun $exe  > $run_out")
+            end
+            if cb ≠ ""; println(runfile, "    "*cb); end
+            println(runfile, "    echo \"Calculation in \$folder completed.\"")
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
@@ -36,6 +39,25 @@ function write_run_script(vasp_exe, path; out="run_job.sh", cb="none")
     run(`chmod +x $out`)
 end
 
+"""
+    get_exclude_callback(excludes::String) -> String
+
+Generates a command string to remove specified files after a calculation. If the `excludes` argument is non-empty, this function builds a shell command to remove each file listed in `excludes`. File names in `excludes` should be comma-separated.
+
+# Arguments
+- `excludes`: A comma-separated string of file names to exclude (i.e., remove) after calculation.
+
+# Returns
+- A string representing the shell command to remove the specified files. Returns an empty string if `excludes` is empty.
+"""
+function get_exclude_callback(excludes)
+    cb = ""
+    if excludes ≠ ""
+        excluded_files = split_line(excludes, char=',')
+        cb = "rm" * prod([" "*file for file in excluded_files])
+    end
+    return cb
+end
 
 """
     add_path_to_folders(file::String, new_path::String)
@@ -73,11 +95,11 @@ function add_path_to_folders(file::String, new_path::String)
             end
         end
     end
+    return nothing
 end
 
-
 """
-    write_slurm_script(path; module_path="", module_list=[], vasp_exe="vasp_std", time=1, nodes=1, ntasks=48, 
+    write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48,
                        ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
 
 Generate a SLURM batch script for running VASP on an HPC system, optimized for JUWELS, but may require adjustments for other HPC systems.
@@ -86,7 +108,7 @@ Generate a SLURM batch script for running VASP on an HPC system, optimized for J
 - `path::String`: The directory where the SLURM script will be created.
 - `module_path::String=""`: Path to the module files if needed.
 - `module_list::Vector{String}=[]`: List of modules to load.
-- `vasp_exe::String="vasp_std"`: The VASP executable to run.
+- `exe::String="vasp_std"`: The executable to run.
 - `time::Int=1`: The wall time limit for the SLURM job script (in hours).
 - `nodes::Int=1`: The number of nodes to allocate.
 - `ntasks::Int=48`: The total number of tasks.
@@ -95,7 +117,7 @@ Generate a SLURM batch script for running VASP on an HPC system, optimized for J
 - `num_gpu::Int=0`: The number of GPUs to allocate.
 - `partition::String="batch"`: The partition to submit the job to.
 - `mail::String=""`: Email address for job notifications.
-- `script_filename::String="batch_jobscript"`: The filename for the SLURM batch script.
+- `filename::String="job"`: The filename for the SLURM batch script.
 
 # Description
 This function generates a SLURM batch script tailored for running VASP simulations. It includes necessary batch setup configurations, module loading commands, and commands for running VASP either on CPU or GPU.
@@ -120,13 +142,12 @@ write_slurm_script(
     script_filename="my_slurm_script.sh"
 )
 """
-function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vasp_std", time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
-    out = path*"/"*script_filename
+function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0, partition="batch", mail="", filename="job")
+    out = filename*".job"
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
     sec = trunc(Int, modf(modf(time)[1]*60)[1]*60)
     time_str = lpad(hrs, 2, "0")*":"*lpad(sec, 2, "0")*":"*lpad(sec, 2, "0")
-
     open(out, "w") do outfile
         print(outfile, """
         #!/bin/bash
@@ -137,8 +158,8 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
         ###
         #SBATCH --nodes=$nodes
         #SBATCH --time=$time_str
+        #SBATCH --ntasks-per-node=$ntasks
         #SBATCH --partition=$partition
-        #SBATCH --ntasks=$ntasks
         """)
         if num_gpu > 0
             print(outfile, """
@@ -148,14 +169,9 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
             # GPU allocation (VASP specific; necessary?)
             #SBATCH --gpus-per-task=1       # num GPUs per process
             """)
-        elseif ntasks_per_core == 0
-            print(outfile, """
-            #SBATCH --partition=$partition
-            """)
-        else
+        elseif ntasks_per_core ≠ 1
             print(outfile, """
             #SBATCH --ntasks-per-core=$ntasks_per_core
-            #SBATCH --partition=$partition
             """)
         end
         print(outfile, """
@@ -167,17 +183,20 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
             #SBATCH --mail-type=START,FAIL,END
             """)
         end
-        if length(module_path) > 0 || length(module_list) > 0
+        if length(module_paths) > 0 || length(module_list) > 0
             print(outfile, """
+
             #========================================#
             # module setup for VASP
             #========================================#
             """)
         end
-        if length(module_path) > 0
-            print(outfile, """
-            module use $module_path
-            """)
+        if length(module_paths) > 0
+            for mod_path in module_paths
+                print(outfile, """
+                module use $mod_path
+                """)
+            end
         end
         if length(module_list) > 0
             for mod in module_list
@@ -201,8 +220,8 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
         echo "Running on hosts: \$SLURM_NODELIST"
         echo "Running on \$SLURM_NNODES nodes."
         echo "Running on \$SLURM_NPROCS processors."
-        echo "Work directory is `pwd`"
-        echo "VASP binary at " \$vasp_exe
+        echo "Work directory is \$(pwd)"
+        echo "VASP binary at " \$exe
 
         echo
         echo "Starting VASP run at" `date`
@@ -235,15 +254,19 @@ function write_slurm_script(path;  module_path="", module_list=[], vasp_exe="vas
         free -g >> host.info
         ulimit -a >> host.info
         echo \$SLURM_NODELIST >> host.info
-        echo The VASP version is $vasp_exe >> host.info
+        echo The VASP version is $exe >> host.info
 
         #========================================#
-        # 5. VASP run
+        # 5. Main job execution
         #========================================#
         """)
-        if num_gpu == 0
+        if num_gpu == 0 && occursin("vasp", exe)
             print(outfile, """
-            srun $vasp_exe > vasp.log
+            srun $exe > vasp.log
+            """)
+        elseif num_gpu == 0 && occursin(".sh", exe)
+            print(outfile, """
+            bash $exe
             """)
         else
             print(outfile, """

@@ -4,7 +4,7 @@ import Vampires: parse_commandline
     # Test 1: Positional arguments only
     args1 = parse_commandline(["incar", "make"])
     @test args1["task"] == "incar" && args1["subtask"] == "make"
-    
+
     # Test 2: Boolean flag argument
     args2 = parse_commandline(["build", "-v"])
     @test args2["task"] == "build" && args2["v"] == true
@@ -12,7 +12,7 @@ import Vampires: parse_commandline
     # Test 3: Multiple keyword arguments
     args3 = parse_commandline(["--par", "ENCUT", "--val", "300"])
     @test args3["par"] == "ENCUT" && args3["val"] == "300"
-    
+
     # Test 4: Combination 1
     args4 = parse_commandline(["-r", "outcar", "read", "--outcar", "OUTCAR_4"])
     @test args4["r"] && args4["task"] == "outcar" && args4["subtask"] == "read" && args4["outcar"] == "OUTCAR_4"
@@ -20,7 +20,7 @@ import Vampires: parse_commandline
     # Test 5: Combination 2
     args5 = parse_commandline(["outcar", "read", "-r", "--outcar", "OUTCAR_4"])
     @test args5["r"] && args5["task"] == "outcar" && args5["subtask"] == "read" && args5["outcar"] == "OUTCAR_4"
-    
+
     # Test 6: Combination 3
     args6 = parse_commandline(["--outcar", "OUTCAR_4", "-r", "outcar", "read"])
     @test args6["r"] && args6["task"] == "outcar" && args6["subtask"] == "read" && args6["outcar"] == "OUTCAR_4"
@@ -48,4 +48,20 @@ import Vampires: parse_commandline
     # Test 12: Test h flag instead of help
     args12 = parse_commandline(["-h", "--par", "bandgap"])
     @test args12["help"] && args12["par"] == "bandgap"
+
+    # Test 13: Test number of default args and descriptions
+    default_args = Vampires.get_default_args()
+    arg_descriptions = Vampires.get_arg_description()
+    args_have_description = map(collect(keys(default_args))) do key
+        hasdescription = haskey(arg_descriptions["posargs"], key) || haskey(arg_descriptions["optargs"], key)
+        if !hasdescription
+            @warn "No description found for $key, did you just add this?"
+        end
+        return hasdescription
+    end
+    @test all(args_have_description)
+
+    # Test 14: Test that a value with '-' in it is parsed correctly
+    args14 = parse_commandline(["--par", "Silicon-bandgap"])
+    @test args14["par"] == "Silicon-bandgap"
 end

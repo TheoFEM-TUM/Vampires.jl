@@ -26,6 +26,12 @@ eigenval:
 ```
 
 ```
+
+h5:
+    read: call the read task for `file` and create a plot.
+```
+
+```
 incar
     set/add: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
     rm: remove a certain tag or block from the INCAR file.
@@ -37,6 +43,12 @@ incar
 ```
 kpoints
     make: generate a kpoint file for a certain grid size or kspacing, respectively.
+```
+
+```
+
+lammps:
+    read: read the atomic configurations from the LAMMPS dump output file.
 ```
 
 ```
@@ -57,9 +69,14 @@ outcar
 ```
 
 ```
-plot
-    bandstructure: plots the bandstructure
-    dos: plots the density of states
+
+<task>:
+    plot: call the read task for `file` and create a plot.
+```
+
+```
+poscar
+    read: read the POSCAR file
 ```
 
 ```
@@ -70,8 +87,22 @@ any_task
 ```
 
 ```
-run_script
+runscript
     make: creates a bash script that runs vasp in a specific folder
+input
+    cp: copy all VASP input files to a new folder
+job
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
+```
+
+```
+settings
+    set: set a new setting in the settings file
+    rm: remove a setting from the settings file
+    read: read a setting from the settings file
 ```
 
 ```
@@ -100,5 +131,17 @@ slurm_script
 ```
 w90_hr
     read: read the W90 Hamiltonian from the *_hr.dat file
+    test: test the accuracy of a W90 model versus DFT
+w90
+    set: set parameters in the INCAR file that are specific to W90
+w90_nscf
+    make: create the folder structure for a NSCF calculation with W90
+```
+
+```
+
+xdatcar:
+    read: read the atomic configurations from the XDATCAR file.
+    merge: merge multiple XDATCAR into one single file.
 ```
 
