@@ -19,6 +19,7 @@ end
 
 @testset "io/output" begin
     include("io/output/test_folder_management.jl")
+    include("io/output/test_bash_and_submission.jl")
 end
 
 @testset "tasks" begin

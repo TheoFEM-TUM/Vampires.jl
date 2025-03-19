@@ -46,6 +46,67 @@ function make_plot(xdata, ydata; title="", xlabel="", ylabel="")
     return fig
 end
 
+
+"""
+    make_bar_plot(xdata, ydata; title="", xlabel="", ylabel="", xticks=[], bar_colors=[], ymin=0, ymax=0)
+
+Creates a bar plot using the provided `xdata` and `ydata` arrays.
+
+If `xticks` is not provided, the x-axis will be labeled using the indices of `xdata`. Bar colors can be customized using `bar_colors`.
+
+# Arguments
+- `xdata` : Array of x-axis data points.
+- `ydata` : Array of y-axis data points.
+
+# Keyword Arguments
+- `title` : Title of the plot. Default is an empty string (`""`).
+- `xlabel` : Label for the x-axis. Default is an empty string (`""`).
+- `ylabel` : Label for the y-axis. Default is an empty string (`""`).
+- `xticks` : Custom labels for x-axis ticks. Default is an empty array (`[]`), using `xdata` indices.
+- `bar_colors` : Array of colors for bars. Default is blue for all bars.
+- `ymin` : Minimum limit for the y-axis. Default is `0`.
+- `ymax` : Maximum limit for the y-axis. Default is `0`, meaning automatic scaling.
+
+# Returns
+- `fig` : The bar plot object with the specified data and labels.
+"""
+
+function make_bar_plot(xdata, ydata; title="", xlabel="", ylabel="", xticks=[], bar_colors=[], ymin=0, ymax=0)
+    # Adjust x values for equidistant bars
+    xdata_equi = 1:length(xdata)
+    if size(xticks, 1) == 0
+        xticks = xdata_equi
+    end
+    if size(bar_colors, 1) == 0
+        bar_colors = repeat([vcolors.blue], size(xdata_equi, 1))
+    end
+
+    # Create the bar plot
+    fig = bar(
+        xdata_equi,
+        ydata,
+        label = "",
+        color = bar_colors,
+        xlab = xlabel,
+        ylab = ylabel,
+        tick_direction = :in,
+        yticks = :auto,
+        bar_width = 0.7,  # Make bars broader
+        legend = false,
+        xticks = (xdata_equi, xticks),  # Replace x-axis ticks with core_n values
+        framestyle = :box,  # Add a frame around the plot
+        xmirror = false,  # Add axis to the top
+        ymirror = false   # Add axis to the right
+
+    )
+    # Add plot title and customize ticks
+    if title != ""; title!(title); end
+     # Adjust y-axis limits for better text visibility
+    if ymin != ymax; ylims!(ymin, ymax); end
+    return fig
+end
+
+
 """
     get_colors(y)
 
@@ -65,6 +126,7 @@ function get_colors(y)
         return autocolor()
     end
 end
+
 
 """
     get_plotting_data(out, args)

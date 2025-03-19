@@ -50,6 +50,7 @@ export plot_bandstructure, plot_value_convergence
 export read_hrdat
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
+export strong_scaling_create_subdirectories_VASP
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy, get_effective_mass
 export compute_msd, compute_velocities
 export compute_autocorr, compute_spectral_density, lorentzian_broadening

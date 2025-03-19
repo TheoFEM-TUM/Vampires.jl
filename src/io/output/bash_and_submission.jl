@@ -99,19 +99,19 @@ function add_path_to_folders(file::String, new_path::String)
 end
 
 """
-    write_slurm_script(exe, path; module_path="", module_list=[], time=1, nodes=1, ntasks=48,
-                       ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", script_filename="batch_jobscript")
+    write_slurm_script(exe, path; module_paths="", module_list=[], time=1, nodes=1, ntasks_per_node=48,
+                       ntasks_per_core=1, omp_num_threads=24, num_gpu=0, partition="batch", mail="", filename="batch_jobscript")
 
 Generate a SLURM batch script for running VASP on an HPC system, optimized for JUWELS, but may require adjustments for other HPC systems.
 
 # Arguments
-- `path::String`: The directory where the SLURM script will be created.
-- `module_path::String=""`: Path to the module files if needed.
-- `module_list::Vector{String}=[]`: List of modules to load.
 - `exe::String="vasp_std"`: The executable to run.
+- `path::String`: The directory where the SLURM script will be created.
+- `module_paths::String=""`: Path to the module files if needed.
+- `module_list::Vector{String}=[]`: List of modules to load.
 - `time::Int=1`: The wall time limit for the SLURM job script (in hours).
 - `nodes::Int=1`: The number of nodes to allocate.
-- `ntasks::Int=48`: The total number of tasks.
+- `ntasks_per_node::Int=48`: The total number of tasks per node
 - `ntasks_per_core::Int=1`: Number of tasks per core.
 - `omp_num_threads::Int=24`: Number of OpenMP threads.
 - `num_gpu::Int=0`: The number of GPUs to allocate.
@@ -126,24 +126,25 @@ The generated script is optimized for the JUWELS supercomputing system, and migh
 
 # Example
 ```julia
-write_slurm_script(
+write_slurm_script("vasp_std",
     "/path/to/dir";
-    module_path="/path/to/modules",
+    module_paths="/path/to/modules",
     module_list=["module1", "module2"],
-    vasp_exe="vasp_std",
     time=2,
     nodes=2,
-    ntasks=96,
+    ntasks_per_node=48,
     ntasks_per_core=2,
     omp_num_threads=12,
     num_gpu=4,
     partition="batch",
     mail="user@example.com",
-    script_filename="my_slurm_script.sh"
+    filename="my_slurm_script.sh"
 )
 """
-function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, nodes=1, ntasks=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0, partition="batch", mail="", filename="job")
-    out = filename*".job"
+function write_slurm_script(exe, path; module_paths::AbstractArray=[], module_list::AbstractArray=[],
+                            time=1, nodes=1, ntasks_per_node=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0,
+                            partition::AbstractString="batch", mail::AbstractString="", filename::AbstractString="job")
+    out = path*filename*".job"
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
     sec = trunc(Int, modf(modf(time)[1]*60)[1]*60)
@@ -158,20 +159,24 @@ function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, 
         ###
         #SBATCH --nodes=$nodes
         #SBATCH --time=$time_str
-        #SBATCH --ntasks-per-node=$ntasks
         #SBATCH --partition=$partition
         """)
-        if num_gpu > 0
+        if num_gpu == 0
+            print(outfile, """
+            #SBATCH --ntasks-per-node=$ntasks_per_node
+            """)
+            if ntasks_per_core ≠ 1
+                print(outfile, """
+                #SBATCH --ntasks-per-core=$ntasks_per_core
+                """)
+            end
+        else # num_gpu > 0
             print(outfile, """
             #SBATCH --gres=gpu:$num_gpu
             # this is required in VASP 6.4.1 - supports only one rank per GPU
             #SBATCH --ntasks-per-node=$num_gpu
             # GPU allocation (VASP specific; necessary?)
             #SBATCH --gpus-per-task=1       # num GPUs per process
-            """)
-        elseif ntasks_per_core ≠ 1
-            print(outfile, """
-            #SBATCH --ntasks-per-core=$ntasks_per_core
             """)
         end
         print(outfile, """
@@ -183,7 +188,7 @@ function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, 
             #SBATCH --mail-type=START,FAIL,END
             """)
         end
-        if length(module_paths) > 0 || length(module_list) > 0
+        if size(module_paths, 1) > 0 || size(module_list, 1) > 0
             print(outfile, """
 
             #========================================#
@@ -191,14 +196,14 @@ function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, 
             #========================================#
             """)
         end
-        if length(module_paths) > 0
+        if size(module_paths, 1) > 0
             for mod_path in module_paths
                 print(outfile, """
                 module use $mod_path
                 """)
             end
         end
-        if length(module_list) > 0
+        if size(module_list, 1) > 0
             for mod in module_list
                 print(outfile, """
                 module load $mod
@@ -273,7 +278,7 @@ function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, 
             """)
         else
             print(outfile, """
-            orterun --map-by ppr:$num_gpu:node --bind-to core -np $num_gpu $vasp_exe > vasp.log
+            orterun --map-by ppr:$num_gpu:node --bind-to core -np $num_gpu $exe > vasp.log
             """)
         end
     end

@@ -1,0 +1,66 @@
+#!/bin/bash
+#========================================#
+# batch script for VASP
+#========================================#
+# Batch setup -> system reads # s batch
+###
+#SBATCH --nodes=1
+#SBATCH --time=01:00:00
+#SBATCH --partition=batch
+#SBATCH --gres=gpu:1
+# this is required in VASP 6.4.1 - supports only one rank per GPU
+#SBATCH --ntasks-per-node=1
+# GPU allocation (VASP specific; necessary?)
+#SBATCH --gpus-per-task=1       # num GPUs per process
+#SBATCH --error=ERROR.%j
+
+# ALL RUNS IN $WORK !
+# ... better
+# start the jobs inside the correct directory
+# as per default initial directory is the directory
+# from where the job was submitted
+
+#========================================#
+# 3. Integrity check
+#========================================#
+
+echo "Starting at `date`"
+echo "Running on hosts: $SLURM_NODELIST"
+echo "Running on $SLURM_NNODES nodes."
+echo "Running on $SLURM_NPROCS processors."
+echo "Work directory is $(pwd)"
+echo "VASP binary at " $exe
+
+echo
+echo "Starting VASP run at" `date`
+echo
+
+#========================================#
+# 4. Parallel execution
+#========================================#
+
+export OMP_NUM_THREADS=40
+# make sure that MKL does not overwrite your OMP configuration
+export MKL_NUM_THREADS=40
+export MKL_THREADING_LAYER=INTEL
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+export OMP_STACKSIZE=512m
+
+#========================================#
+# 5. System info
+#========================================#
+hostname > host.info
+grep 'Linux' /etc/issue >> host.info
+grep 'model name' /proc/cpuinfo |cut -d: -f2 |uniq -c >> host.info
+grep 'cpu M' /proc/cpuinfo >> host.info
+grep 'MemTotal' /proc/meminfo >> host.info
+free -g >> host.info
+ulimit -a >> host.info
+echo $SLURM_NODELIST >> host.info
+echo The VASP version is vasp_std >> host.info
+
+#========================================#
+# 5. Main job execution
+#========================================#
+orterun --map-by ppr:1:node --bind-to core -np 1 vasp_std > vasp.log
