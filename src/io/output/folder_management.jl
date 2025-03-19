@@ -158,22 +158,23 @@ function split_path_at_folder(path, folder)
 end
 
 """
-    strong_scaling_create_subdirectories(kpar_range::AbstractArray,
-                                         ncore_nsim_range::AbstractArray;
-                                         path::String="./",
-                                         verbose::Bool=true,
-                                         keyword::String="cpu",
-                                         time::Int=1,
-                                         avail_cpus_per_node::Int=2,
-                                         avail_gpus_per_node::Int=4,
-                                         module_paths::AbstractArray=[],
-                                         module_list::AbstractArray=[],
-                                         exe::String="vasp_std",
-                                         partition::String="batch",
-                                         omp_num_threads::Int=0,
-                                         mail::String="",
-                                         script_filename::String="jobscript",
-                                         sub_directory_name::String="strong_scaling")
+    strong_scaling_create_subdirectories_VASP(kpar_range::AbstractArray,
+                                              ncore_nsim_range::AbstractArray;
+                                              path::String="./",
+                                              verbose::Bool=true,
+                                              keyword::String="cpu",
+                                              time::Int=1,
+                                              avail_cpus_per_node::Int=1,
+                                              avail_gpus_per_node::Int=1,
+                                              module_paths::AbstractArray=[],
+                                              module_list::AbstractArray=[],
+                                              exe::String="vasp_std",
+                                              partition::String="batch",
+                                              omp_num_threads::Int=0,
+                                              mail::String="",
+                                              script_filename::String="jobscript",
+                                              sub_directory_name::String="strong_scaling"
+                                              )
 
 Creates subdirectories and prepares input files for strong scaling tests in VASP simulations.
 
@@ -204,7 +205,7 @@ Creates subdirectories and prepares input files for strong scaling tests in VASP
 
 # Example
 ```julia
-strong_scaling_create_subdirectories(
+strong_scaling_create_subdirectories_VASP(
     kpar_range=[1, 2, 4],
     ncore_nsim_range=[8, 4, 2],
     path="./",
@@ -221,8 +222,8 @@ function strong_scaling_create_subdirectories_VASP(kpar_range::AbstractArray,
                                                    verbose::Bool = true,
                                                    keyword::String = "",
                                                    time::Int = 1,
-                                                   avail_cpus_per_node::Int = 2,
-                                                   avail_gpus_per_node::Int = 4,
+                                                   avail_cpus_per_node::Int = 1,
+                                                   avail_gpus_per_node::Int = 1,
                                                    module_paths::AbstractArray = [],
                                                    module_list::AbstractArray = [],
                                                    exe::String = "vasp_std",
