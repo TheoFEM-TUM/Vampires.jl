@@ -108,6 +108,63 @@ end
 
 
 """
+    plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title="Strong scaling VASP", figure_filename="plot.png", xticks=string.(core_n))
+
+Plots a bar chart of the speedup in VASP strong scaling tests based on the number of CPU cores or GPUs.
+
+# Arguments
+- `core_n`: An array of core (CPU) or GPU counts used in the scaling test.
+- `avg_time_scf_step_n`: The corresponding average SCF step times for each configuration.
+- `type`: (Optional) The scaling type. Options:
+  - `"cpu"` (default): Plots speedup based on CPU cores.
+  - `"gpu"`: Plots speedup based on GPUs.
+  - `"mixed"`: Plots both CPU and GPU speedup results.
+- `title`: (Optional) The title of the plot.
+- `figure_filename`: (Optional) The filename to save the plot (default: `"plot.png"`).
+- `xticks`: (Optional) Custom x-axis tick labels.
+"""
+function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title="Strong scaling VASP", figure_filename="plot.png", xticks=string.(core_n))
+    # Calculate speedup relative to the first element in avg_time_scf_step_n
+    speedup = avg_time_scf_step_n[1] ./ avg_time_scf_step_n
+
+    # Set the color and x-axis label based on the type
+    bar_color = type == "gpu" ? vamp_colors["Bluish Green"] : type=="mixed" ? vcat([vamp_colors["Sky Blue"]], repeat([vamp_colors["Bluish Green"]], length(speedup)-1)) : vamp_colors["Sky Blue"]
+    xlab = type == "gpu" ? "Number of GPUs" : type == "mixed" ? "" : "Number of Cores"
+
+    p = plot_bars(core_n, speedup, xlab, "Speedup", xticks, bar_color, 0, maximum(speedup) * 1.2, title=title)
+
+    # Add speedup text on top of each bar
+    for (i, s) in enumerate(speedup)
+        annotate!(i, s, text("$(round(s, digits=1)) x", :black, :bottom, 10))
+    end
+    savefig(figure_filename)
+end
+
+
+"""
+    plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n; type="mixed", title="Strong scaling VASP", figure_filename="plot.png", index=2)
+
+Plots a bar chart of strong scaling results for both CPU and GPU configurations.
+
+# Arguments
+- `core_n`: An array of core counts used in CPU-based scaling tests.
+- `core_avg_time_scf_step_n`: The corresponding average SCF step times for CPU configurations.
+- `gpu_n`: An array of GPU counts used in GPU-based scaling tests.
+- `gpu_avg_time_scf_step_n`: The corresponding average SCF step times for GPU configurations.
+- `type`: (Optional) Scaling type. Defaults to `"mixed"` (CPU and GPU combined).
+- `title`: (Optional) The title of the plot.
+- `figure_filename`: (Optional) The filename to save the plot (default: `"plot.png"`).
+- `index`: (Optional) The index of the CPU configuration to use as a reference point in mixed plots (default: `2`).
+"""
+function plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n; type="mixed", title="Strong scaling VASP", figure_filename="plot.png", index=2)
+    core_n = vcat([core_n[index]], gpu_n)
+    avg_time_scf_step_n = vcat([core_avg_time_scf_step_n[index]], gpu_avg_time_scf_step_n)
+    xticks = type == "mixed" ? vcat(["CPU"], string.(core_n[2:end]) .* " GPU" ) : string.(core_n)
+    plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type=type, title=title, figure_filename=figure_filename, xticks=xticks)
+end
+
+
+"""
     get_colors(y)
 
 Returns a set of colors based on the input `y`.
