@@ -15,14 +15,14 @@ Available commands:
 run_task(::Type{Val{:h5}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] h5 read [--p <path>] [--h5 <file>]
+    vamp [-r] h5 read --h5 <file> [--p <path>]
 
 Read the contents of an *.h5 file and return then as a NamedTuple. Useful for plotting.
 
 # Arguments
+- `h5`: Name of the h5 file. The extension '.h5' is not required
 - `r`: Task is applied recursively to h5 files in all subfolders.
 - `p`: Sets the path where the command is executed.
-- `h5`: Name of the h5 file. The extension '.h5' is not required
 
 # Examples
 ```bash

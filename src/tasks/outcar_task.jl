@@ -18,14 +18,14 @@ Available commands:
 run_task(::Type{Val{:outcar}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] outcar read [--par <parameter>] [--p <path>] [--outcar <file>] [--o <output>]
+    vamp [-r] outcar read --par <parameter> [--outcar <file>] [--p <path>] [--o <output>]
 
 Read specific data from the OUTCAR file and optionally save the data to an HDF5 file.
 
 # Arguments
 - `par`: The name of the parameter to read from the OUTCAR file (e.g., `eigenvalues`, `forces`, or any specific value like `NIONS`).
-- `p`: Path to the OUTCAR file (optional, defaults to the current directory).
 - `outcar`: Name of the OUTCAR file to read (optional; default is "OUTCAR").
+- `p`: Path to the OUTCAR file (optional, defaults to the current directory).
 - `o`: Output file where the data should be saved (optional; if it contains "h5", the data will be saved in HDF5 format).
 
 # Behavior

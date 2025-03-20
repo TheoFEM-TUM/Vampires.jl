@@ -16,7 +16,7 @@ Available commands:
 run_task(::Type{Val{:lammps}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] lammps read [--lammps <file>] [--p <path>]
+    vamp [-r] lammps read --lammps <file> [--p <path>]
 
 Reads atomic configurations from an XDATCAR file and calculates specific properties, such as mean squared displacement (MSD), based on the specified parameter.
 

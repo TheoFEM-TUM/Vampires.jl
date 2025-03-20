@@ -25,7 +25,7 @@ Available commands:
 run_task(::Type{Val{:incar}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] incar make [--par <key(s)>] [--val <key(s)>] [--block <block_label>] [--p <path>] [--incar <file>]
+    vamp [-r] incar make --par <key(s)> --val <key(s)> --block <block_label> [--p <path>] [--incar <file>]
 
 Create a new INCAR file with specified parameters or blocks. If no values are provided, default values are used.
 
@@ -190,9 +190,10 @@ run_task(::Type{Val{:incar}}, ::Type{Val{:add}}, args) = run_task(Val{Symbol("in
 run_task(::Type{Val{:addincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 
 """
-    vamp [-r] incar rm --par <key(s)> [--p <path>] [--incar <file>] [--block <block_label>] [--out <file>]
+    vamp [-r] incar rm [--par <key(s)>] [--block <block_label>] [--p <path>] [--incar <file>] [--out <file>]
 
 Read a given INCAR file and remove a specified tag or an entire block of tags.
+    - *If `par` is not given, the entire block will be removed. Multiple blocks are separated by commas.*
 
 # Arguments
 - `r`: Task is applied recursively to INCAR files in all subfolders.
