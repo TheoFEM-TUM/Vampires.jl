@@ -1,6 +1,22 @@
 """"""
 
-# wrapper functions for task output
+# helper functions for task output/input
+
+
+function check_required_parameters(required_parameters::AbstractArray{String}, args)
+    check::Bool = true
+    ref = get_default_args()
+    for required_parameter in required_parameters
+        if args[required_parameter] == ref[required_parameter]; check = false; break; end
+    end
+    if !check
+        println("Missing Parameters. Please specify the following parameters: ")
+        for required_parameter in required_parameters
+            println("--$required_parameter")
+        end
+        exit()
+    end
+end
 
 
 """
