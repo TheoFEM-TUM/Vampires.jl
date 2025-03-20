@@ -13,11 +13,13 @@ include("io/test_read_utils.jl")
     include("io/input/test_xdatcar.jl")
     include("io/input/test_lammps.jl")
     include("io/input/test_outcar.jl")
+    include("io/input/test_extended_config.jl")
     include("io/plotting/test_colors.jl")
 end
 
 @testset "io/output" begin
     include("io/output/test_folder_management.jl")
+    include("io/output/test_bash_and_submission.jl")
 end
 
 @testset "tasks" begin
