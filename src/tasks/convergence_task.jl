@@ -25,8 +25,8 @@ Create subdirectories for convergence tests, each with varying values for the sp
 # Arguments
 - `par`: The parameter for which the convergence test will be run (e.g., `ENCUT`, `kgrid`, etc.).
 - `val`: A comma-separated range of values to use for the parameter (e.g., `400,500,600`).
-- `p`: The path where subdirectories for the convergence tests will be created (optional; defaults to the current directory).
-- `method`: The method for generating the k-grid, only relevant for k-grid convergence.
+- `p`: (Optional) The path where subdirectories for the convergence tests will be created (optional; defaults to the current directory).
+- `method`: (Optional) The method for generating the k-grid, only relevant for k-grid convergence.
 
 # Examples
 ```bash
@@ -57,8 +57,8 @@ Read specific data from the OUTCAR file and optionally save the data to an HDF5 
 
 # Arguments
 - `par`: The name of the parameter to read from the OUTCAR file (e.g., `eigenvalues`, `forces`, or any specific value like `NIONS`).
-- `outcar`: Name of the OUTCAR file to read (optional; default is "OUTCAR").
-- `p`: Path to the OUTCAR file (optional, defaults to the current directory).
-- `o`: Output file where the data should be saved (optional; if it contains "h5", the data will be saved in HDF5 format).
+- `outcar`: (Optional) Name of the OUTCAR file to read (optional; default is "OUTCAR").
+- `p`: (Optional) Path to the OUTCAR file (optional, defaults to the current directory).
+- `o`: (Optional) Output file where the data should be saved (optional; if it contains "h5", the data will be saved in HDF5 format).
 """
 run_task(::Type{Val{:convergence}}, ::Type{Val{:read}}, args) = run_task(Val{Symbol("outcar")}, Val{Symbol("read")}, args)

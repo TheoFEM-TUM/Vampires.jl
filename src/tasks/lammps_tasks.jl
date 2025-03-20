@@ -22,7 +22,7 @@ Reads atomic configurations from an XDATCAR file and calculates specific propert
 
 # Arguments
 - `lammps`: The name of the LAMMPS file containing atomic configurations from a molecular dynamics simulation.
-- `p`: The path where the XDATCAR and POSCAR files are located.
+- `p`: (Optional) The path where the XDATCAR and POSCAR files are located.
 
 # Returns
 - Returns the lattice vectors and configurations from the XDATCAR file.

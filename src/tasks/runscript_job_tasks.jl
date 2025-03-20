@@ -31,9 +31,9 @@ run_task(::Type{Val{:job}}, ::Type{Val{:none}}, args) = nothing
 Creates a run script that executes the VASP executable at the specified path.
 
 # Arguments
-- `exe`: The name of the VASP executable that will be used in the run script.
-- `p`: The path where the run script will be created. This is the directory in which the script will be saved.
-- `exclude`: File or list of files to be removed after each calculation.
+- `exe`: (Optional) The name of the VASP executable that will be used in the run script.
+- `p`: (Optional) The path where the run script will be created. This is the directory in which the script will be saved.
+- `exclude`: (Optional) File or list of files to be removed after each calculation.
 
 # Behavior
 - The function generates a script that runs the VASP executable specified by `vasp_exe`.
@@ -73,8 +73,8 @@ function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>]
-                      [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>]
+    vamp job make --exe <executable> --partition <partition> --nodes <nodes> --time <time>
+                      --mail <email> --module_list <modules> --module_paths <path> [--p <path>]
 
 Creates and submits a Slurm job script to run the specified executable with customized job settings.
 
@@ -86,8 +86,8 @@ Creates and submits a Slurm job script to run the specified executable with cust
 - `mail`: An email address for job status notifications.
 - `module_list`: A comma-separated list of required modules for the job, loaded before execution.
 - `module_path`: A specific module path to load environment modules from.
-- `p`: The directory path where the Slurm script will be generated and saved.
 - `o`: The output filename prefix for the Slurm script(s).
+- `p`: (Optional) The directory path where the Slurm script will be generated and saved.
 
 # Behavior
 - Generates a Slurm job script for each executable matching `exe` found in the specified directory.
@@ -130,7 +130,7 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp [-r] job submit [--account <account_name>] [--hostname <hostname>] [--p <path>]
+    vamp [-r] job submit --account <account_name> [--hostname <hostname>] [--p <path>]
 
 Submit all job files with the `.job` file extension. If the current hostname matches the specified `hostname`, the jobs are submitted locally; otherwise, they are submitted to a remote host.
 
@@ -140,8 +140,8 @@ The paths have to look something like `~/sshfs/<hostname>/path/to/job` (local) a
 # Arguments
 - `r`: if set, submit all `.job` files in all subdirectories.
 - `account`: specifies the account to which the job submission is charged.
-- `hostname`: optional, specifies the target hostname for the job submission.
-- `p`: the directory path where `.job` files are located. If not provided, the current directory is used.
+- `hostname`: (Optional) specifies the target hostname for the job submission.
+- `p`: (Optional) the directory path where `.job` files are located. If not provided, the current directory is used.
 
 # Examples
 ```bash
@@ -183,7 +183,7 @@ Check the status of all jobs for the current user. If the current hostname match
 **Note:** Remote status queries require SSH to be configured such that `ssh <hostname>` establishes a connection to the remote host.
 
 # Arguments
-- `hostname`: Optional, specifies the target hostname to query the job status. If not provided or set to `"none"`, the query runs on the local host.
+- `hostname`: (Optional) specifies the target hostname to query the job status. If not provided or set to `"none"`, the query runs on the local host.
 
 # Examples
 ```bash
@@ -207,13 +207,13 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
 end
 
 """
-    vamp job cancel [--hostname <hostname>] [--N <job_id>]
+    vamp job cancel --N <job_id> [--hostname <hostname>]
 
 Cancel a job with the specified `job_id`. If the current hostname matches the specified `hostname`, the job is cancelled locally; otherwise, it is cancelled remotely on the specified host.
 
 # Arguments
-- `hostname`: optional, the target hostname where the job is running. If set to `"none"`, the job is cancelled on the local machine.
 - `N`: the job ID of the job to cancel.
+- `hostname`: (Optional) the target hostname where the job is running. If set to `"none"`, the job is cancelled on the local machine.
 
 # Examples
 ```bash
@@ -238,16 +238,16 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:cancel}}, args)
 end
 
 """
-    vamp [-r] input cp [--p <origin>] [--o <dest>] [--include <additional_files>] [--exclude <file_to_exlude>]
+    vamp [-r] input cp [--p <origin>] --o <dest> [--include <additional_files>] [--exclude <file_to_exlude>]
 
 Copy all input files (`POSCAR`, `POTCAR`, `INCAR`, `KPOINTS` by default) to the destination `dest`. If `dest` does not exist, create it.
 Files can be included/excluded using the `include`/`exclude` keywords.
 
 # Arguments
-- `p`: Origin path of where to look for the files.
+- `p`: (Optional) Origin path of where to look for the files. Defaults current directory
 - `o`: Destination path of where to copy files.
-- `include`: Additional files to copied.
-- `exclude`: Files to exclude.
+- `include`: (Optional) Additional files to copied.
+- `exclude`: (Optional) Files to exclude.
 
 # Examples
 ```bash
@@ -273,7 +273,7 @@ end
 Removes selected VASP output files in the specified directory.
 
 # Arguments
-- `p`: Path to the directory containing files to be removed. Defaults to the current directory if not provided.
+- `p`: (Optional) Path to the directory containing files to be removed. Defaults to the current directory if not provided.
 - `include`: (Optional) A comma-separated list of additional files (or file patterns) to include in the deletion, beyond the default VASP outputs.
 - `exclude`: (Optional) A comma-separated list of files (or file patterns) to exclude from deletion, even if they match the default VASP outputs or `--include` list.
 

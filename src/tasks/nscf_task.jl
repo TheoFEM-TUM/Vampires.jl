@@ -15,15 +15,18 @@ Available commands:
 """
 run_task(::Type{Val{:nscf}}, subtask, args) = nothing
 
-"""
-    vamp nscf make --kpoints <kpoints_file> [--p <path>] [--vasp_exe <vasp_executable>]
 
-Prepare directories and create a script for non-self-consistent field (NSCF) calculations.
+"""
+vamp nscf make --kpoints <kpoints_file> [--p <path>] [--exe <executable>] [--incar <incar_file>] [--exclude <pattern>]
+
+Prepare directories and generate a script for non-self-consistent field (NSCF) calculations in VASP.
 
 # Arguments
-- `kpoints`: Path to the KPOINTS file(s). Multiple filenames are separated with commas.
-- `p`: Sets the path where the subdirectories and script will be created (optional; default is the current directory).
-- `vasp_exe`: Path to the VASP executable that will be used in the generated script (optional; default is `vasp_std`).
+- `kpoints`: Path to the KPOINTS file(s). Multiple filenames should be separated by commas.
+- `p`: (Optional) Directory where NSCF subdirectories and scripts will be created. Defaults to the current directory.
+- `exe`: (Optional) Path to the VASP executable to be used in the generated script. Defaults to `vasp_std`.
+- `incar`: (Optional) Path to an INCAR file to customize settings. If not provided, a default INCAR will be used.
+- `exclude`: (Optional) A pattern to exclude certain files or directories from processing.
 
 # Behavior
 - The function creates subdirectories for NSCF calculations and copies necessary files.

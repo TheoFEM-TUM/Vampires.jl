@@ -33,8 +33,8 @@ Create a new INCAR file with specified parameters or blocks. If no values are pr
 - `par`: Name of the tag(s) to include in the INCAR file. Multiple tags are separated by commas.
 - `val`: Values for the tag(s). Multiple values are separated by commas.
 - `block`: Block label to include in the INCAR file, with all associated default parameters. Multiple blocks are separated by commas.
-- `p`: Sets the path where the INCAR file will be created (optional).
-- `incar`: Name of the INCAR file to be created (optional; default is "INCAR").
+- `p`: (Optional) Sets the path where the INCAR file will be created (optional).
+- `incar`: (Optional) Name of the INCAR file to be created (optional; default is "INCAR").
 
 # Behavior
 - If `par` is provided, the function creates a new INCAR file with the specified parameters, each initialized with their default values.
@@ -75,8 +75,8 @@ Read and display the value(s) of specified parameter(s) from an INCAR file.
 
 # Arguments
 - `par`: Name of the tag(s) to read from the INCAR file. Multiple tags are separated by commas.
-- `p`: Sets the path where the INCAR file is located (optional).
-- `incar`: Name of the INCAR file to read (optional; default is "INCAR").
+- `p`: (Optional) Sets the path where the INCAR file is located (optional).
+- `incar`: (Optional) Name of the INCAR file to read (optional; default is "INCAR").
 
 # Behavior
 - The function reads the specified INCAR file and prints the values of the provided parameters.
@@ -150,10 +150,10 @@ Read a given incar file and add or change a tag to a certain value. Can also be 
 - `r`: Task is applied recursively to INCAR files in all subfolders.
 - `par`: Name of the tag(s). Multiple tags are separated by commas.
 - `val`: Value of the tag(s). Multiple tags are separated by commas.
-- `p`: Sets the path where the command is executed.
-- `incar`: Name of the INCAR file.
-- `block`: Block label within the INCAR file where the tag is placed. If `par` is not given, the block will be added with default values. Multiple blocks are separated by commas.
-- `out`: Sets the name of the modified INCAR file (default=INCAR).
+- `p`: (Optional) Sets the path where the command is executed.
+- `incar`: (Optional) Name of the INCAR file.
+- `block`: (Optional) Block label within the INCAR file where the tag is placed. If `par` is not given, the block will be added with default values. Multiple blocks are separated by commas.
+- `out`: (Optional) Sets the name of the modified INCAR file (default=INCAR).
 
 # Examples
 ```bash
@@ -197,11 +197,11 @@ Read a given INCAR file and remove a specified tag or an entire block of tags.
 
 # Arguments
 - `r`: Task is applied recursively to INCAR files in all subfolders.
-- `par`: Name of the tag(s) to remove. Multiple tags are separated by commas.
-- `p`: Sets the path where the command is executed.
-- `incar`: Name of the INCAR file.
-- `block`: Block label within the INCAR file to remove. If `par` is not given, the entire block will be removed. Multiple blocks are separated by commas.
-- `out`: Sets the name of the modified INCAR file (default=INCAR).
+- `par`: (Optional) Name of the tag(s) to remove. Multiple tags are separated by commas.
+- `p`: (Optional) Sets the path where the command is executed.
+- `incar`: (Optional) Name of the INCAR file.
+- `block`: (Optional) Block label within the INCAR file to remove. If `par` is not given, the entire block will be removed. Multiple blocks are separated by commas.
+- `out`: (Optional) Sets the name of the modified INCAR file (default=INCAR).
 
 # Examples
 ```bash

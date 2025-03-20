@@ -20,9 +20,9 @@ run_task(::Type{Val{:h5}}, ::Type{Val{:none}}, args) = nothing
 Read the contents of an *.h5 file and return then as a NamedTuple. Useful for plotting.
 
 # Arguments
-- `h5`: Name of the h5 file. The extension '.h5' is not required
 - `r`: Task is applied recursively to h5 files in all subfolders.
-- `p`: Sets the path where the command is executed.
+- `h5`: Name of the h5 file. The extension '.h5' is not required
+- `p`: (Optional) Sets the path where the command is executed.
 
 # Examples
 ```bash
