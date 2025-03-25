@@ -54,6 +54,7 @@ vamp incar make --par EDIFF,LREAL --val 1e-5,False --p /path/to/dir
 ```
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:make}}, args)
+    check_required_parameters(["par", "val", "block"], args)
     incar = get_empty_incar()
     if length(args["par"]) > 0
         keys = split_line(args["par"], char=',')
@@ -95,6 +96,7 @@ vamp incar read --par EDIFF --incar INCAR_relax
 ```
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
+    check_required_parameters(["par"], args)
     incar = read_incar(joinpath(args["p"], args["incar"]))
     keys = split_line(args["par"], char=',')
     values = map(keys) do key
@@ -131,6 +133,7 @@ vamp incar whatis --par num_wann
 * `vamp whatis`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:whatis}}, args)
+    check_required_parameters(["par"], args)
     param = args["par"]
     if iswannier90key(param)
         println("The $param keyword ", get_comment(param), ".")
@@ -176,6 +179,7 @@ vamp -r incar set --par EDIFF --val 1e-5
 * `vamp addincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
+    check_required_parameters(["par", "val"], args)
     incar_in = joinpath(args["p"], args["incar"])
     incar_out = args["o"] == "none" ? incar_in : joinpath(args["p"], args["o"])
     if length(args["par"]) > 0

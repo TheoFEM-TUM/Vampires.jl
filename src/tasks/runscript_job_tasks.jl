@@ -74,7 +74,7 @@ end
 
 """
     vamp job make --exe <executable> --partition <partition> --nodes <nodes> --time <time>
-                      --mail <email> --module_list <modules> --module_paths <path> [--p <path>]
+                      --mail <email> [--module_list <modules>] [--module_paths <path>] [--p <path>]
 
 Creates and submits a Slurm job script to run the specified executable with customized job settings.
 
@@ -83,9 +83,9 @@ Creates and submits a Slurm job script to run the specified executable with cust
 - `partition`: The Slurm partition to use for the job. Defaults to `"batch"`.
 - `nodes`: The number of nodes allocated for the job. Defaults to `1`.
 - `time`: The maximum runtime for the job, in hours. Defaults to `1`.
-- `mail`: An email address for job status notifications.
-- `module_list`: A comma-separated list of required modules for the job, loaded before execution.
-- `module_path`: A specific module path to load environment modules from.
+- `mail`: (Optional) An email address for job status notifications.
+- `module_list`: (Optional) A comma-separated list of required modules for the job, loaded before execution.
+- `module_paths`: (Optional) A specific module path to load environment modules from.
 - `o`: The output filename prefix for the Slurm script(s).
 - `p`: (Optional) The directory path where the Slurm script will be generated and saved.
 
@@ -107,6 +107,7 @@ vamp run job make --exe vasp_std --module_list module1,module2 --module_path /pa
 ```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
+    check_required_parameters(["exe", "partition", "nodes", "time", "mail", ""], args)
     exe = args["exe"]
     partition = args["partition"]
     nodes = parse(Int64, args["nodes"])

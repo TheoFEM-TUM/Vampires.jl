@@ -118,8 +118,8 @@ end
 Reads and processes VASP strong scaling test results from OUTCAR files, extracting the average self-consistent field (SCF) step times.
 
 # Arguments
-- `p`: The base directory where the strong scaling test folders are located.
-- `outcar`: The filename of the `OUTCAR` file to read within each test folder.
+- `p`: (Optional) The base directory where the strong scaling test folders are located.
+- `outcar`: (Optional) The filename of the `OUTCAR` file to read within each test folder.
 - `exclude`: (Optional) A pattern to exclude certain directories from processing.
 - `N`: (Optional) Index for filtering combined CPU/GPU results. If omitted or ≤0, defaults to `2`.
 
@@ -179,8 +179,8 @@ end
 Reads VASP strong scaling test results and generates a bar plot to visualize the speedup in SCF step time.
 
 # Arguments
-- `"p"`: Base path where the results are stored.
-- `"outcar"`: The name of the OUTCAR file used to extract time-per-SCF-step data.
+- `"p"`: (Optional) Base path where the results are stored.
+- `"outcar"`: (Optional) The name of the OUTCAR file used to extract time-per-SCF-step data.
 - `"N"`: (Optional) Specifies the running index of the CPU comparison for mixed CPU-GPU plots.
 
 # Output
