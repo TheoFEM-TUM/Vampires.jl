@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        julia-version: ["1.10.4"]
+        julia-version: ['1.11.4']
     steps:
     - uses: actions/checkout@v4
     - name: Set up Julia ${{ matrix.julia-version }}
@@ -22,7 +22,7 @@ jobs:
       id: verify_diff
       run: |
         git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
-  
+
     - name: Commit and push changes
       if: steps.verify_diff.outputs.changed == 'true'
       env:
