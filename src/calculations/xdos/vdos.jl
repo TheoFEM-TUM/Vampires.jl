@@ -1,5 +1,5 @@
 """
-    compute_vdos(v::AbstractArray{Float64}, timestep::T; method::String="full", atom_names::Array{String}=[]) where T <: Number
+    compute_vdos(v::AbstractArray{Float64}, timestep::T; method::String="full", atom_names::Array{String}=[], normalize::Bool=true) where T <: Number
 
 Compute the vibrational density of states (VDOS) from velocity data.
 
@@ -10,13 +10,14 @@ Compute the vibrational density of states (VDOS) from velocity data.
   - `"full"`: Computes the VDOS using the full velocity autocorrelation function (VACF).
   - Other methods such as `"zero_padding"` and `"shrinking_window"` are defined but not implemented.
 - `atom_names::Array{String}=[]` (optional): same length as size(v, 1); An array of strings specifying the names of atoms corresponding to the velocity data. Used to assign atomic masses for normalization. If empty, masses are not considered in the computation.
+- `normalize::Bool=true` (optional): if true the returned spectrum is normalized (default)
 
 # Returns
 - `(ω, S)::Tuple{Vector{Float64}, Vector{Float64}}`: A tuple containing:
   - `ω`: A vector of frequencies in units of cm⁻¹.
   - `S`: The normalized spectral density of the velocity autocorrelation.
 """
-function compute_vdos(v::AbstractArray{Float64}, timestep::T ; method::String="full", atom_names::Array{String}=[]) where T <: Number
+function compute_vdos(v::AbstractArray{Float64}, timestep::T ; method::String="full", atom_names::Array{String}=[], normalize::Bool=true) where T <: Number
     # Compute frequencies in cm^-1
     v = v*u"m/ps"  # replace unit with m/ps
     if size(atom_names)[1] > 0
@@ -36,7 +37,9 @@ function compute_vdos(v::AbstractArray{Float64}, timestep::T ; method::String="f
         vac_norm = vac_in ./ sum(reshape(hcat([masses[j] .* v[:, j, :].^2 for j in axes(v, 2)]...), size(v)...))  # normalization
         ω = uconvert.(u"cm^-1", rfftfreq(size(vac_norm, 1), 1/(ustrip(timestep)*u"fs")) ./ c_0)
         S = compute_spectral_density(vac_norm)
-        S /= maximum(S)
+        if normalize
+            S /= maximum(S)
+        end
         return ω, S
     elseif method == "zero_padding"
         error("Method $method not implemented")
@@ -50,7 +53,7 @@ end
 
 
 """
-    compute_vdos(structure::Structure, timestep::T; method::String="full") where T <: Number
+    compute_vdos(structure::Structure, timestep::T; method::String="full", normalize::Bool=true) where T <: Number
 
 Compute the vibrational density of states (VDOS) from atomic velocity data derived from a `Structure` object.
 
@@ -60,14 +63,15 @@ Compute the vibrational density of states (VDOS) from atomic velocity data deriv
 - `method::String="full"` (optional): The method to compute VDOS. Currently, only `"full"` is supported.
   - `"full"`: Computes the VDOS using the full velocity autocorrelation function (VACF).
   - Other methods such as `"zero_padding"` and `"shrinking_window"` are defined but not implemented.
+- `normalize::Bool=true` (optional): if true the returned spectrum is normalized (default)
 
 # Returns
 - `(ω, S)::Tuple{Vector{Float64}, Vector{Float64}}`: A tuple containing:
   - `ω`: A vector of frequencies in units of cm⁻¹.
   - `S`: The normalized spectral density of the velocity autocorrelation.
 """
-function compute_vdos(structure::Structure, timestep::T ; method::String="full") where T <: Number
-    vel = compute_velocities(structure.positions, 1, xdat.lattice)
-    ω, S = compute_vdos(vel, timestep; method=method, atom_names=structure.atom_types)
+function compute_vdos(structure::Structure, timestep::T ; method::String="full", normalize::Bool=true) where T <: Number
+    vel = compute_velocities(structure.positions, 1, structure.lattice)
+    ω, S = compute_vdos(vel, timestep; method=method, atom_names=structure.atom_types, normalize=normalize)
     return ω, S
 end
