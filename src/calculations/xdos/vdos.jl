@@ -46,3 +46,28 @@ function compute_vdos(v::AbstractArray{Float64}, timestep::T ; method::String="f
         error("Method $method not implemented")
     end
 end
+
+
+
+"""
+    compute_vdos(structure::Structure, timestep::T; method::String="full") where T <: Number
+
+Compute the vibrational density of states (VDOS) from atomic velocity data derived from a `Structure` object.
+
+# Arguments
+- `structure::Structure`: A structure representing data from a VASP XDATCAR or POSCAR file. The `positions` field stores atomic positions, and `atom_types` provides atomic species information.
+- `timestep::T`: The time interval between successive velocity samples, specified in femtoseconds (fs). `T` must be a subtype of `Number`.
+- `method::String="full"` (optional): The method to compute VDOS. Currently, only `"full"` is supported.
+  - `"full"`: Computes the VDOS using the full velocity autocorrelation function (VACF).
+  - Other methods such as `"zero_padding"` and `"shrinking_window"` are defined but not implemented.
+
+# Returns
+- `(ω, S)::Tuple{Vector{Float64}, Vector{Float64}}`: A tuple containing:
+  - `ω`: A vector of frequencies in units of cm⁻¹.
+  - `S`: The normalized spectral density of the velocity autocorrelation.
+"""
+function compute_vdos(structure::Structure, timestep::T ; method::String="full") where T <: Number
+    vel = compute_velocities(structure.positions, 1, xdat.lattice)
+    ω, S = compute_vdos(vel, timestep; method=method, atom_names=structure.atom_types)
+    return ω, S
+end
