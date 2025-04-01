@@ -29,6 +29,7 @@ end
     include("tasks/test_poscar_task.jl")
     include("tasks/test_eigenval_task.jl")
     include("tasks/test_w90_tests.jl")
+    include("tasks/test_scaling_tasks.jl")
 end
 
 @testset "calculations" begin
