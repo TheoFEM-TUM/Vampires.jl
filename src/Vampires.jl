@@ -69,7 +69,7 @@ using PrecompileTools: @compile_workload, @setup_workload
     v = Float64[1, 2, 3]
     task = Val{:incar}
     subtask = Val{:set}
-    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"", "o"=>"none")
+    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>joinpath(string(@__DIR__), "../"), "block"=>"", "o"=>"none")
     args_list = ["--help"]
     @compile_workload begin
         redirect_stdout(Base.DevNull()) do

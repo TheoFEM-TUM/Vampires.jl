@@ -144,7 +144,7 @@ write_slurm_script("vasp_std",
 function write_slurm_script(exe, path; module_paths::AbstractArray=[], module_list::AbstractArray=[],
                             time=1, nodes=1, ntasks_per_node=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0,
                             partition::AbstractString="batch", mail::AbstractString="", filename::AbstractString="job")
-    out = path*filename*".job"
+    out = joinpath(path, filename*".job")
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
     sec = trunc(Int, modf(modf(time)[1]*60)[1]*60)

@@ -14,7 +14,7 @@ function convergence_create_subdirectories(param, param_range; path="./", verbos
     files = [poscar, potcar, incar, kpoints]
     include = get_include(include_files)
     for value in param_range
-        folder = param*"_"*value
+        folder = param*"_"*value*"/"
         mkpath(joinpath(path, folder))
         if param == "kgrid"
             N = parse(Int64, value)
@@ -55,7 +55,7 @@ The function creates two subdirectories, `scf` and `nscf`, within the specified 
       - `LCHARG` is set to `"False"`.
 """
 function nscf_create_subdirectories(path, kpoints, incar; verbose=false)
-    folders = ["scf", "nscf"]
+    folders = ["scf/", "nscf/"]
     kpoint_files = split_line(kpoints, char=','); if length(kpoint_files) == 1; append!(kpoint_files, kpoint_files); end
     incar_files = split_line(incar, char=','); if length(incar_files) == 1; append!(incar_files, incar_files); end
     for (k, folder) in enumerate(folders)
@@ -237,20 +237,20 @@ function strong_scaling_create_subdirectories_VASP(kpar_range::AbstractArray,
     @assert length(kpar_range) == length(ncore_nsim_range)
     for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
         folder = "$(sub_directory_name)_$(i)_"*keyword*"/"
-        mkpath(path*folder)
+        mkpath(joinpath(path, folder))
         copy_vasp_input(path, folder)
-        set_key_in_incar("KPAR", string(kpar), path*"INCAR", out=path*folder*"INCAR", verbose=verbose)
+        set_key_in_incar("KPAR", string(kpar), joinpath(path, "INCAR"), out=joinpath(path, folder, "INCAR"), verbose=verbose)
         if keyword == "cpu"
             # if omp_num_threads is default, set to 1 for correct scaling tests
             omp_num_threads = omp_num_threads == 0 ? 1 : omp_num_threads
-            set_key_in_incar("NCORE", string(ncore_nsim), path*folder*"INCAR", verbose=verbose)
+            set_key_in_incar("NCORE", string(ncore_nsim), joinpath(path, folder, "INCAR"), verbose=verbose)
             write_slurm_script(exe, path*folder;  module_paths=module_paths, module_list=module_list,
                                time=time, nodes=ceil(Int, kpar / avail_cpus_per_node), ntasks_per_node=kpar*24, ntasks_per_core=1,
                                omp_num_threads=omp_num_threads, num_gpu=0, partition=partition, mail=mail, filename=script_filename)
         elseif keyword == "gpu"
             # if omp_num_threads is default, set to 20 * number of avail gpus per node (vasp recommendation)
             omp_num_threads = omp_num_threads == 0 ? 20 * avail_cpus_per_node : omp_num_threads
-            set_key_in_incar("NSIM", string(ncore_nsim), path*folder*"INCAR", verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
+            set_key_in_incar("NSIM", string(ncore_nsim), joinpath(path, folder, "INCAR"), verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
             write_slurm_script(exe, path*folder;  module_paths=module_paths, module_list=module_list,
                                time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks_per_node=kpar, num_gpu=kpar,
                                omp_num_threads=omp_num_threads, partition=partition,

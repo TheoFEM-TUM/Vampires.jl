@@ -145,7 +145,7 @@
             core_n = []
             cpu_avg_time_scf_step_n = []
             for folder in cpu_folders
-                outcar_path = base_path*folder*"/"*outcar_name
+                outcar_path = joinpath(base_path, folder, outcar_name)
                 loops = read_value_from_outcar("LOOP", outcar_path; type=Float64, line_mode="first")
                 push!(cpu_avg_time_scf_step_n, mean(loops))
                 cores = parse(Int, split(folder, "_")[3])
@@ -157,7 +157,7 @@
             gpu_n = []
             gpu_avg_time_scf_step_n = []
             for folder in gpu_folders
-                outcar_path = base_path*folder*"/"*outcar_name
+                outcar_path = joinpath(base_path, folder, outcar_name)
                 loops = read_value_from_outcar("LOOP", outcar_path; type=Float64, line_mode="first")
                 push!(gpu_avg_time_scf_step_n, mean(loops))
                 gpus = parse(Int, split(folder, "_")[3])
