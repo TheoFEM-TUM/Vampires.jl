@@ -240,7 +240,7 @@ end
 """
     vamp [-r] input cp [--p <origin>] [--o <dest>] [--include <additional_files>] [--exclude <file_to_exlude>]
 
-Copy all input files (`POSCAR`, `POTCAR`, `INCAR`, `KPOINTS` by default) to the destination `dest`. If `dest` does not exist, create it. 
+Copy all input files (`POSCAR`, `POTCAR`, `INCAR`, `KPOINTS` by default) to the destination `dest`. If `dest` does not exist, create it.
 Files can be included/excluded using the `include`/`exclude` keywords.
 
 # Arguments

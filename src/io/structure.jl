@@ -121,7 +121,7 @@ Adjust atomic positions so that atom position are not shifted with respect to pe
 - 'positions::Array{Float64}': 3xNionxNconfig Array of atomic position (Nion = number of atoms, Nconfig=number of MD snapshots)
 """
 function adjust_pos_PBC!(positions)
-    for t in 2:size(positions, 3)  
+    for t in 2:size(positions, 3)
         # Calculate difference in between positions between two snapshot
         dX = positions[:, :, t] - positions[:, :, t - 1]
         for i in 1:size(positions, 1)

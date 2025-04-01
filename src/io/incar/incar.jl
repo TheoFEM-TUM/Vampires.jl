@@ -197,7 +197,7 @@ function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comm
     if isW90 == false
         isW90 = iswannier90key(key) ? true : false
     end
-    
+
     # Add Wannier90 block if Wannier90 key is added
     if isW90 && !haskey(incar.vasp, "Wannier90") 
         incar.vasp["Wannier90"] = OrderedDict{String, IncarValue}()
@@ -213,7 +213,7 @@ function set_key!(incar::Incar, key::AbstractString, value::AbstractString; comm
     end
 
     set_key!(incar, key, IncarValue(value, comment), block_label, isW90)
-    
+
     # num_wann should be set as a VASP and a W90 keyword
     if key == "num_wann"
         set_key!(incar, "NUM_WANN", IncarValue(value, comment), "Wannier90", false)
@@ -285,7 +285,7 @@ function write_incar(incar::Incar, filename="INCAR")
                 end
                 if w90_label ≠ collect(keys(incar.w90))[end]; println(file, ""); end
             end
-            
+
             println(file, " \"")
         end
         if block_label ≠ collect(keys(incar.vasp))[end]; println(file, ""); end

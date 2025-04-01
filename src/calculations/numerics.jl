@@ -46,15 +46,21 @@ Computes the full autocorrelation of the input vector `x`, returning a vector of
 - The calculation for each lag `k` (positive or negative) involves the dot product of overlapping segments of `x`, ensuring symmetric results.
 - The function ensures the autocorrelation is correctly calculated for all lags, including handling edge cases at both ends of the input vector.
 """
-function compute_full_autocorrelation(x)
+function compute_full_autocorrelation(x::AbstractArray{T, 1}) where T <: Number
     n = length(x)
-    result = Array{Float64}(undef, 2 * n - 1)
+    result = Array{Number}(undef, 2 * n - 1)
     @inbounds for lag in 1:(n-1)
         result[n + lag] = sum(x[1:(n - lag)] .* x[(1 + lag):n])
         result[n - lag] = sum(x[(lag + 1):n] .* x[1:(n - lag)])
     end
     result[n] = sum(x .* x)
     return result
+end
+
+function compute_full_autocorrelation(x::AbstractArray{T, 3}, weights::AbstractArray{<:Number}=[]) where T <: Number
+    weights = size(weights) == 0 ? ones(size(x, 2)) : weights
+    t = hcat([weights[j] .* compute_full_autocorrelation(x[i, j, :]) for i in axes(x, 1), j in axes(x, 2)]...)
+    return reshape(t, :, size(x, 2), 3)
 end
 
 """
@@ -88,7 +94,31 @@ function _get_finite_difference_coef(N, )
     end
 end
 
-function evaluate_finite_difference(x, dt, N=3)
-    coeffs = _get_finite_difference_coef(N)
-    (x ⋅ Es) ./ dt
+"""
+    lorentzian_broadening(x, y, γ=-1)
+
+Applies Lorentzian broadening to the input data `(x, y)` using a specified broadening parameter `γ`. This function convolves the input data with a Lorentzian function to broaden the data, often used in spectroscopy or signal processing.
+
+# Arguments
+- `x::Vector{Float64}`: The input x-values (e.g., the data points or the spectral axis).
+- `y::Vector{Float64}`: The input y-values corresponding to `x` (e.g., intensity or amplitude data).
+- `γ::Float64`: The full-width at half-maximum (FWHM) of the Lorentzian function. If not specified (`γ = -1`), it is set to the difference between consecutive `x` values.
+
+# Returns
+- `Tuple{Vector{Float64}, Vector{Float64}}`: A tuple containing:
+  - `x_out::Vector{Float64}`: The new x-values after broadening, ranging from 0 to the maximum of `x`, with spacing determined by `γ`.
+  - `y_out::Vector{Float64}`: The y-values after applying Lorentzian broadening to the input data.
+"""
+function lorentzian_broadening(x, y, γ=-1)
+    if γ == -1
+        γ = x[2] - x[1]
+    end
+    x_out = collect(0:γ:maximum(x))
+    y_out = zeros(length(x_out))
+
+    for i in eachindex(x)
+        u = (π * ((-x_out .+ x[i]).^2 .+ γ^2))
+        y_out += y[i] * γ ./ u
+    end
+    return (x_out, y_out)
 end

@@ -36,6 +36,6 @@
     out = @run_task_recursive eigenval read args
     @test out.bandgap == [0.5953680000000001, 0.5953680000000001, 0.5953680000000001]
     Vampires.task_output(out, args)
-    @test h5read("bandgap.h5", "mean_bandgap") == 0.5953680000000001 
+    @test h5read("bandgap.h5", "mean_bandgap") == 0.5953680000000001
     rm("bandgap.h5")
 end

@@ -75,7 +75,7 @@ end
 """
     print_output(key, value; folder="none", error=0.)
 
-Prints a formatted output message displaying the `key`, `value`, optional `folder`, and optional `error` associated with a given value. 
+Prints a formatted output message displaying the `key`, `value`, optional `folder`, and optional `error` associated with a given value.
 
 # Arguments
 - `key`: A string representing the name or label associated with the `value`.
@@ -96,10 +96,10 @@ end
 """
     round_value(value; digits=7)
 
-Rounds a given value or array of values to the specified number of decimal places (default is 7). 
+Rounds a given value or array of values to the specified number of decimal places (default is 7).
 
 # Arguments
-- `value`: The value or array of values to be rounded. 
+- `value`: The value or array of values to be rounded.
 - `digits`: The number of digits to round to. Default is 7.
 
 # Returns

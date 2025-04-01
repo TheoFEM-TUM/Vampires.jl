@@ -119,7 +119,7 @@ function copy_vasp_input(path, folder, files=["KPOINTS", "POTCAR", "POSCAR", "IN
 
     # Filter files that are added via the include list
     filter!(file->file ∉ [b for (_, b) in include], files)
-    
+
     infiles = vcat(files, [a for (a, _) in include])
     outfiles = vcat(files, [b for (_, b) in include])
     for (infile, outfile) in zip(infiles, outfiles)
@@ -151,8 +151,8 @@ function split_path_at_folder(path, folder)
     if index === nothing
         error("Folder name '$folder' not found in the path '$path'")
     elseif index ≤ length(segments) - 1
-        return joinpath(segments[index+1:end]...)    
-    else 
+        return joinpath(segments[index+1:end]...)
+    else
         return ""
     end
 end
