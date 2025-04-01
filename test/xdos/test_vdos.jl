@@ -56,6 +56,12 @@
         @test S ≈ read_from_file(joinpath(test_file_path, "vdos_broadening_gaas_correct.dat"))
     end
 
+    @testset "Full Method GaAs Wrapper" begin
+        xdat = read_xdatcar(test_file_path * "XDATCAR_gaas")
+        ω, S = compute_vdos(xdat, 1; method="full")
+        @test S ≈ read_from_file(test_file_path*"vdos_gaas_correct.dat")
+    end
+
     # Test unsupported method
     @testset "Unsupported Method" begin
         @test_throws ErrorException compute_vdos(velocities, timestep; method="zero_padding", atom_names=atom_names)
