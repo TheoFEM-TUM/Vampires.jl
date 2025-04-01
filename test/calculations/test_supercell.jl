@@ -10,7 +10,7 @@ sc_poscar = transform_primitive_cell(poscar, Ns)
     @test pc_poscar.atom_names == poscar.atom_names
     @test pc_poscar.atom_numbers == poscar.atom_numbers
     @test pc_poscar.lattice == poscar.lattice
-    @test pc_poscar.rs_atom == poscar.rs_atom
+    @test pc_poscar.positions == poscar.positions
 
     # Test 2x2x2 supercell
     @test unique(sc_poscar.atom_types) == poscar.atom_types
@@ -21,8 +21,8 @@ end
 
 path = test_file_path*"param_test/"
 N = 10; Nmin = 5
-supercell_create_subdirectories(path, test_file_path*"XDATCAR_gaas", test_file_path*"SC_POSCAR", N, method="random", Nmin=Nmin)
-_, configs = read_xdatcar(test_file_path*"XDATCAR_gaas")
+supercell_create_subdirectories(path, test_file_path*"XDATCAR_gaas", N, method="random", Nmin=Nmin)
+xdatcar = read_xdatcar(test_file_path*"XDATCAR_gaas")
 @testset "Supercell snapshots" begin
     inds = read_from_file(path*"config_inds.dat", type=Int64)
     @test length(inds) == N
@@ -31,7 +31,8 @@ _, configs = read_xdatcar(test_file_path*"XDATCAR_gaas")
     end
     for i in 1:N
         poscar = read_poscar(path*"config_$i/POSCAR")
-        @test poscar.rs_atom == configs[:, :, inds[i]]
+        xdat_pos = xdatcar.positions[:, :, inds[i]]
+        @test poscar.positions == xdat_pos
     end
     @test minimum(inds) ≥ Nmin
 end

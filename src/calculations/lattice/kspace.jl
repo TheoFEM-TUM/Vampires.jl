@@ -14,3 +14,27 @@ function convert_kspacing_to_kgrid(kspacing, lattice)
     bs = get_bs(lattice)
     return Int.(max.(1, ceil.(norm.(eachcol(bs)) ./ kspacing)))
 end
+
+"""
+    find_kpoint(kpoint, kpoints)
+
+Find the index of the first occurrence of a given k-point in an array of k-points and adjust the index 
+to point to the last of any consecutive duplicate k-points (as this sometimes happens for VASP bandstructures).
+
+# Arguments
+- `kpoint::AbstractVector`: The k-point to locate in `kpoints`.
+- `kpoints::AbstractMatrix`: A matrix where each column represents a k-point in a multidimensional space.
+
+# Returns
+- `Int`: The index of `kpoints` where the specified `kpoint` is found, pointing to the last instance
+  in any sequence of consecutive duplicates.
+"""
+function find_kpoint(kpoint, kpoints)
+    k_ind = findfirst(k -> isapprox(k, kpoint), eachcol(kpoints))
+    if k_ind ≠ nothing && size(kpoints, 2) > k_ind
+        while kpoints[:, k_ind + 1] == kpoints[:, k_ind]
+            k_ind += 1
+        end
+    end
+    return k_ind
+end

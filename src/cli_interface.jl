@@ -91,8 +91,7 @@ function main(cli_args)
             println("Running task $task_string $subtask_string ...")
             out = args["r"] ? run_task_recursive(task, subtask, args) : run_task(task, subtask, args)
             if out ≠ nothing
-                keys, values = out
-                task_output(keys, values, args)
+                task_output(out, args)
             end
         catch e
             if e == ArgumentError
@@ -123,10 +122,10 @@ function get_default_args()
         "tol"=>"0.1",
         "npar"=>"1",
         "npar"=>"1",
-        "method"=>"none",
-        "reduce" => "nonenone",
-        "exclude" => "",
-        "include"=> "",
+        "method" => "none",
+        "reduce" => "none",
+        "exclude"=>"",
+        "include" => "",
         "incar" => "INCAR",
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
@@ -137,7 +136,9 @@ function get_default_args()
         "kpoints" => "KPOINTS",
         "w90_hr" => "wannier90_hr.dat",
         "exe" => "vasp_std",
+        "h5" => "",
         "account" => "none",
+        "hostname" => "none",
         "ext_par_file" => "none",
         "ncore" => "none",
         "nsim" => "none",
@@ -153,7 +154,9 @@ function get_default_args()
         "nodes" => "1",
         "mail" => "",
         "module_list" => "",
-        "module_paths" => ""
+        "module_paths" => "",
+        "npt" => false,
+        "lammps" => ""
     )
     read_settings!(args_dict)
     return args_dict
@@ -179,7 +182,7 @@ function get_arg_description()
             "tol" => "a numerical tolerance parameter",
             "npar" => "general task dependent parallelization parameter",
             "method" => "general task dependent method parameter",
-            "reduce" => "specifies a function to reduce the task output",
+            "reduce" => "specifies a method to apply to the task output as post-processing",
             "incar" => "set the name of the INCAR file",
             "eigenval" => "set the name of the EIGENVAL file",
             "doscar" => "set the name of the DOSCAR file",
@@ -188,10 +191,12 @@ function get_arg_description()
             "xdatcar" => "set the name of the XDATCAR file",
             "outcar" => "set the name of the OUTCAR file",
             "kpoints" => "set the name of the kpoints file",
+            "h5" => "set the name of an h5 file",
             "exclude" => "task dependent exclude parameter",
             "include" => "task dependent include parameter",
             "regex" => "regular expression that e.g., filters the subdirectories used to run a recursive task",
             "account" => "set the account name for job submission on slurm system",
+            "hostname" => "set the hostname of a remote host",
             "w90_hr" => "set the name of the *_hr.dat file",
             "exe" => "set the name of the main executable",
             "ext_par_file" => "Path to an extended parameter file that contains additional settings for the simulation",
@@ -204,7 +209,14 @@ function get_arg_description()
             "nodes" => "the number of requested nodes (slurm script)",
             "mail" => "the mail address to mail job updates to (slurm script)",
             "module_list" => "the module names to be imported in a slurm script",
-            "module_paths" => "additional paths where modules may be located (slurm script)"
+            "module_paths" => "additional paths where modules may be located (slurm script)",
+            "title" => "specifies the title of a plot",
+            "xdata" => "specifies the xdata for a plot",
+            "ydata" => "specifies the ydata for a plot",
+            "xlabel" => "specifies the label of the x axis",
+            "ylabel" => "specifies the label of the y axis",
+            "npt" => "specifies if MD input is an NPT ensemble",
+            "lammps" => "set name of LAMMPS file"
         )
     )
     return arg_descriptions

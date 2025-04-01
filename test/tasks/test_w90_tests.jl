@@ -8,18 +8,18 @@
 
     # Test 1: Test standard read
     Hr, Rs, deg = read_hrdat(joinpath(args["p"], "wannier90_hr.dat"))
-    keys, values = run_task(Val{Symbol("w90_hr")}, Val{Symbol("read")}, args)
+    out = run_task(Val{Symbol("w90_hr")}, Val{Symbol("read")}, args)
 
-    @test keys == ["Hr", "Rs", "degeneracies"]
-    @test Hr == values[1]
-    @test Rs == values[2]
-    @test deg == values[3]
+    @test string.(keys(out)) == ("Hr", "Rs", "degeneracies")
+    @test Hr == out.Hr
+    @test Rs == out.Rs
+    @test deg == out.degeneracies
 
     # Test 2: Test recursive read
     args["o"] = "w90.h5"
     args["r"] = true
-    keys, values = run_task_recursive(Val{Symbol("w90_hr")}, Val{Symbol("read")}, args)
-    Vampires.task_output(keys, values, args)
+    out = run_task_recursive(Val{Symbol("w90_hr")}, Val{Symbol("read")}, args)
+    Vampires.task_output(out, args)
 
     @test all([h5read("w90.h5", "Hr")[:, :, :, i] == Hr for i in 1:3])
     @test all([h5read("w90.h5", "Rs")[:, :, i] == Rs for i in 1:3])

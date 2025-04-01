@@ -41,8 +41,9 @@ Read the Wannier90 `w90_hr.dat` file and export its data in HDF5 format.
 # Example 1: Read data from a w90_hr.dat file and save it to a default HDF5 file.
 vamp w90_hr read --w90_hr /path/to/w90_hr.dat
 
-# Example 2: Read data from 
+# Example 2: Read data from
 vamp w90_hr read --w90_hr /path/to/w90_hr.dat --o /path/to/output.h5
+```
 """
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
     input_filename = joinpath(args["p"], args["w90_hr"])
@@ -52,7 +53,7 @@ function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
     if args["par"] == "eigenvalues"
         ks, _, _ = read_eigenval(eigenval)
         Es, _ = get_wannier90_eigenvalues(Hr, Rs, deg, ks)
-        return ["eigenvalues"], [Es]
+        return (eigenvalues = Es,)
     elseif args["par"] == "bandgap"
         num_wann = parse(Int64, findvalue(read_incar(incar), "num_wann"))
         bandmin = parse(Int64, args["N"])
@@ -60,9 +61,9 @@ function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:read}}, args)
         ks, _, occs = read_eigenval(eigenval)
         Es, _ = get_wannier90_eigenvalues(Hr, Rs, deg, ks)
         ΔE = get_bandgap(Es, occs[bandmin:bandmax, :])
-        return ["bandgap"], [ΔE]
+        return (bandgap = ΔE,)
     else
-        return ["Hr", "Rs", "degeneracies"], [Hr, Rs, deg]
+        return (Hr = Hr, Rs = Rs, degeneracies = deg)
     end
 end
 
@@ -91,6 +92,7 @@ vamp w90_hr test --method rmse --N 14
 
 # Example 2: Calculate the MAE between Wannier90 and DFT in every subfolder for custom filenames.
 vamp -r w90_hr test --w90_hr custom_hr.dat --eigenval custom_EIGENVAL
+```
 """
 function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:test}}, args)
     bandmin = parse(Int64, args["N"]) == 0 ? 1 : parse(Int64, args["N"])
@@ -120,6 +122,7 @@ Set parameters in the INCAR file for a Wannier90 calculation based on the specif
 ```bash
 # Example 1: Set energy windows in the INCAR file with a tolerance of 0.15, starting from band index 10.
 vamp w90 set --par windows --tol 0.15 --N 10 --p /path/to/dir --incar INCAR --eigenval EIGENVAL_bands
+```
 """
 function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
     tol = parse(Float64, args["tol"])
@@ -135,7 +138,7 @@ function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
         args["par"] = "dis_win_min,dis_win_max,dis_froz_min,dis_froz_max"
         args["val"] = "$dis_win_min,$dis_win_max,$dis_froz_min,$dis_froz_max"
     elseif args["par"] == "projections"
-        # TODO
+        error("The functionality to set projections automatically is not implemented yet.")
     end
     
     run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
@@ -157,6 +160,7 @@ Prepare subdirectories and scripts for a non-self-consistent field (NSCF) Wannie
 ```bash
 # Example: Set up an NSCF Wannier90 calculation with specific INCAR and KPOINTS, and exclude certain files.
 vamp w90_nscf make --p /path/to/calc --exe vasp_std --kpoints KPOINTS,KPOINTS_W90 --incar INCAR,INCAR_W90 --exclude WAVECAR,XDATCAR
+```
 """
 function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     nscf_create_subdirectories(args["p"], args["kpoints"], args["incar"])
@@ -165,7 +169,7 @@ function run_task(::Type{Val{:w90_nscf}}, ::Type{Val{:make}}, args)
     cb = get_exclude_callback(args["exclude"])
     if length(cb) > 0; cb *= "\n"; end
     cb *= "    if [[ \"\$folder\" == \"scf\" ]]; then\n      ln -f CHGCAR ../nscf/CHGCAR\n      vamp w90 set --N $bandmin --par windows --eigenval EIGENVAL --incar ../nscf/INCAR\n    fi"
-    write_run_script(args["exe"], args["p"], cb=cb, out=filename)
+    write_run_script(args["exe"], "./", cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
 
     scf_incar = joinpath(args["p"], "scf/INCAR")

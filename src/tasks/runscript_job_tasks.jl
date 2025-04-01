@@ -3,19 +3,25 @@ list of available tasks:
 
 runscript
     make: creates a bash script that runs vasp in a specific folder
-job
-    make: create a new job file
-    submit: submit all *.job files
 input
     cp: copy all VASP input files to a new folder
+job
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
 """
 
 
 """
-# CLI Commands to work with bash scripts
+# CLI Commands to work with bash scripts and jobs (slurm)
 
 Available commands:
 * `vamp runscript make`: Create a bash script to perform VASP calculations.
+* `vamp job make`: Creates a job script for the given parameters.
+* `vamp job submit`: Submits all *.job files.
+* `vamp job status`: Shows the status of all active jobs.
+* `vamp job cancel`: Cancel a given job
 """
 run_task(::Type{Val{:job}}, ::Type{Val{:none}}, args) = nothing
 
@@ -49,6 +55,7 @@ vamp -r runscript make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 function run_task(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
     cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
+    return nothing
 end
 
 function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
@@ -62,10 +69,11 @@ function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
             write_run_script(args["exe"], args["p"], cb=cb, out=script_name)
         end
     end
+    return nothing
 end
 
 """
-    vamp run job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>]
+    vamp job make [--exe <executable>] [--partition <partition>] [--nodes <nodes>] [--time <time>]
                       [--mail <email>] [--module_list <modules>] [--module_path <path>] [--p <path>]
 
 Creates and submits a Slurm job script to run the specified executable with customized job settings.
@@ -96,6 +104,7 @@ vamp run job make --exe run_file --partition short --nodes 2 --time 4 --mail use
 
 # Example 3: Load specific modules and specify a module path before running `vasp_std`.
 vamp run job make --exe vasp_std --module_list module1,module2 --module_path /path/to/modules --p /path/to/dir
+```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     exe = args["exe"]
@@ -117,49 +126,114 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     else
         write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
     end
+    return nothing
 end
 
 """
-    vamp [-r] job submit [--account <account_name>]
+    vamp [-r] job submit [--account <account_name>] [--hostname <hostname>] [--p <path>]
 
-Submit all job files that contain the `.job` file ending.
+Submit all job files with the `.job` file extension. If the current hostname matches the specified `hostname`, the jobs are submitted locally; otherwise, they are submitted to a remote host.
+
+**Note:** Remote submission requires ssh to be configured such that `ssh <hostname>` establishes a connection to the host. Furthermore, an environment variable `\$SCRATCH_<account_name>` needs to be defined and point to a directory that is accessible on both the local and remote systems.
+The paths have to look something like `~/sshfs/<hostname>/path/to/job` (local) and `\$SCRATCH_<account_name>/path/to/job` (remote).
 
 # Arguments
-- `r`: if set, submit all job files in all subfolders.
-- `account`: the account for which the job is submitted.
+- `r`: if set, submit all `.job` files in all subdirectories.
+- `account`: specifies the account to which the job submission is charged.
+- `hostname`: optional, specifies the target hostname for the job submission.
+- `p`: the directory path where `.job` files are located. If not provided, the current directory is used.
 
 # Examples
 ```bash
-# Example 1: Submit all jobs for `MYACCOUNT`.
+# Example 1: Submit all `.job` files in the current directory for `MYACCOUNT`.
 vamp job submit --account MYACCOUNT
 
-# Example 2: Submit all jobs in all subfolders for `MYACCOUNT`
+# Example 2: Submit all `.job` files in all subdirectories for `MYACCOUNT`.
 vamp -r job submit --account MYACCOUNT
+
+# Example 3: Submit `.job` files on a specific host and in a specific directory.
+vamp job submit --account MYACCOUNT --hostname target_host
 ```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
     account = args["account"]
-    for file in readdir(args["p"])
-        if occursin(".job", file)
-            run(`sbatch -A $account $file`)
-        end
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+    original_working_directory = pwd()
+    path = args["p"]
+
+    cd(path)
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`sbatch -A $account \*.job`)
+    else
+        scratch_path = "\$SCRATCH_$account/\$USER/"
+        path_on_host = split_path_at_folder(pwd(), hostname)
+        total_path = joinpath(scratch_path, path_on_host)
+        run(`ssh $hostname "cd $total_path && echo \"Submitting job at \$(pwd)\" && sbatch -A $account *.job"`)
     end
+    cd(original_working_directory)
+    return nothing
 end
 
 """
-    vamp job status
+    vamp job status [--hostname <hostname>]
 
-Get the status of all active jobs of the current user.
+Check the status of all jobs for the current user. If the current hostname matches the specified `hostname`, the job status is queried locally; otherwise, it is queried on the specified remote host.
+
+**Note:** Remote status queries require SSH to be configured such that `ssh <hostname>` establishes a connection to the remote host.
+
+# Arguments
+- `hostname`: Optional, specifies the target hostname to query the job status. If not provided or set to `"none"`, the query runs on the local host.
 
 # Examples
 ```bash
-# Example 1: Show the status of all active jobs.
+# Example 1: Check the status of all jobs for the current user on the local host.
 vamp job status
+
+# Example 2: Check the status of all jobs for the current user on a remote host `target_host`.
+vamp job status --hostname target_host
 ```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:status}}, args)
-    user = ENV["USER"]
-    run(`squeue -u $user`)
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.16S\"`)
+    else
+        run(`ssh $hostname "squeue -u \$USER -o \"%.18i %.9P %.40j %.8u %.2t %.10M %.6D %R %.16S\""`)
+    end
+    return nothing
+end
+
+"""
+    vamp job cancel [--hostname <hostname>] [--N <job_id>]
+
+Cancel a job with the specified `job_id`. If the current hostname matches the specified `hostname`, the job is cancelled locally; otherwise, it is cancelled remotely on the specified host.
+
+# Arguments
+- `hostname`: optional, the target hostname where the job is running. If set to `"none"`, the job is cancelled on the local machine.
+- `N`: the job ID of the job to cancel.
+
+# Examples
+```bash
+# Example 1: Cancel a job with job ID 12345 on the local machine.
+vamp job cancel --N 12345
+
+# Example 2: Cancel a job with job ID 12345 on a remote host.
+vamp job cancel --hostname remote_host --N 12345
+```
+"""
+function run_task(::Type{Val{:job}}, ::Type{Val{:cancel}}, args)
+    hostname = args["hostname"]
+    current_hostname = readchomp(`hostname`)
+    job_id = args["N"]
+
+    if hostname == "none" || occursin(hostname, current_hostname)
+        run(`scancel $job_id`)
+    else
+        run(`ssh $hostname "scancel $job_id"`)
+    end
     return nothing
 end
 
@@ -199,7 +273,6 @@ end
 Removes selected VASP output files in the specified directory.
 
 # Arguments
-
 - `p`: Path to the directory containing files to be removed. Defaults to the current directory if not provided.
 - `include`: (Optional) A comma-separated list of additional files (or file patterns) to include in the deletion, beyond the default VASP outputs.
 - `exclude`: (Optional) A comma-separated list of files (or file patterns) to exclude from deletion, even if they match the default VASP outputs or `--include` list.

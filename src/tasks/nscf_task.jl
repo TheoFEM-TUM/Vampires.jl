@@ -46,8 +46,8 @@ function run_task(::Type{Val{:nscf}}, ::Type{Val{:make}}, args)
     filename = joinpath(args["p"], "run_nscf.sh")
     cb = get_exclude_callback(args["exclude"])
     if length(cb) > 0; cb *= "\n"; end
-    cb *= "    if [[ \"\$folder\" == \"scf\" ]]; then\n      ln CHGCAR ../nscf/CHGCAR\n    fi"
-    write_run_script(args["exe"], args["p"], cb=cb, out=filename)
+    cb *= "if [[ \"\$folder\" == \"scf\" ]]; then\n      ln CHGCAR ../nscf/CHGCAR\n    fi"
+    write_run_script(args["exe"], "./", cb=cb, out=filename)
     add_path_to_folders.(filename, ["scf", "nscf"])
     return nothing
 end

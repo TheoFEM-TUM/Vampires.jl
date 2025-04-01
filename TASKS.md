@@ -21,6 +21,12 @@ eigenval:
 ```
 
 ```
+
+h5:
+    read: call the read task for `file` and create a plot.
+```
+
+```
 incar
     set/add: changes or adds a parameter _par_ to a given value _value_ or adds a block to the incar
     rm: remove a certain tag or block from the INCAR file.
@@ -32,6 +38,12 @@ incar
 ```
 kpoints
     make: generate a kpoint file for a certain grid size or kspacing, respectively.
+```
+
+```
+
+lammps:
+    read: read the atomic configurations from the LAMMPS dump output file.
 ```
 
 ```
@@ -53,7 +65,7 @@ outcar
 
 ```
 
-file:
+<task>:
     plot: call the read task for `file` and create a plot.
 ```
 
@@ -72,11 +84,13 @@ any_task
 ```
 runscript
     make: creates a bash script that runs vasp in a specific folder
-job
-    make: create a new job file
-    submit: submit all *.job files
 input
     cp: copy all VASP input files to a new folder
+job
+    make: creates a job script for the given parameters.
+    submit: submit all job files
+    status: show the status of all active jobs
+    cancel: cancel a given job
 ```
 
 ```
@@ -84,11 +98,6 @@ settings
     set: set a new setting in the settings file
     rm: remove a setting from the settings file
     read: read a setting from the settings file
-```
-
-```
-"""
-list of available tasks
 ```
 
 ```
@@ -105,5 +114,6 @@ w90_nscf
 
 xdatcar:
     read: read the atomic configurations from the XDATCAR file.
+    merge: merge multiple XDATCAR into one single file.
 ```
 

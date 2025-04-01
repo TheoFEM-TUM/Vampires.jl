@@ -18,6 +18,8 @@ vampires_path = string(@__DIR__)
 
 Pkg.develop(PackageSpec(path=vampires_path))
 Pkg.activate(vampires_path)
+Pkg.resolve()
+Pkg.update()
 Pkg.instantiate()
 
 # Parse command line arguments
@@ -43,7 +45,7 @@ function parse_commandline()
 end
 
 #Check if Vampires can be imported
-try 
+try
     cd("..")
     using Vampires
     cd(vampires_path)

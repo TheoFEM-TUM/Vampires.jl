@@ -71,22 +71,21 @@ function nscf_create_subdirectories(path, kpoints, incar; verbose=false)
 end
 
 """
-    supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1)
+    supercell_create_subdirectories(path, xdatcar_path, N; method="random", Nmin=1)
 
 Create subdirectories for supercell configurations extracted from an XDATCAR file.
 
 # Arguments
 - `path::String`: The directory path where subdirectories will be created.
 - `xdatcar_path::String`: The file path to the XDATCAR file containing atomic configurations.
-- `poscar_path::String`: The file path to the POSCAR file containing lattice information and atomic positions.
 - `N::Int`: The number of configurations to extract and create subdirectories for.
 - `method::String="random"`: The method for selecting configurations. "random" selects configurations randomly,
   while "uniform" selects them evenly spaced along the XDATCAR trajectory.
 - `Nmin::Int=1`: The minimum index of configurations to consider. Defaults to 1.
 """
-function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; method="random", Nmin=1, potcar="POTCAR", kpoints="KPOINTS", incar="INCAR", include_files=String[])
-    poscar = read_poscar(poscar_path)
-    lattice, configs = read_xdatcar(xdatcar_path)
+function supercell_create_subdirectories(path, xdatcar_path, N; method="random", Nmin=1, potcar="POTCAR", kpoints="KPOINTS", incar="INCAR", include_files=String[])
+    xdatcar = read_xdatcar(xdatcar_path)
+    lattice, configs = xdatcar.lattice, xdatcar.positions
     Nmax = size(configs, 3)
     inds = lowercase(method[1]) == 'u' ? floor.(Int64, LinRange(Nmin, Nmax, N)) : sample(Nmin:Nmax, N, replace=false, ordered=true)
     write_to_file(inds, joinpath(path, "config_inds"))
@@ -94,9 +93,9 @@ function supercell_create_subdirectories(path, xdatcar_path, poscar_path, N; met
     files = [incar, potcar, kpoints]
     for (k, ind) in enumerate(inds)
         mkdir(joinpath(path, "config_$k"))
-        new_poscar = Poscar(1, lattice, poscar.atom_names, poscar.atom_numbers, configs[:, :, ind], poscar.atom_types)
-        write_poscar(new_poscar, filename=joinpath(path, "config_$k", "POSCAR"))
-        copy_vasp_input(path, "config_$k", files, ignore=["POSCAR"], include=include)
+        new_poscar = Structure(1, lattice, xdatcar.atom_names, xdatcar.atom_numbers, configs[:, :, ind], xdatcar.atom_types)
+        write_poscar(new_poscar, filename=joinpath(path, "config_$k/POSCAR"))
+        copy_vasp_input(path, "config_$k", ignore=["POSCAR"], include=[potcar=>"POTCAR", kpoints=>"KPOINTS", incar=>"INCAR"])
     end
 end
 
@@ -133,3 +132,27 @@ function copy_vasp_input(path, folder, files=["KPOINTS", "POTCAR", "POSCAR", "IN
 end
 
 get_include(include_files) = [file=>file for file in include_files]
+
+"""
+    split_path_at_folder(path::String, folder::String) -> String
+
+Split a path at the first occurrence of a specified folder name and return the remaining path after that folder.
+
+# Arguments
+- `path::String`: The full path to split.
+- `folder::String`: The folder name at which to split the path.
+
+# Returns
+- A `String` representing the portion of the path following the specified folder name. If the folder is the last element, an empty string is returned.
+"""
+function split_path_at_folder(path, folder)
+    segments = split_line(path, char='/')
+    index = findfirst(seg -> occursin(folder, seg), segments)
+    if index === nothing
+        error("Folder name '$folder' not found in the path '$path'")
+    elseif index ≤ length(segments) - 1
+        return joinpath(segments[index+1:end]...)    
+    else 
+        return ""
+    end
+end

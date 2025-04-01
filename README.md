@@ -2,6 +2,10 @@
   <img width="460" height="460" src="https://github.com/user-attachments/assets/b0ec8dd0-b5eb-4acc-892a-dc184e10f8c2">
 </p>
 
+[![CI](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/TheoFEM-TUM/Vampires.jl/graph/badge.svg?token=LJT1XRIQBZ)](https://codecov.io/gh/TheoFEM-TUM/Vampires.jl)
+[![docs](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/docs.yml/badge.svg)](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/docs.yml)
+
 # VASP Analysis for Materials Properties In Realistic Energy Surfaces
 ## A Collection of Toolkits for VASP Postprocessing in Julia, currently named:
 
@@ -61,7 +65,7 @@ vamp convergence make -par ENCUT --val 300,350,400
 
 This command creates three subfolders and copies all necessary input files into each one. Next, a bash script is needed to run VASP in each subfolder. The `-r` flag (recursive mode) instructs `Vampires.jl` to execute the specified task within each subfolder. Recursive mode is supported for various tasks, making it ideal for methods that require batch execution, like convergence tests.
 ```bash
-vamp -r run_script make --vasp_exe vasp_std
+vamp -r runscript make --exe vasp_std
 ```
 Finally, once the calculations are complete, we can plot the results—such as the total energy versus the cut-off energy—providing a clear visualization of the convergence behavior.
 ```bash

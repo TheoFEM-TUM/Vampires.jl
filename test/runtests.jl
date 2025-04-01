@@ -1,4 +1,4 @@
-using Vampires, Test, LinearAlgebra, HDF5
+using Vampires, Test, LinearAlgebra, HDF5, Plots
 
 global test_file_path = string(@__DIR__) * "/test_files/"
 
@@ -11,7 +11,9 @@ include("io/test_read_utils.jl")
     include("io/input/test_doscar.jl")
     include("io/input/test_poscar.jl")
     include("io/input/test_xdatcar.jl")
+    include("io/input/test_lammps.jl")
     include("io/input/test_outcar.jl")
+    include("io/plotting/test_colors.jl")
 end
 
 @testset "io/output" begin
@@ -28,11 +30,12 @@ end
 end
 
 @testset "calculations" begin
-    include("calculations/test_bandgap.jl")
+    include("calculations/test_bandstructure.jl")
     include("calculations/test_vectors.jl")
     include("calculations/test_supercell.jl")
     include("calculations/test_kspace.jl")
     include("calculations/test_hamiltonian.jl")
+    include("calculations/test_dynamics.jl")
 end
 
 @testset "xdos" begin

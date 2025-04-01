@@ -31,7 +31,7 @@ function write_run_script(exe, path; out="run_job.sh", cb="", run_out="vasp.log"
                 println(runfile, "    srun $exe  > $run_out")
             end
             if cb ≠ ""; println(runfile, "    "*cb); end
-            println("    echo \"Calculation in \$folder completed.\"")
+            println(runfile, "    echo \"Calculation in \$folder completed.\"")
             println(runfile, "    cd ..")
             println(runfile, "done")
         end
@@ -221,7 +221,7 @@ function write_slurm_script(exe, path; module_paths=[], module_list=[], time=1, 
         echo "Running on hosts: \$SLURM_NODELIST"
         echo "Running on \$SLURM_NNODES nodes."
         echo "Running on \$SLURM_NPROCS processors."
-        echo "Work directory is `pwd`"
+        echo "Work directory is \$(pwd)"
         echo "VASP binary at " \$exe
 
         echo

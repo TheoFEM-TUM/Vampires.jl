@@ -4,6 +4,7 @@ list of available tasks:
 
 xdatcar:
     read: read the atomic configurations from the XDATCAR file.
+    merge: merge multiple XDATCAR into one single file.
 """
 
 
@@ -12,6 +13,7 @@ xdatcar:
 
 Available commands:
 * `vamp xdatcar read`: read the data from the XDATCAR file.
+* `vamp xdatcar merge`: merge multiple XDATCAR into one single file.
 """
 run_task(::Type{Val{:xdatcar}}, ::Type{Val{:none}}, args) = nothing
 
@@ -42,13 +44,45 @@ vamp xdatcar read --par MSD
 ```
 """
 function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
-    lattice, configs = read_xdatcar(joinpath(args["p"], args["xdatcar"]))
+    xdatcar = read_xdatcar(joinpath(args["p"], args["xdatcar"]))
+    lattice, configs = xdatcar.lattice, xdatcar.positions
 
     if lowercase(args["par"]) == "msd"
         poscar = read_poscar(joinpath(args["p"], args["poscar"]))
-        msd, err = get_msd(poscar.rs_atom, configs, lattice)
-        return ["msd", "deviation"], [msd, err]
+        msd, err = compute_msd(poscar.positions, configs, lattice)
+        return (msd = msd, deviation = err)
+    elseif lowercase(args["par"]) == "vdos"
+        δt = args["N"] == "none" ? read_value_from_outcar("POTIM", args["outcar"]) : parse(Float64, args["N"])
+        v = compute_velocities(xdatcar.positions, δt, xdatcar.lattice)
+        vdos = compute_vdos(v, δt, "fourier")
+        return ["energy", "vdos"], vdos'
+        return (energy = vdos'[1], vdos = vdos'[2])
     end
 
-    return ["lattice", "configs"], [lattice, configs]
+    return (lattice = lattice, configs = configs)
+end
+
+"""
+    vamp [-r] xdatcar merge [--xdatcar <file0, file1, ...>] [--p <path>] [--o <file>]
+
+Merges atomic configurations from several XDATCARs in the given order and writes them to an output file.
+
+# Arguments
+- `xdatcar`: The name of the XDATCAR files from an molecular dynamics simulation in the order they should be merged.
+- `p`: The path where the XDATCAR files are located.
+- `o`: The name of the output file.
+
+# Examples
+```bash
+# Example 1: Merge two XDATCAR_* files to a single XDATCAR
+vamp xdatcar merge --xdatcar XDATCAR_0-100,XDATCAR_101-200 --out XDATCAR
+```
+"""
+function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:merge}}, args)
+    structure_n = read_xdatcar.(joinpath.(args["p"], split(args["xdatcar"], ",")))
+    output_filename = args["o"] == "none" ? "XDATCAR_merged" : args["o"]
+    open(joinpath(args["p"], output_filename), "w") do file
+        write_xdatcar(file, structure_n)
+    end
+    return nothing
 end

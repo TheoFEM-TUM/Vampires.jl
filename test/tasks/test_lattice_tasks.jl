@@ -7,7 +7,7 @@
     args["incar"] = "INCAR_1"
     args["N"] = "2"
 
-    run_task(Val{Symbol("supercell")}, Val{Symbol("sample")}, args)
+    @run_task supercell sample args
     
     # Test 1: Test that the number of folders is equal to N
     @test count(file->occursin("config", file), Vampires.readfolders(joinpath(@__DIR__, "test_files"))) == 2
