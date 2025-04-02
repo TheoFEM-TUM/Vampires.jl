@@ -48,12 +48,12 @@
     end
 
     @testset "Full Method GaAs" begin
-        xdat = read_xdatcar(test_file_path * "XDATCAR_gaas")
+        xdat = read_xdatcar(joinpath(test_file_path, "XDATCAR_gaas"))
         vel = compute_velocities(xdat.positions, 1, xdat.lattice)
         ω, S = compute_vdos(vel, 1; method="full", atom_names=xdat.atom_types)
-        @test S ≈ read_from_file(test_file_path*"vdos_gaas_correct.dat")
+        @test S ≈ read_from_file(joinpath(test_file_path, "vdos_gaas_correct.dat"))
         ω, S = lorentzian_broadening(ustrip.(ω), S, 0.4)
-        @test S ≈ read_from_file(test_file_path*"vdos_broadening_gaas_correct.dat")
+        @test S ≈ read_from_file(joinpath(test_file_path, "vdos_broadening_gaas_correct.dat"))
     end
 
     @testset "Full Method GaAs Wrapper" begin

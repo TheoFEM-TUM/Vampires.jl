@@ -46,7 +46,7 @@ vamp supercell make --N 1,2,3 --poscar structure/POSCAR
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
-    check_required_parameters(["N"], args)
+    if !check_required_parameters(["N"], args); return; end
     poscar = read_poscar(joinpath(args["p"], args["poscar"]))
     N = occursin(',', args["N"]) ? split_line(args["N"], char=',') : args["N"]
     N = parse.(Int64, N)
@@ -77,7 +77,7 @@ vamp supercell sample --N 100,4000 --xdatcar custom_XDATCAR --method uniform
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
-    check_required_parameters(["N"], args)
+    if !check_required_parameters(["N"], args); return; end
     poscar = joinpath(args["p"], args["poscar"])
     xdatcar = joinpath(args["p"], args["xdatcar"])
     incar = joinpath(args["p"], args["incar"])

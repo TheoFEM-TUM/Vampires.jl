@@ -56,7 +56,7 @@ vamp outcar read --par effective_mass --kpoints 0,0,0 --N 3 --method fdm
 ```
 """
 function run_task(::Type{Val{:outcar}}, ::Type{Val{:read}}, args)
-    check_required_parameters(["par"], args)
+    if !check_required_parameters(["par"], args); return; end
     param = args["par"]
     input_file = joinpath(args["p"], args["outcar"])
 

@@ -1,6 +1,6 @@
 using Vampires, Test, LinearAlgebra, HDF5, Plots, Unitful
 
-global test_file_path = string(@__DIR__) * "/test_files/"
+global test_file_path = joinpath(string(@__DIR__), "test_files/")
 
 include("io/test_read_utils.jl")
 
@@ -29,6 +29,7 @@ end
     include("tasks/test_poscar_task.jl")
     include("tasks/test_eigenval_task.jl")
     include("tasks/test_w90_tests.jl")
+    include("tasks/test_scaling_tasks.jl")
 end
 
 @testset "calculations" begin

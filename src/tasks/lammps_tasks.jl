@@ -33,7 +33,7 @@ vamp lammps read --lammps position.lammpstrj --p /home/LAMMPS_output/
 ```
 """
 function run_task(::Type{Val{:lammps}}, ::Type{Val{:read}}, args)
-    check_required_parameters(["lammps"], args)
+    if !check_required_parameters(["lammps"], args); return; end
     lammps = read_lammps(joinpath(args["p"], args["lammps"]), args["npt"])
     lattice, configs = lammps.lattice, lammps.positions
     return (lattice = lattice, configs = configs)

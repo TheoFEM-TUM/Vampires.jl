@@ -34,6 +34,7 @@
         run_task(Val{Symbol("incar")}, Val{Symbol("add")}, args)
         args["par"] = "NCORE,KPAR"
         out = run_task(Val{Symbol("incar")}, Val{Symbol("read")}, args)
+        println("out:", out)
         @test string.(keys(out)) == ("NCORE", "KPAR")
         @test values(out) == ("1", "1")
         rm("INCAR")

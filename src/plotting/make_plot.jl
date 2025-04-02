@@ -77,7 +77,7 @@ function make_bar_plot(xdata, ydata; title="", xlabel="", ylabel="", xticks=[], 
     if size(xticks, 1) == 0
         xticks = xdata_equi
     end
-    if size(bar_colors, 1) == 0
+    if !(typeof(bar_colors) <: AbstractArray)
         bar_colors = repeat([vcolors.blue], size(xdata_equi, 1))
     end
 
@@ -128,10 +128,10 @@ function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title
     speedup = avg_time_scf_step_n[1] ./ avg_time_scf_step_n
 
     # Set the color and x-axis label based on the type
-    bar_color = type == "gpu" ? vamp_colors["Bluish Green"] : type=="mixed" ? vcat([vamp_colors["Sky Blue"]], repeat([vamp_colors["Bluish Green"]], length(speedup)-1)) : vamp_colors["Sky Blue"]
+    bar_color = type == "gpu" ? vcolors.green : type=="mixed" ? vcat([vcolors.sky_blue], repeat([vcolors.green], length(speedup)-1)) : vcolors.sky_blue
     xlab = type == "gpu" ? "Number of GPUs" : type == "mixed" ? "" : "Number of Cores"
 
-    p = plot_bars(core_n, speedup, xlab, "Speedup", xticks, bar_color, 0, maximum(speedup) * 1.2, title=title)
+    p = make_bar_plot(core_n, speedup; title="Speedup", xlabel=xlab, ylabel="Speedup", xticks=xticks, ymin=0, ymax=maximum(speedup) * 1.2, bar_colors=bar_color)
 
     # Add speedup text on top of each bar
     for (i, s) in enumerate(speedup)

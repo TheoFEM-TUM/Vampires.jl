@@ -41,7 +41,7 @@ vamp convergence make --par LREAL --val True,False --path lreal_tests
 ```
 """
 function run_task(::Type{Val{:convergence}}, ::Type{Val{:make}}, args)
-    check_required_parameters(["par", "val"], args)
+    if !check_required_parameters(["par", "val"], args); return; end
     param = args["par"]
     param_range = split(args["val"], ",")
     path = args["p"]

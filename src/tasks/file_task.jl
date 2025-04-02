@@ -31,7 +31,7 @@ vamp h5 read --h5 FILENAME
 ```
 """
 function run_task(::Type{Val{:h5}}, ::Type{Val{:read}}, args)
-    check_required_parameters(["h5"], args)
+    if !check_required_parameters(["h5"], args); return; end
     filename = occursin(".h5", args["h5"]) ? args["h5"] : args["h5"] * ".h5"
     h5open(joinpath(args["p"], filename), "r") do file
         out = mapreduce(merge, keys(file)) do dataset

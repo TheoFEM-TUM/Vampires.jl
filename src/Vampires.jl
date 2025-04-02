@@ -25,7 +25,7 @@ include("calculations/lattice/dynamics.jl")
 
 # plotting
 include("plotting/vamp_colors.jl")
-include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/recursive_plots/convergence.jl"); include("plotting/make_plot.jl")
+include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); include("plotting/make_plot.jl")
 
 # tasks
 # recursive.jl has to be the first include as it defines the @rcalc macro
@@ -47,7 +47,7 @@ export add_incar_block!, rm_incar_block!
 export read_value_from_outcar
 export write_to_file, read_from_file, write_kpoints
 export vcolors, autocolor, resetcolor
-export plot_bandstructure, plot_value_convergence
+export plot_bandstructure
 export read_hrdat
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
@@ -69,7 +69,7 @@ using PrecompileTools: @compile_workload, @setup_workload
     v = Float64[1, 2, 3]
     task = Val{:incar}
     subtask = Val{:set}
-    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"", "o"=>"none")
+    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>joinpath(string(@__DIR__), "../"), "block"=>"", "o"=>"none")
     args_list = ["--help"]
     @compile_workload begin
         redirect_stdout(Base.DevNull()) do
