@@ -55,6 +55,8 @@ function parse_structure_file_header(lines)
     for i in 1:3
         lattice[:, i] = @. a * parse(Float64, lines[2+i])
     end
+    # set a to 1 after scaling the lattice
+    a = 1.0
 
     # Atom names and numbers
     if length(lines[6]) ≠ length(lines[7])

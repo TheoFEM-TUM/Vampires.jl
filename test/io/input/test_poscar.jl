@@ -1,7 +1,7 @@
 poscar = read_poscar(test_file_path*"POSCAR_gaas")
 
 @testset "GaAs POSCAR Read" begin
-    @test poscar.a == 5.65
+    @test poscar.a == 1.0
     @test poscar.atom_names == ["Ga", "As"]
     @test poscar.lattice == [2.825 0.0 2.825; 2.825 2.825 0.0; 0.0 2.825 2.825]
     @test poscar.positions == [0.0 0.25; 0.0 0.25; 0.0 0.25]
