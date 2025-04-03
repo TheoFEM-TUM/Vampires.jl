@@ -137,3 +137,8 @@ function adjust_pos_PBC!(positions)
         end
     end
 end
+# TODO: unify with vdos
+# function adjust_pos_PBC!(positions)
+#     return ifelse.(positions .> reshape(cellsize ./ 2, :, 1, 1), positions .- reshape(cellsize, :, 1, 1),
+#     ifelse.(positions .< reshape(-cellsize ./ 2, :, 1, 1), positions .+ reshape(cellsize, :, 1, 1), positions))
+# end

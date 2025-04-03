@@ -23,6 +23,12 @@ function read_xdatcar(xdatcar="XDATCAR")
     # Find starting line of configurations
     i_start, _ = next_line_with("Direct", lines)
 
+    # define helper variable convert to toggle conversion to direct coordinates
+    convert = false
+    if i_start == 0
+        i_start, _ = next_line_with("Cartesian", lines)
+        convert = true
+    end
     # Calculate the number of configurations
     L = length(lines)
 
@@ -32,8 +38,11 @@ function read_xdatcar(xdatcar="XDATCAR")
     for i in i_start+1:(Nion + 1):L, j in i:(i+Nion - 1)
         push!(positions, parse.(Float64, lines[j])...)
     end
-
     positions = reshape(positions, (3, Nion, :))
+
+    if convert
+        positions = cart_to_frac(positions, lattice)
+    end
 
     return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
 end
