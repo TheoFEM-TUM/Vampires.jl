@@ -15,15 +15,18 @@ Extract all data from the POSCAR file at `poscar`.
     - `positions`: A 3xNionx(Nconfig=1) array of atomic positions.
     - `atom_types`: An array of atom types corresponding to each atom position.
 """
-function read_poscar(poscar="POSCAR")
+function read_poscar(poscar::AbstractString="POSCAR")
     lines = open_and_read(poscar)
     lines = split_lines(lines)
 
     a, lattice, atom_names, atom_numbers, atom_types, Nion = parse_structure_file_header(lines[1:7])
-    # TODO: check if Cartesian and convert
     positions = zeros(Float64, 3, Nion)
     for i in 1:Nion
        positions[:, i] = [parse(Float64, el) for el in lines[8+i][1:3]]
+    end
+
+    if "cart" in lowercase.(lines[8])
+        positions = cart_to_frac(positions, lattice)
     end
     return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
 end

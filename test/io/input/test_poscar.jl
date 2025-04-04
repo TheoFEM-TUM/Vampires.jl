@@ -20,6 +20,17 @@ poscar2 = read_poscar("POSCAR")
     @test poscar2.atom_types == ["Ga", "As"]
 end
 
+poscar = read_poscar(test_file_path*"POSCAR_gaas_cartesian")
+
+@testset "GaAs POSCAR Read Cartesian" begin
+    @test poscar.a == 1.0
+    @test poscar.atom_names == ["Ga", "As"]
+    @test poscar.lattice == [2.825 0.0 2.825; 2.825 2.825 0.0; 0.0 2.825 2.825]
+    @test poscar.positions == [0.0 0.25; 0.0 0.25; 0.0 0.25]
+    @test poscar.atom_numbers == [1, 1]
+    @test poscar.atom_types == ["Ga", "As"]
+end
+
 @testset "add_atom_counts" begin
     atom_types_1 = ["Ga", "As"]
     atom_types_1 = Vampires.add_atom_counts(atom_types_1)
