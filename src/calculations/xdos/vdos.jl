@@ -33,7 +33,7 @@ function compute_vdos(v::AbstractArray{Float64}, timestep::T ; method::String="f
         # calculate multidimensional autocorrelation -> returns 3xNionx(2*Nsteps-1)
         vac_ijn = compute_full_autocorrelation(v, masses)
         # calculate ensemble average over (x, y, z) and (atoms...)
-        vac_in = reduce(vcat, sum(vac_ijn, dims=(2, 3)))  # ensemble average
+        vac_in = reduce(vcat, sum(vac_ijn, dims=(2, 3)))
         vac_norm = vac_in ./ sum(reshape(hcat([masses[j] .* v[:, j, :].^2 for j in axes(v, 2)]...), size(v)...))  # normalization
         ω = uconvert.(u"cm^-1", rfftfreq(size(vac_norm, 1), 1/(ustrip(timestep)*u"fs")) ./ c_0)
         S = compute_spectral_density(vac_norm)

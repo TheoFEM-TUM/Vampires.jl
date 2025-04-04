@@ -108,5 +108,5 @@ end
     ], 3, 2, 4) * 1e-7  # convert to m/ps
 
     v = compute_velocities(x, δt, L)
-    @test isapprox(v, v_expected, atol=1e-6)
+    @test isapprox(v, v_expected, atol=1e-8)
 end

@@ -4,7 +4,6 @@
     @test isapprox([8.666666, -4.333333, -4.333333], compute_autocorr(v; normalize=true), atol=1e-6)
 end
 
-# TODO: more test cases
 @testset "Full Autocorroletion Function" begin
     v = [2, 3, -1]
     @test isapprox([-2, 3, 14, 3, -2], Vampires.compute_full_autocorrelation(v), atol=1e-6)

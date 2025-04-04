@@ -1,4 +1,3 @@
-# TODO: automatically collect task strings from task files to cli_interface for an overview
 """
     TASKS
 

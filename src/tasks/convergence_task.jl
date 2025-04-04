@@ -6,7 +6,6 @@ convergence
     read: reads a specific output (e.g., energy) from a convergence test
     plot: plots a specific output (e.g., TOTEN) vs folder seed (e.g., ENCUT)
 """
-# TODO: unify this with time series and ionic relaxation
 
 
 """
