@@ -76,3 +76,33 @@ function get_bs(a)
     b[:, 3] = 2π / V .* (a[:, 1] × a[:, 2])
     return b
 end
+
+"""
+    get_lattice_parameter(str::Structure)
+
+Calculate the lattice parameters (a, b, c, α, β, γ) and the unit cell volume from a `Structure`.
+
+# Arguments
+- `str::Structure`: A `Structure` object containing the lattice vectors.
+
+# Returns
+- `a`: length of the first lattice vector
+- `b`: length of the first lattice vector
+- `c`: length of the first lattice vector
+- `α`: angle between the second and third lattice vector
+- `β`: angle between the first and third lattice vector
+- `γ`: angle between the first and second lattice vector
+"""
+function get_lattice_parameter(str::Structure)
+    # calculate lengths
+    a = norm(str.lattice[:, 1])
+    b = norm(str.lattice[:, 2])
+    c = norm(str.lattice[:, 3])
+    # calculate angles in degrees
+    α = acosd(dot(str.lattice[:, 2], str.lattice[:, 3]) / (b * c))
+    β = acosd(dot(str.lattice[:, 1], str.lattice[:, 3]) / (a * c))
+    γ = acosd(dot(str.lattice[:, 1], str.lattice[:, 2]) / (a * b))
+    # Volume
+    volume = get_volume(str.lattice)
+    return a, b, c, α, β, γ, volume
+end

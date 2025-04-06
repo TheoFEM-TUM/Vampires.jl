@@ -7,7 +7,7 @@ import Documenter: @doc
 include("io/read_utils.jl")
 
 # input
-include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl"); include("io/lammps.jl"); include("io/extended_config.jl")
+include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/contcar.jl"); include("io/xdatcar.jl"); include("io/lammps.jl"); include("io/extended_config.jl")
 include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
 include("io/outcar.jl"); include("io/settings.jl"); include("io/output/error_reduce_funcs.jl")
 include("io/w90_hr.jl")
@@ -30,7 +30,7 @@ include("plotting/energy/bandstructure.jl"); include("plotting/xdos/dos.jl"); in
 # tasks
 # recursive.jl has to be the first include as it defines the @rcalc macro
 include("tasks/recursive.jl")
-include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("tasks/poscar_task.jl")
+include("tasks/incar_tasks.jl"); include("tasks/convergence_task.jl"); include("tasks/poscar_task.jl"); include("tasks/contcar_task.jl")
 include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks/runscript_job_tasks.jl"); include("tasks/outcar_task.jl")
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
 include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/lammps_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl"); include("tasks/plot_task.jl")
@@ -40,7 +40,7 @@ include("tasks/scaling_tasks.jl")
 include("cli_interface.jl")
 
 export Structure
-export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt, read_lammps
+export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt, read_lammps, read_contcar
 export read_config
 export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
 export add_incar_block!, rm_incar_block!
@@ -55,7 +55,7 @@ export strong_scaling_create_subdirectories_VASP
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy, get_effective_mass
 export compute_msd, compute_velocities
 export compute_autocorr, compute_spectral_density, lorentzian_broadening
-export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell
+export frac_to_cart, cart_to_frac, get_volume, get_bs, transform_primitive_cell, get_lattice_parameter
 export compute_dos, convert_kspacing_to_kgrid, compute_vdos
 
 export run_task, run_task_recursive, @run_task, @run_task_recursive
