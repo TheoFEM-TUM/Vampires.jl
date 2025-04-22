@@ -94,6 +94,16 @@ job
 ```
 
 ```
+
+    strong_scaling:
+        read: read the results of a strong scaling run
+        plot: plot the results of a strong scaling run as a bar plot
+        cpu: create a folder structure with slurm files to analyze CPU scaling in VASP
+        gpu: create a folder structure with slurm files to analyze GPU scaling in VASP
+    """
+```
+
+```
 settings
     set: set a new setting in the settings file
     rm: remove a setting from the settings file

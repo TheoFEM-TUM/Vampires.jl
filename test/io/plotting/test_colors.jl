@@ -15,4 +15,5 @@
     # Should still be blue
     @test autocolor() == RGB(0.0, 0.45, 0.70)
     resetcolor()
+    @test vcolors.blue == RGB(0.0, 0.45, 0.70)
 end

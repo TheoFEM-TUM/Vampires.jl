@@ -82,3 +82,27 @@ end
     result = Vampires.split_path_at_folder("/home/user/project/folder", "proj")
     @test result == "folder"
 end
+
+@testset "StrongScaling" begin
+    kpar_range = [1, 2, 4]
+    ncore_nsim_range = [8, 4, 2]
+    for keyword in ["cpu", "gpu"]
+        strong_scaling_create_subdirectories_VASP(kpar_range, ncore_nsim_range; path=path, verbose=false, keyword=keyword, time=1, avail_gpus_per_node=4, avail_cpus_per_node=2)
+
+        for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
+            folder = "strong_scaling_$(i)_" * keyword
+            @test "INCAR" in readdir(path*folder) && "KPOINTS" in readdir(path*folder) && "POSCAR" in readdir(path*folder) && "POTCAR" in readdir(path*folder)
+
+            incar = read_incar(path*folder*"/INCAR")
+            @test findvalue(incar, "KPAR") == string(kpar)
+
+            if keyword == "cpu"
+                @test findvalue(incar, "NCORE") == string(ncore_nsim)
+            elseif keyword == "gpu"
+                @test findvalue(incar, "NSIM") == string(ncore_nsim)
+            end
+
+            rm(path*folder, recursive=true)
+        end
+    end
+end

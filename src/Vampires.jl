@@ -7,7 +7,7 @@ import Documenter: @doc
 include("io/read_utils.jl")
 
 # input
-include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl"); include("io/lammps.jl")
+include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/xdatcar.jl"); include("io/lammps.jl"); include("io/extended_config.jl")
 include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
 include("io/outcar.jl"); include("io/settings.jl"); include("io/output/error_reduce_funcs.jl")
 include("io/w90_hr.jl")
@@ -35,11 +35,13 @@ include("tasks/lattice_tasks.jl"); include("tasks/nscf_task.jl"); include("tasks
 include("tasks/kpoint_tasks.jl"); include("tasks/eigenval_tasks.jl"); include("tasks/doscar_task.jl")
 include("tasks/w90_tasks.jl"); include("tasks/xdatcar_tasks.jl"); include("tasks/lammps_tasks.jl"); include("tasks/task_output.jl"); include("tasks/settings_tasks.jl"); include("tasks/plot_task.jl")
 include("tasks/file_task.jl"); include("tasks/tasks_macro.jl")
+include("tasks/scaling_tasks.jl")
 
 include("cli_interface.jl")
 
 export Structure
 export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt, read_lammps
+export read_config
 export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
 export add_incar_block!, rm_incar_block!
 export read_value_from_outcar
@@ -49,6 +51,7 @@ export plot_bandstructure, plot_value_convergence
 export read_hrdat
 
 export convergence_create_subdirectories, nscf_create_subdirectories, write_run_script, add_path_to_folders, supercell_create_subdirectories
+export strong_scaling_create_subdirectories_VASP
 export get_bandgap, get_vbm_and_cbm, get_fermi_energy, get_effective_mass
 export compute_msd, compute_velocities
 export compute_autocorr, compute_spectral_density, lorentzian_broadening
@@ -66,7 +69,7 @@ using PrecompileTools: @compile_workload, @setup_workload
     v = Float64[1, 2, 3]
     task = Val{:incar}
     subtask = Val{:set}
-    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>string(@__DIR__)*"/../", "block"=>"", "o"=>"none")
+    args = Dict("par"=>"ENCUT", "val"=>"250", "incar"=>"test/test_files/INCAR", "p"=>joinpath(string(@__DIR__), "../"), "block"=>"", "o"=>"none")
     args_list = ["--help"]
     @compile_workload begin
         redirect_stdout(Base.DevNull()) do

@@ -1,4 +1,4 @@
-poscar = read_poscar(test_file_path * "POSCAR_gaas")
+poscar = read_poscar(joinpath(test_file_path, "POSCAR_gaas"))
 
 pc_poscar = transform_primitive_cell(poscar, 1)
 Ns = [4, 4, 4]

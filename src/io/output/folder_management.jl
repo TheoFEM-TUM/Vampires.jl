@@ -14,7 +14,7 @@ function convergence_create_subdirectories(param, param_range; path="./", verbos
     files = [poscar, potcar, incar, kpoints]
     include = get_include(include_files)
     for value in param_range
-        folder = param*"_"*value
+        folder = param*"_"*value*"/"
         mkpath(joinpath(path, folder))
         if param == "kgrid"
             N = parse(Int64, value)
@@ -55,7 +55,7 @@ The function creates two subdirectories, `scf` and `nscf`, within the specified 
       - `LCHARG` is set to `"False"`.
 """
 function nscf_create_subdirectories(path, kpoints, incar; verbose=false)
-    folders = ["scf", "nscf"]
+    folders = ["scf/", "nscf/"]
     kpoint_files = split_line(kpoints, char=','); if length(kpoint_files) == 1; append!(kpoint_files, kpoint_files); end
     incar_files = split_line(incar, char=','); if length(incar_files) == 1; append!(incar_files, incar_files); end
     for (k, folder) in enumerate(folders)
@@ -154,5 +154,107 @@ function split_path_at_folder(path, folder)
         return joinpath(segments[index+1:end]...)
     else
         return ""
+    end
+end
+
+"""
+    strong_scaling_create_subdirectories_VASP(kpar_range::AbstractArray,
+                                              ncore_nsim_range::AbstractArray;
+                                              path::String="./",
+                                              verbose::Bool=true,
+                                              keyword::String="cpu",
+                                              time::Int=1,
+                                              avail_cpus_per_node::Int=1,
+                                              avail_gpus_per_node::Int=1,
+                                              module_paths::AbstractArray=[],
+                                              module_list::AbstractArray=[],
+                                              exe::String="vasp_std",
+                                              partition::String="batch",
+                                              omp_num_threads::Int=0,
+                                              mail::String="",
+                                              script_filename::String="jobscript",
+                                              sub_directory_name::String="strong_scaling"
+                                              )
+
+Creates subdirectories and prepares input files for strong scaling tests in VASP simulations.
+
+# Arguments
+- `kpar_range::AbstractArray`: An array of `KPAR` values to be tested.
+- `ncore_nsim_range::AbstractArray`: A corresponding array of `NCORE` (for CPU) or `NSIM` (for GPU) values to be tested.
+
+# Keyword Arguments
+- `path::String="./"`: Base directory containing the input files (`KPOINTS`, `POTCAR`, `POSCAR`).
+- `verbose::Bool=true`: If `true`, enables verbose INCAR manipulation output.
+- `keyword::String="cpu"`: Specifies the type of scaling test (`"cpu"` or `"gpu"`).
+- `time::Int=1`: Wall time limit for the SLURM job scripts (in hours).
+- `avail_cpus_per_node::Int=2`: Number of CPUs available per compute node.
+- `avail_gpus_per_node::Int=4`: Number of GPUs available per compute node.
+- `module_paths::AbstractArray=[]`: List of module paths to be loaded.
+- `module_list::AbstractArray=[]`: List of modules required for the job.
+- `exe::String="vasp_std"`: VASP executable command.
+- `partition::String="batch"`: SLURM partition name.
+- `omp_num_threads::Int=0`: Number of OpenMP threads ('0' -> not set;  fall back to VASP recommendation).
+- `mail::String=""`: Email address for SLURM job notifications.
+- `script_filename::String="jobscript"`: Name of the SLURM script file.
+- `sub_directory_name::String="strong_scaling"`: Base name for created subdirectories.
+
+# Throws
+- `ArgumentError`: If `keyword` is not `"cpu"` or `"gpu"`.
+- `AssertionError`: If `kpar_range` and `ncore_nsim_range` do not have the same length.
+- `SystemError`: If required input files (`KPOINTS`, `POTCAR`, `POSCAR`) are missing in the specified path.
+
+# Example
+```julia
+strong_scaling_create_subdirectories_VASP(
+    kpar_range=[1, 2, 4],
+    ncore_nsim_range=[8, 4, 2],
+    path="./",
+    verbose=true,
+    keyword="cpu",
+    time=1,
+    avail_gpus_per_node=4,
+    avail_cpus_per_node=2
+)
+"""
+function strong_scaling_create_subdirectories_VASP(kpar_range::AbstractArray,
+                                                   ncore_nsim_range::AbstractArray;
+                                                   path::String = "",
+                                                   verbose::Bool = true,
+                                                   keyword::String = "",
+                                                   time::Int = 1,
+                                                   avail_cpus_per_node::Int = 1,
+                                                   avail_gpus_per_node::Int = 1,
+                                                   module_paths::AbstractArray = [],
+                                                   module_list::AbstractArray = [],
+                                                   exe::String = "vasp_std",
+                                                   partition::String = "batch",
+                                                   omp_num_threads::Int = 0,  # '0' -> not set; fall back to VASP recommendation
+                                                   mail::String = "",
+                                                   script_filename::String = "jobscript",
+                                                   sub_directory_name::String = "strong_scaling"
+                                                   )
+    if keyword ∉ ["cpu", "gpu"]; throw("Scaling tests for $keyword are not supported"); end
+    @assert length(kpar_range) == length(ncore_nsim_range)
+    for (i, kpar, ncore_nsim) in zip(collect(1:length(kpar_range)), kpar_range, ncore_nsim_range)
+        folder = "$(sub_directory_name)_$(i)_"*keyword*"/"
+        mkpath(joinpath(path, folder))
+        copy_vasp_input(path, folder)
+        set_key_in_incar("KPAR", string(kpar), joinpath(path, "INCAR"), out=joinpath(path, folder, "INCAR"), verbose=verbose)
+        if keyword == "cpu"
+            # if omp_num_threads is default, set to 1 for correct scaling tests
+            omp_num_threads = omp_num_threads == 0 ? 1 : omp_num_threads
+            set_key_in_incar("NCORE", string(ncore_nsim), joinpath(path, folder, "INCAR"), verbose=verbose)
+            write_slurm_script(exe, path*folder;  module_paths=module_paths, module_list=module_list,
+                               time=time, nodes=ceil(Int, kpar / avail_cpus_per_node), ntasks_per_node=kpar*24, ntasks_per_core=1,
+                               omp_num_threads=omp_num_threads, num_gpu=0, partition=partition, mail=mail, filename=script_filename)
+        elseif keyword == "gpu"
+            # if omp_num_threads is default, set to 20 * number of avail gpus per node (vasp recommendation)
+            omp_num_threads = omp_num_threads == 0 ? 20 * avail_cpus_per_node : omp_num_threads
+            set_key_in_incar("NSIM", string(ncore_nsim), joinpath(path, folder, "INCAR"), verbose=verbose, block_label=get_block_label_for_keyword("KPAR"))
+            write_slurm_script(exe, path*folder;  module_paths=module_paths, module_list=module_list,
+                               time=time, nodes=ceil(Int, kpar / avail_gpus_per_node), ntasks_per_node=kpar, num_gpu=kpar,
+                               omp_num_threads=omp_num_threads, partition=partition,
+                               mail=mail, filename=script_filename)
+        end
     end
 end
