@@ -70,6 +70,7 @@ function read_lammps(lammps_filename, npt=false)
 
     # Initialize
     positions = zeros(Float64, 3, Nion, Nconfig)
+    velocities = [spzeros(Float64, 3, Nion) for _ in 1:Nconfig]
     atom_types = String[]
     lattices = Float64[]
 
@@ -130,7 +131,7 @@ function read_lammps(lammps_filename, npt=false)
     # Adjust positions for periodic boundary conditions
     adjust_pos_PBC!(positions)
 
-    return Structure(a, lattices, atom_names, atom_numbers, positions, atom_types)
+    return Structure(a, lattices, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 
 """

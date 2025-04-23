@@ -28,7 +28,14 @@ function read_poscar(poscar::AbstractString="POSCAR")
     if "cart" in lowercase.(lines[8])
         positions = cart_to_frac(positions, lattice)
     end
-    return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
+    velocities = spzeros(Float64, 3, Nion)
+    start = 10+Nion
+    if size(lines, 1) > start
+        for i in start:(start+Nion-1)
+            velocities[:, i-start+1] = [parse(Float64, el) for el in lines[i][1:3]]
+        end
+    end
+    return Structure(a, lattice, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 
 """

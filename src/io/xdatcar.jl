@@ -43,8 +43,9 @@ function read_xdatcar(xdatcar="XDATCAR")
     if convert
         positions = cart_to_frac(positions, lattice)
     end
+    velocities = spzeros(Float64, 3, Nion)
 
-    return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
+    return Structure(a, lattice, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 
 """
@@ -80,7 +81,8 @@ function read_xdatcar_npt(xdatcar="XDATCAR")
     end
     positions = reshape(positions, (3, Nion, :))
     lattices = reshape(lattices, (3, 3, :))
-    return Structure(a, lattices, atom_names, atom_numbers, positions, atom_types)
+    velocities = spzeros(Float64, 3, Nion)
+    return Structure(a, lattices, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 
 """
@@ -133,7 +135,7 @@ open("XDATCAR_combined", "w") do io
 end
 ```
 """
-function write_xdatcar(iostream, structure_n::Array{Structure{A, L, P}}) where {A, L, P}
+function write_xdatcar(iostream, structure_n::Vector{Structure{A, L, P, V}}) where {A, L, P, V}
     running_index = 1 # to keep track of the total amount of configurations
     if length(size(structure_n[1].lattice)) == 3
         for structure in structure_n, pos in axes(structure.positions, 3)
@@ -167,7 +169,7 @@ open("XDATCAR_combined", "w") do io
 end
 ```
 """
-function write_xdatcar(iostream, structure::Structure{A, L, P}) where {A, L, P}
+function write_xdatcar(iostream, structure::Structure{A, L, P, V}) where {A, L, P, V}
     running_index = 1 # to keep track of the total amount of configurations
     if length(size(structure.lattice)) == 3
         for pos in axes(structure.positions, 3)

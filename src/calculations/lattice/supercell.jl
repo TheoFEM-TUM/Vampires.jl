@@ -22,6 +22,7 @@ function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     Nion_sc = Nion*prod(Ns)
 
     Rs_sc = zeros(3, Nion_sc)
+    velocities = spzeros(Float64, 3, Nion)
     sc_ion_types = Array{String}(undef, Nion_sc)
 
     # Multiply lattice vectors
@@ -48,7 +49,7 @@ function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     Rs_sc = round.(Rs_sc[:, inds], digits=digits)
     unique_ion_types = unique(sc_ion_types)
     ion_numbers = [count(t->t==type, sc_ion_types) for type in unique_ion_types]
-    return Structure(1., sc_lattice, unique_ion_types, ion_numbers, Rs_sc, sc_ion_types)
+    return Structure(1., sc_lattice, unique_ion_types, ion_numbers, Rs_sc, velocities, sc_ion_types)
 end
 
 transform_primitive_cell(poscar, N::Int64) = transform_primitive_cell(poscar, [N, N, N])

@@ -86,7 +86,7 @@ end
 @testset "get_lattice_parameter" begin
     # Unit cube
     lattice = [1.0 0 0; 0 1.0 0; 0 0 1.0]
-    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), ["X"])
+    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), zeros(3, 1), ["X"])
     a, b, c, α, β, γ, volume = get_lattice_parameter(str)
     @test a ≈ 1.0
     @test b ≈ 1.0
@@ -98,7 +98,7 @@ end
 
     # Scaled cube
     lattice = [2.0 0 0; 0 2.0 0; 0 0 2.0]
-    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), ["X"])
+    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), zeros(3,1), ["X"])
     a, b, c, α, β, γ, volume = get_lattice_parameter(str)
 
     @test a ≈ 2.0
@@ -111,7 +111,7 @@ end
 
     # Parallelepiped with known angles
     lattice = [1.0 1.0 0.0; 0.0 1.0 1.0; 1.0 0.0 1.0]
-    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), ["X"])
+    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), zeros(3,1), ["X"])
     a, b, c, α, β, γ, volume = get_lattice_parameter(str)
 
     @test isapprox(a, norm(lattice[:,1]), atol=1e-8)

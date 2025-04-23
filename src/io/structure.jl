@@ -11,14 +11,16 @@ If the Structure represents an XDATCAR file, the `positions` field holds more th
 - `atom_numbers::Array{Int64, 1}`: An array of the number of each type of atom.
 - `atom_types::Array{String, 1}`: An array of atom types corresponding to each atom position.
 - `positions::Array{Float64, 3}`: A 3D array of shape (3, Nion, Nconfig), where each 3xNion slice represents the atomic positions in a configuration;
-    ! Nconfig = 1 for POSCAR files
+- `velocities::SparseMatrixCSC{Float64, 3}`: A 3D array of shape (3, Nion, Nconfig), where each 3xNion slice represents the atomic velocities of a configuration;
+! Nconfig = 1 for POSCAR files
 """
-struct Structure{A, L, P}
+struct Structure{A, L, P, V}
     a :: A
     lattice :: L
     atom_names :: Array{String, 1}
     atom_numbers :: Array{Int64, 1}
     positions :: P
+    velocities :: V
     atom_types :: Array{String, 1}
 end
 

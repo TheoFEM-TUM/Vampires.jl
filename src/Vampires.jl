@@ -1,6 +1,6 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful, FFTW, Printf, PeriodicTable, TensorOperations
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful, FFTW, Printf, PeriodicTable, TensorOperations, SparseArrays
 import PhysicalConstants.CODATA2018: ħ, m_e, h, c_0
 import Documenter: @doc
 
