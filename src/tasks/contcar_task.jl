@@ -44,6 +44,6 @@ function run_task(::Type{Val{:contcar}}, ::Type{Val{:read}}, args)
     if param == "lattice"
         contcar, velocities = read_contcar(input_file)
         a, b, c, α, β, γ, volume = get_lattice_parameter(contcar)
-        return (a = a, b = b, c = c, α = α, β = β, γ = γ, volume = volume)
+        return (a = a, b = b, c = c, alpha = α, beta = β, gamma = γ, volume = volume)
     end
 end
