@@ -130,7 +130,7 @@ function get_default_args()
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
         "poscar" => "POSCAR",
-        "potcar"=>"POTCAR",
+        "potcar" => "POTCAR",
         "xdatcar" => "XDATCAR",
         "outcar" => "OUTCAR",
         "kpoints" => "KPOINTS",
