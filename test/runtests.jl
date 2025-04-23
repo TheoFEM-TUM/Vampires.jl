@@ -3,6 +3,7 @@ using Vampires, Test, LinearAlgebra, HDF5, Plots, Unitful
 global test_file_path = joinpath(string(@__DIR__), "test_files/")
 
 include("io/test_read_utils.jl")
+include("io/test_structure.jl")
 
 @testset "io" begin
     include("io/test_incar_line.jl")
@@ -13,6 +14,7 @@ include("io/test_read_utils.jl")
     include("io/input/test_xdatcar.jl")
     include("io/input/test_lammps.jl")
     include("io/input/test_outcar.jl")
+    include("io/input/test_contcar.jl")
     include("io/input/test_extended_config.jl")
     include("io/plotting/test_colors.jl")
 end

@@ -1,6 +1,11 @@
 # List of Available Tasks
 
 ```
+contcar
+    read: read a certain value from the contcar file
+```
+
+```
 convergence
     make: creates the folder structure where the specified parameter is changed in the different subdirectories
     read: reads a specific output (e.g., energy) from a convergence test

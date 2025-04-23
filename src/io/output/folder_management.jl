@@ -93,7 +93,8 @@ function supercell_create_subdirectories(path, xdatcar_path, N; method="random",
     files = [incar, potcar, kpoints]
     for (k, ind) in enumerate(inds)
         mkdir(joinpath(path, "config_$k"))
-        new_poscar = Structure(1, lattice, xdatcar.atom_names, xdatcar.atom_numbers, configs[:, :, ind], xdatcar.atom_types)
+        velocities = spzeros(Float64, 3, size(configs, 2))
+        new_poscar = Structure(1, lattice, xdatcar.atom_names, xdatcar.atom_numbers, configs[:, :, ind], velocities, xdatcar.atom_types)
         write_poscar(new_poscar, filename=joinpath(path, "config_$k/POSCAR"))
         copy_vasp_input(path, "config_$k", ignore=["POSCAR"], include=[potcar=>"POTCAR", kpoints=>"KPOINTS", incar=>"INCAR"])
     end
