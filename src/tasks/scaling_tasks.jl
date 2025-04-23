@@ -24,7 +24,7 @@
 
 
     """
-        vamp [-r] strong_scaling <subtask> [--ext_par_file <file>] [--block <name>] [--kpar <values>] [--ncore <values>] [--nsim <values>]
+        vamp [-r] strong_scaling <subtask> --ext_par_file <file> --block <name> --kpar <values> [--ncore <values>] [--nsim <values>]
             [--p <path>] [--v <verbose>] [--exe <vasp_exe>] [--N <time>] [--partition <partition>]
             [--omp_num_threads <num>] [--mail <email>]
 
@@ -37,13 +37,13 @@
     - `kpar`: A comma- or semicolon-separated list of `KPAR` values to be tested.
     - `ncore`: (Required for `cpu` tasks) A comma- or semicolon-separated list of `NCORE` values to be tested.
     - `nsim`: (Required for `gpu` tasks) A comma- or semicolon-separated list of `NSIM` values to be tested.
-    - `p`: The base directory where the scaling tests will be created.
-    - `v`: Enables verbose output if set.
-    - `exe`: Specifies the VASP executable to use. Defaults to `"vasp_std"` unless overridden in `ext_par_file`.
-    - `N`: Time limit for the SLURM job script. Defaults to the value in `ext_par_file`.
-    - `partition`: The SLURM partition to use for the job.
-    - `omp_num_threads`: Number of OpenMP threads to use. Defaults to the value in `ext_par_file`.
-    - `mail`: Email for SLURM job notifications.
+    - `p`: (Optional) The base directory where the scaling tests will be created.
+    - `v`: (Optional) Enables verbose output if set.
+    - `exe`: (Optional) Specifies the VASP executable to use. Defaults to `"vasp_std"` unless overridden in `ext_par_file`.
+    - `N`: (Required as argument or in ext_par_file) Time limit for the SLURM job script. Defaults to the value in `ext_par_file`.
+    - `partition`: (Required as argument or in ext_par_file) The SLURM partition to use for the job.
+    - `omp_num_threads`: (Required as argument or in ext_par_file) Number of OpenMP threads to use. Defaults to the value in `ext_par_file`.
+    - `mail`: (Optional) Email for SLURM job notifications.
 
     # Throws
     - `Error`: If required arguments (`ext_par_file`, `block`, `kpar`, `ncore/nsim`) are missing.
@@ -83,10 +83,10 @@
     function run_task(::Type{Val{:strong_scaling}}, subtask::Union{Type{Val{:cpu}}, Type{Val{:gpu}}}, args)
         keyword = string(subtask.parameters[1])
         if (args["ext_par_file"] == "none" || args["block"]) == "none"
-            println("Error: Tasks preparing slurm scripts for strong scaling requires a parameter file and a specification of the input block. For examples check out `/test/test_files/extended_parameter_file`."); exit;
+            println("Error: Tasks preparing slurm scripts for strong scaling requires a parameter file and a specification of the input block. For examples check out `/test/test_files/extended_parameter_file`."); return;
         end
         if (args["kpar"] == "none" || ((args["nsim"] == "none" && keyword == "gpu") || (args["ncore"] == "none" && keyword == "cpu")))
-            println("Error: You need to specify `--kpar`, and `--ncore` (for CPU) or `--nsim` (for GPU)."); exit();
+            println("Error: You need to specify `--kpar`, and `--ncore` (for CPU) or `--nsim` (for GPU)."); return;
         end
         extended_args = read_config(args["ext_par_file"])[args["block"]]
         kpar_range = [parse(Int, kpar) for kpar in split(args["kpar"], r",|;")]
@@ -118,8 +118,8 @@
     Reads and processes VASP strong scaling test results from OUTCAR files, extracting the average self-consistent field (SCF) step times.
 
     # Arguments
-    - `p`: The base directory where the strong scaling test folders are located.
-    - `outcar`: The filename of the `OUTCAR` file to read within each test folder.
+    - `p`: (Optional) The base directory where the strong scaling test folders are located.
+    - `outcar`: (Optional) The filename of the `OUTCAR` file to read within each test folder.
     - `exclude`: (Optional) A pattern to exclude certain directories from processing.
     - `N`: (Optional) Index for filtering combined CPU/GPU results. If omitted or ≤0, defaults to `2`.
 
@@ -179,8 +179,8 @@
     Reads VASP strong scaling test results and generates a bar plot to visualize the speedup in SCF step time.
 
     # Arguments
-    - `"p"`: Base path where the results are stored.
-    - `"outcar"`: The name of the OUTCAR file used to extract time-per-SCF-step data.
+    - `"p"`: (Optional) Base path where the results are stored.
+    - `"outcar"`: (Optional) The name of the OUTCAR file used to extract time-per-SCF-step data.
     - `"N"`: (Optional) Specifies the running index of the CPU comparison for mixed CPU-GPU plots.
 
     # Output

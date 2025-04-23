@@ -1,5 +1,46 @@
 """"""
 
+# helper functions for task output/input
+
+
+function check_required_parameters(required_parameters::AbstractArray{String}, args)
+    check::Bool = true
+    ref = get_default_args()
+    for required_parameter in required_parameters
+        if args[required_parameter] == ref[required_parameter]; check = false; break; end
+    end
+    if !check
+        println("Missing Parameters. Please specify the following parameters: ")
+        for required_parameter in required_parameters
+            println("--$required_parameter")
+        end
+    end
+    return check
+end
+
+function check_required_parameters(required_parameters::AbstractArray{String}, alternative_parameters::AbstractArray{String}, args)
+    check::Bool = true
+    ref = get_default_args()
+    for required_parameter in required_parameters
+        if args[required_parameter] == ref[required_parameter]; check = false; break; end
+    end
+    if !check
+        for alternative_parameter in alternative_parameters
+            if !(args[alternative_parameter] == ref[alternative_parameter]); check = true; break; end
+        end
+    end
+    if !check
+        println("Missing Parameters. Please specify the following parameters: ")
+        for required_parameter in required_parameters
+            println("--$required_parameter")
+        end
+        println("or alternatively:")
+        for alternative_parameter in alternative_parameters
+            println("--$alternative_parameter")
+        end
+    end
+    return check
+end
 
 
 """

@@ -23,10 +23,10 @@ run_task(::Type{Val{:eigenval}}, ::Type{Val{:none}}, args) = nothing
 Reads eigenvalue data from an EIGENVAL file, processes the k-points, eigenvalues, and occupations, and writes the result to an output file in HDF5 format.
 
 # Arguments
-- `p`: The path where the EIGENVAL file is located. The full path is constructed using this argument and the `eigenval` argument.
-- `eigenval`: Name of the EIGENVAL file to read (optional; default path is given by `p`).
-- `o`: Name of the output file where the results (k-points, eigenvalues, occupations) will be written. The default output format is HDF5, and the default file name is `eigenval.h5`. If not specified, "eigenval.h5" is used.
-- `par`: A specific parameter to read.
+- `p`: (Optional) The path where the EIGENVAL file is located. The full path is constructed using this argument and the `eigenval` argument.
+- `eigenval`: (Optional) Name of the EIGENVAL file to read (optional; default path is given by `p`).
+- `o`: (Optional) Name of the output file where the results (k-points, eigenvalues, occupations) will be written. The default output format is HDF5, and the default file name is `eigenval.h5`. If not specified, "eigenval.h5" is used.
+- `par`: (Optional) A specific parameter to read.
 
 # Behavior
 - The function reads the k-points, eigenvalues, and occupations from the EIGENVAL file located at the specified path.
@@ -70,9 +70,9 @@ end
 Reads the eigenvalues from an EIGENVAL file and generates a plot of the electronic bandstructure.
 
 # Arguments
-- `p`: Path to the directory containing the EIGENVAL file.
-- `eigenval`: Name of the EIGENVAL file to read from.
-- `o`: Output filename for the plot (optional). If not specified, the plot is shown but not saved.
+- `p`: (Optional) Path to the directory containing the EIGENVAL file.
+- `eigenval`: (Optional) Name of the EIGENVAL file to read from.
+- `o`: (Optional) Output filename for the plot (optional). If not specified, the plot is shown but not saved.
 
 # Behavior
 - Reads the eigenvalues and k-points from the specified EIGENVAL file.

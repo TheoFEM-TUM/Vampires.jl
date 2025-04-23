@@ -12,8 +12,8 @@ poscar
 Read the POSCAR file and export its data.
 
 # Arguments
-- `poscar`: Path to the `POSCAR` file to be read.
-- `o`: Name of the output file.
+- `poscar`: (Optional) Path to the `POSCAR` file to be read.
+- `o`: (Optional) Name of the output file.
 
 # Examples
 ```bash

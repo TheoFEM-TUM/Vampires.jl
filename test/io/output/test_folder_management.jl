@@ -21,9 +21,9 @@ end
     for (folder, value) in zip(keyword * "_" .* values, values)
         @test "INCAR" in readdir(path*folder) && "KPOINTS" in readdir(path*folder) && "POSCAR" in readdir(path*folder) && "POTCAR" in readdir(path*folder)
         lines = Vampires.open_and_read(path*folder*"/KPOINTS")
-        @test split_line(lines[3]) == ["Gamma"]
-        @test split_line(lines[4]) == [value, value, value]
-        rm(path*folder, recursive=true)
+        @test Vampires.split_line(lines[3]) == ["Gamma"]
+        @test Vampires.split_line(lines[4]) == [value, value, value]
+        rm(joinpath(path, folder), recursive=true)
     end
 
     # Test Monkhorst-Pack grid
@@ -31,8 +31,8 @@ end
     for (folder, value) in zip(keyword * "_" .* values, values)
         @test "INCAR" in readdir(path*folder) && "KPOINTS" in readdir(path*folder) && "POSCAR" in readdir(path*folder) && "POTCAR" in readdir(path*folder)
         lines = Vampires.open_and_read(path*folder*"/KPOINTS")
-        @test split_line(lines[3]) == ["Monkhorst-Pack"]
-        @test split_line(lines[4]) == [value, value, value]
+        @test Vampires.split_line(lines[3]) == ["Monkhorst-Pack"]
+        @test Vampires.split_line(lines[4]) == [value, value, value]
         rm(path*folder, recursive=true)
     end
 end

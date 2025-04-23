@@ -23,13 +23,13 @@ run_task(::Type{Val{:xdatcar}}, ::Type{Val{:none}}, args) = nothing
 Reads atomic configurations from an XDATCAR file and calculates specific properties, such as mean squared displacement (MSD), based on the specified parameter.
 
 # Arguments
-- `par`: Specifies the property to calculate. Accepted values:
+- `par`: (Optional) Specifies the property to calculate. Accepted values:
     - `"msd"`: Computes the mean squared displacement (MSD) and its standard deviation relative to the initial atomic positions in the POSCAR file.
     - `"vdos"`: Computes the (mass weighted) vibrational density of states.
-- `xdatcar`: The name of the XDATCAR file containing atomic configurations from a molecular dynamics simulation.
-- `poscar`: The name of the POSCAR file containing the initial atomic configuration (required if `par` is `"msd"`).
-- `p`: The path where the XDATCAR and POSCAR files are located.
-- `o`: The name of the output file.
+- `xdatcar`: (Optional) The name of the XDATCAR file containing atomic configurations from a molecular dynamics simulation.
+- `poscar`: (Optional) The name of the POSCAR file containing the initial atomic configuration (required if `par` is `"msd"`).
+- `p`: (Optional) The path where the XDATCAR and POSCAR files are located.
+- `o`: (Optional) The name of the output file.
 
 # Returns
 - If `par` is `"msd"`: Returns MSD and its standard deviation
@@ -68,14 +68,14 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
 end
 
 """
-    vamp [-r] xdatcar merge [--xdatcar <file0, file1, ...>] [--p <path>] [--o <file>]
+    vamp [-r] xdatcar merge --xdatcar <file0, file1, ...> --o <file> [--p <path>]
 
 Merges atomic configurations from several XDATCARs in the given order and writes them to an output file.
 
 # Arguments
 - `xdatcar`: The name of the XDATCAR files from an molecular dynamics simulation in the order they should be merged.
-- `p`: The path where the XDATCAR files are located.
 - `o`: The name of the output file.
+- `p`: (Optional) The path where the XDATCAR files are located.
 
 # Examples
 ```bash
