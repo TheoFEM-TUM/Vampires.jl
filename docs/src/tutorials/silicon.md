@@ -23,10 +23,7 @@ Direct
   0.00  0.00  0.00
   0.25  0.25  0.25
 ```
-Get a POTCAR for silicon with (this only works on a supercomputer)
-```bash
-vamp potcar make
-```
+Get a POTCAR for silicon, this comes with your VASP code.
 
 ## Converging important parameters
 

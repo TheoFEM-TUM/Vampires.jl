@@ -27,7 +27,9 @@ makedocs(
             "cli_docs/job.md",
         ],
         "Tutorials" => [
-            "tutorials/silicon.md"
+            "tutorials/silicon.md",
+            "tutorials/supercell.md",
+            "tutorials/wannier90.md"
         ],
         "Library Mode" => [
             "man/library.md"
