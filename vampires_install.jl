@@ -18,8 +18,8 @@ vampires_path = string(@__DIR__)
 
 Pkg.develop(PackageSpec(path=vampires_path))
 Pkg.activate(vampires_path)
-Pkg.resolve()
 Pkg.update()
+Pkg.resolve()
 Pkg.instantiate()
 
 # Parse command line arguments
