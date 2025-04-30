@@ -1,6 +1,11 @@
 # List of Available Tasks
 
 ```
+contcar
+    read: read a certain value from the contcar file
+```
+
+```
 convergence
     make: creates the folder structure where the specified parameter is changed in the different subdirectories
     read: reads a specific output (e.g., energy) from a convergence test
@@ -91,6 +96,16 @@ job
     submit: submit all job files
     status: show the status of all active jobs
     cancel: cancel a given job
+```
+
+```
+
+    strong_scaling:
+        read: read the results of a strong scaling run
+        plot: plot the results of a strong scaling run as a bar plot
+        cpu: create a folder structure with slurm files to analyze CPU scaling in VASP
+        gpu: create a folder structure with slurm files to analyze GPU scaling in VASP
+    """
 ```
 
 ```

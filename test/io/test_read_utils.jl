@@ -59,7 +59,7 @@ end
 
     # Test 3: test with strings
     @test Vampires._concat_values([["Hello", "World"], ["foo", "bar"]]) == ["Hello" "foo"; "World" "bar"]
-    
+
     # Test 4: vector of strings should return itself
     Vampires._concat_values(["Hello", "World"])
 end

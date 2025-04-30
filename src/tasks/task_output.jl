@@ -1,5 +1,46 @@
 """"""
 
+# helper functions for task output/input
+
+
+function check_required_parameters(required_parameters::AbstractArray{String}, args)
+    check::Bool = true
+    ref = get_default_args()
+    for required_parameter in required_parameters
+        if args[required_parameter] == ref[required_parameter]; check = false; break; end
+    end
+    if !check
+        println("Missing Parameters. Please specify the following parameters: ")
+        for required_parameter in required_parameters
+            println("--$required_parameter")
+        end
+    end
+    return check
+end
+
+function check_required_parameters(required_parameters::AbstractArray{String}, alternative_parameters::AbstractArray{String}, args)
+    check::Bool = true
+    ref = get_default_args()
+    for required_parameter in required_parameters
+        if args[required_parameter] == ref[required_parameter]; check = false; break; end
+    end
+    if !check
+        for alternative_parameter in alternative_parameters
+            if !(args[alternative_parameter] == ref[alternative_parameter]); check = true; break; end
+        end
+    end
+    if !check
+        println("Missing Parameters. Please specify the following parameters: ")
+        for required_parameter in required_parameters
+            println("--$required_parameter")
+        end
+        println("or alternatively:")
+        for alternative_parameter in alternative_parameters
+            println("--$alternative_parameter")
+        end
+    end
+    return check
+end
 
 
 """
@@ -75,7 +116,7 @@ end
 """
     print_output(key, value; folder="none", error=0.)
 
-Prints a formatted output message displaying the `key`, `value`, optional `folder`, and optional `error` associated with a given value. 
+Prints a formatted output message displaying the `key`, `value`, optional `folder`, and optional `error` associated with a given value.
 
 # Arguments
 - `key`: A string representing the name or label associated with the `value`.
@@ -96,10 +137,10 @@ end
 """
     round_value(value; digits=7)
 
-Rounds a given value or array of values to the specified number of decimal places (default is 7). 
+Rounds a given value or array of values to the specified number of decimal places (default is 7).
 
 # Arguments
-- `value`: The value or array of values to be rounded. 
+- `value`: The value or array of values to be rounded.
 - `digits`: The number of digits to round to. Default is 7.
 
 # Returns

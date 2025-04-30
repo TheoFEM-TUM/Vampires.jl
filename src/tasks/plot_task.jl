@@ -16,19 +16,20 @@ Available commands:
 run_task(::Type{Val{:file}}, ::Type{Val{:plot}}, args) = nothing
 
 """
-    vamp [-r] <task> plot [--par <param>] [--xdata <xkey>] [--ydata <ykey>] [--xlabel <xlabel>] [--ylabel <ylabel>] [--o <filename>]
+    vamp [-r] <task> plot --o <filename> [--par <param>] [--xdata <xkey>] [--ydata <ykey>] [--xlabel <xlabel>] [--ylabel <ylabel>] [--title <title>]
 
 Call the read task to read the contents from `task` and plot them. If output file is neither `png` or `pdf` the plot will be printed to stdout.
 
 # Arguments
+- `o`: Output file name for saving the plot. Accepted formats are `png` and `pdf`. If omitted, the plot will be printed directly to stdout.
 - `task`: Specifies the type of file to be read, such as `eigenval`, `outcar`, or `poscar`.
 - `par`: (Optional) Parameter to filter or specify certain settings in the `read` task.
 - `xdata`: (Optional) Key to select the data column for the x-axis. If not provided, defaults to the first available data column.
 - `ydata`: Key to select the data column for the y-axis. Required if there is more than one data column.
 - `xlabel`: (Optional) Label for the x-axis of the plot. If not provided, defaults to the name of the x-data column.
 - `ylabel`: (Optional) Label for the y-axis of the plot. If not provided, defaults to the name of the y-data column.
-- `o`: (Optional) Output file name for saving the plot. Accepted formats are `png` and `pdf`. If omitted, the plot will be printed directly to stdout.
 - `reduce`: (Optional) Specifies a method that is applied to the data an in task output.
+- `title`: (Optional) Specifies the plot title.
 
 # Examples
 ```bash
@@ -64,7 +65,7 @@ function run_task_recursive(task, ::Type{Val{:plot}}, args)
     out = reduce_output(out, Val{Symbol(strip(args["reduce"], '.'))}, broadcasted)
     xdata, ydata, xlabel, ylabel = get_plotting_data(out, args)
     fig = make_plot(xdata, ydata, title=args["title"], xlabel=xlabel, ylabel=ylabel)
-    
+
     output_plot(fig, output_filename)
     return nothing
 end

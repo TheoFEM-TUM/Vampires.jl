@@ -82,3 +82,44 @@ end
     expected_b[:, 3] = 2π / V .* cross(a[:, 1], a[:, 2])
     @test get_bs(a) ≈ expected_b
 end
+
+@testset "get_lattice_parameter" begin
+    # Unit cube
+    lattice = [1.0 0 0; 0 1.0 0; 0 0 1.0]
+    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), zeros(3, 1), ["X"])
+    a, b, c, α, β, γ, volume = get_lattice_parameter(str)
+    @test a ≈ 1.0
+    @test b ≈ 1.0
+    @test c ≈ 1.0
+    @test α ≈ 90.0
+    @test β ≈ 90.0
+    @test γ ≈ 90.0
+    @test volume ≈ 1.0
+
+    # Scaled cube
+    lattice = [2.0 0 0; 0 2.0 0; 0 0 2.0]
+    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), zeros(3,1), ["X"])
+    a, b, c, α, β, γ, volume = get_lattice_parameter(str)
+
+    @test a ≈ 2.0
+    @test b ≈ 2.0
+    @test c ≈ 2.0
+    @test α ≈ 90.0
+    @test β ≈ 90.0
+    @test γ ≈ 90.0
+    @test volume ≈ 8.0
+
+    # Parallelepiped with known angles
+    lattice = [1.0 1.0 0.0; 0.0 1.0 1.0; 1.0 0.0 1.0]
+    str = Structure(1.0, lattice, ["X"], [1], zeros(3,1), zeros(3,1), ["X"])
+    a, b, c, α, β, γ, volume = get_lattice_parameter(str)
+
+    @test isapprox(a, norm(lattice[:,1]), atol=1e-8)
+    @test isapprox(b, norm(lattice[:,2]), atol=1e-8)
+    @test isapprox(c, norm(lattice[:,3]), atol=1e-8)
+    @test isapprox(α, acosd(dot(lattice[:,2], lattice[:,3]) / (b * c)), atol=1e-8)
+    @test isapprox(β, acosd(dot(lattice[:,1], lattice[:,3]) / (a * c)), atol=1e-8)
+    @test isapprox(γ, acosd(dot(lattice[:,1], lattice[:,2]) / (a * b)), atol=1e-8)
+    @test isapprox(volume, get_volume(lattice), atol=1e-8)
+end
+

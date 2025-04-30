@@ -11,14 +11,16 @@ If the Structure represents an XDATCAR file, the `positions` field holds more th
 - `atom_numbers::Array{Int64, 1}`: An array of the number of each type of atom.
 - `atom_types::Array{String, 1}`: An array of atom types corresponding to each atom position.
 - `positions::Array{Float64, 3}`: A 3D array of shape (3, Nion, Nconfig), where each 3xNion slice represents the atomic positions in a configuration;
-    ! Nconfig = 1 for POSCAR files
+- `velocities::SparseMatrixCSC{Float64, 3}`: A 3D array of shape (3, Nion, Nconfig), where each 3xNion slice represents the atomic velocities of a configuration;
+! Nconfig = 1 for POSCAR files
 """
-struct Structure{A, L, P}
+struct Structure{A, L, P, V}
     a :: A
     lattice :: L
     atom_names :: Array{String, 1}
     atom_numbers :: Array{Int64, 1}
     positions :: P
+    velocities :: V
     atom_types :: Array{String, 1}
 end
 
@@ -55,6 +57,8 @@ function parse_structure_file_header(lines)
     for i in 1:3
         lattice[:, i] = @. a * parse(Float64, lines[2+i])
     end
+    # set a to 1 after scaling the lattice
+    a = 1.0
 
     # Atom names and numbers
     if length(lines[6]) ≠ length(lines[7])
@@ -121,11 +125,11 @@ Adjust atomic positions so that atom position are not shifted with respect to pe
 - 'positions::Array{Float64}': 3xNionxNconfig Array of atomic position (Nion = number of atoms, Nconfig=number of MD snapshots)
 """
 function adjust_pos_PBC!(positions)
-    for t in 2:size(positions, 3)  
+    for t in axes(positions, 3)[2:end]
         # Calculate difference in between positions between two snapshot
         dX = positions[:, :, t] - positions[:, :, t - 1]
-        for i in 1:size(positions, 1)
-            for j in 1:size(positions, 2)
+        for i in axes(positions, 1)
+            for j in axes(positions, 2)
                 if dX[i, j] > 0.5
                     positions[i, j, t] -= 1
                 elseif dX[i, j] < -0.5

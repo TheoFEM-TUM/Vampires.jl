@@ -1,6 +1,6 @@
 
 
-incar = read_incar(test_file_path*"INCAR")
+incar = read_incar(joinpath(test_file_path, "INCAR"))
 
 @testset "INCAR read" begin
     @test findvalue(incar, "ENCUT") == "250"

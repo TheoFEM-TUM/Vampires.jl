@@ -1,4 +1,3 @@
-# TODO: automatically collect task strings from task files to cli_interface for an overview
 """
     TASKS
 
@@ -129,6 +128,7 @@ function get_default_args()
         "incar" => "INCAR",
         "eigenval" => "EIGENVAL",
         "doscar" => "DOSCAR",
+        "contcar" => "CONTCAR",
         "poscar" => "POSCAR",
         "potcar" => "POTCAR",
         "xdatcar" => "XDATCAR",
@@ -188,6 +188,7 @@ function get_arg_description()
             "doscar" => "set the name of the DOSCAR file",
             "poscar" => "set the name of the POSCAR file",
             "potcar" => "set the name of the POTCAR file",
+            "contcar" => "set the name of the CONTCAR file",
             "xdatcar" => "set the name of the XDATCAR file",
             "outcar" => "set the name of the OUTCAR file",
             "kpoints" => "set the name of the kpoints file",

@@ -22,12 +22,12 @@ run_task(::Type{Val{:doscar}}, ::Type{Val{:none}}, args) = nothing
 Reads the density of states (DOS) data from a DOSCAR file and writes the results to an HDF5 file if specified.
 
 # Arguments
-- `p`: The path to the working directory.
-- `doscar`: Path to the DOSCAR file to read from.
-- `par`: An optional parameter that specifies what to read from the doscar (e.g., pdos)
-- `o`: Output filename where the processed data will be saved.
-- `poscar`: Path to the POSCAR file (needed for atom types).
-- `incar`: Path to the INCAR file (needed for parameters that affect the (p)dos).
+- `p`: (Optional) The path to the working directory.
+- `doscar`: (Optional) Path to the DOSCAR file to read from.
+- `par`: (Optional) An optional parameter that specifies what to read from the doscar (e.g., pdos)
+- `o`: (Optional) Output filename where the processed data will be saved.
+- `poscar`: (Optional) Path to the POSCAR file (needed for atom types).
+- `incar`: (Optional) Path to the INCAR file (needed for parameters that affect the (p)dos).
 
 # Examples
 ```bash
@@ -72,9 +72,9 @@ end
 Reads the density of states (DOS) data from a DOSCAR file and generates a plot of the DOS.
 
 # Arguments
-- `p`: Path to the directory containing the DOSCAR file.
-- `doscar`: Name of the DOSCAR file to read from.
-- `o`: Output filename for the plot (optional). If not specified, the plot is shown but not saved.
+- `p`: (Optional) Path to the directory containing the DOSCAR file.
+- `doscar`: (Optional) Name of the DOSCAR file to read from.
+- `o`: (Optional) Output filename for the plot (optional). If not specified, the plot is shown but not saved.
 
 # Behavior
 - Reads the DOS data from the specified DOSCAR file.

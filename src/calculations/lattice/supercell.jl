@@ -1,20 +1,20 @@
 """
     transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
 
-Create a supercell by multiplying the primitive cell specified in the `poscar` object by the scaling factors 
-provided in the `Ns` vector. The resulting supercell will have the atomic positions and types adjusted 
+Create a supercell by multiplying the primitive cell specified in the `poscar` object by the scaling factors
+provided in the `Ns` vector. The resulting supercell will have the atomic positions and types adjusted
 accordingly.
 
 # Arguments
-- `poscar::Poscar`: The primitive cell represented as a `Poscar` object. This object should contain the 
+- `poscar::Poscar`: The primitive cell represented as a `Poscar` object. This object should contain the
   lattice vectors, atomic positions (in fractional coordinates), and atomic types.
 - `Ns::Vector{Int64}`: A vector of three integers specifying the scaling factors along the a, b, and c
   lattice directions, respectively.
-- `digits::Int` (optional): The number of digits to round the fractional coordinates of the atoms in the 
+- `digits::Int` (optional): The number of digits to round the fractional coordinates of the atoms in the
   resulting supercell. Default is 10.
 
 # Returns
-- `Poscar`: A new `Poscar` object representing the supercell. This includes the scaled lattice vectors, 
+- `Poscar`: A new `Poscar` object representing the supercell. This includes the scaled lattice vectors,
   updated atomic positions (in fractional coordinates), and atomic types.
 """
 function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
@@ -22,6 +22,7 @@ function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     Nion_sc = Nion*prod(Ns)
 
     Rs_sc = zeros(3, Nion_sc)
+    velocities = spzeros(Float64, 3, Nion)
     sc_ion_types = Array{String}(undef, Nion_sc)
 
     # Multiply lattice vectors
@@ -48,7 +49,7 @@ function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     Rs_sc = round.(Rs_sc[:, inds], digits=digits)
     unique_ion_types = unique(sc_ion_types)
     ion_numbers = [count(t->t==type, sc_ion_types) for type in unique_ion_types]
-    return Structure(1., sc_lattice, unique_ion_types, ion_numbers, Rs_sc, sc_ion_types)
+    return Structure(1., sc_lattice, unique_ion_types, ion_numbers, Rs_sc, velocities, sc_ion_types)
 end
 
 transform_primitive_cell(poscar, N::Int64) = transform_primitive_cell(poscar, [N, N, N])

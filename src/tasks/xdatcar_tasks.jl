@@ -23,15 +23,17 @@ run_task(::Type{Val{:xdatcar}}, ::Type{Val{:none}}, args) = nothing
 Reads atomic configurations from an XDATCAR file and calculates specific properties, such as mean squared displacement (MSD), based on the specified parameter.
 
 # Arguments
-- `par`: Specifies the property to calculate. Accepted values:
+- `par`: (Optional) Specifies the property to calculate. Accepted values:
     - `"msd"`: Computes the mean squared displacement (MSD) and its standard deviation relative to the initial atomic positions in the POSCAR file.
-- `xdatcar`: The name of the XDATCAR file containing atomic configurations from a molecular dynamics simulation.
-- `poscar`: The name of the POSCAR file containing the initial atomic configuration (required if `par` is `"msd"`).
-- `p`: The path where the XDATCAR and POSCAR files are located.
-- `o`: The name of the output file.
+    - `"vdos"`: Computes the (mass weighted) vibrational density of states.
+- `xdatcar`: (Optional) The name of the XDATCAR file containing atomic configurations from a molecular dynamics simulation.
+- `poscar`: (Optional) The name of the POSCAR file containing the initial atomic configuration (required if `par` is `"msd"`).
+- `p`: (Optional) The path where the XDATCAR and POSCAR files are located.
+- `o`: (Optional) The name of the output file.
 
 # Returns
 - If `par` is `"msd"`: Returns MSD and its standard deviation
+- Elseif `par` is `"vdos"`: Returns vdos and corresponding frequencies
 - Otherwise: Returns the lattice vectors and configurations from the XDATCAR file.
 
 # Examples
@@ -53,24 +55,27 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
         return (msd = msd, deviation = err)
     elseif lowercase(args["par"]) == "vdos"
         δt = args["N"] == "none" ? read_value_from_outcar("POTIM", args["outcar"]) : parse(Float64, args["N"])
+        if !(typeof(δt) <: Number) || δt == 0.0
+            println("Please specify a time step larger than 0.0 (you may use '--N'). Exiting...")
+            exit()
+        end
         v = compute_velocities(xdatcar.positions, δt, xdatcar.lattice)
-        vdos = compute_vdos(v, δt, "fourier")
-        return ["energy", "vdos"], vdos'
-        return (energy = vdos'[1], vdos = vdos'[2])
+        ω, S = compute_vdos(v, δt; method="full", atom_names=xdatcar.atom_types)
+        return (energy = ustrip.(ω), vdos = ustrip.(S))
     end
 
     return (lattice = lattice, configs = configs)
 end
 
 """
-    vamp [-r] xdatcar merge [--xdatcar <file0, file1, ...>] [--p <path>] [--o <file>]
+    vamp [-r] xdatcar merge --xdatcar <file0, file1, ...> --o <file> [--p <path>]
 
 Merges atomic configurations from several XDATCARs in the given order and writes them to an output file.
 
 # Arguments
 - `xdatcar`: The name of the XDATCAR files from an molecular dynamics simulation in the order they should be merged.
-- `p`: The path where the XDATCAR files are located.
 - `o`: The name of the output file.
+- `p`: (Optional) The path where the XDATCAR files are located.
 
 # Examples
 ```bash

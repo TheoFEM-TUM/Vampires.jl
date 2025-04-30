@@ -23,6 +23,12 @@ function read_xdatcar(xdatcar="XDATCAR")
     # Find starting line of configurations
     i_start, _ = next_line_with("Direct", lines)
 
+    # define helper variable convert to toggle conversion to direct coordinates
+    convert = false
+    if i_start == 0
+        i_start, _ = next_line_with("Cartesian", lines)
+        convert = true
+    end
     # Calculate the number of configurations
     L = length(lines)
 
@@ -32,10 +38,14 @@ function read_xdatcar(xdatcar="XDATCAR")
     for i in i_start+1:(Nion + 1):L, j in i:(i+Nion - 1)
         push!(positions, parse.(Float64, lines[j])...)
     end
-
     positions = reshape(positions, (3, Nion, :))
 
-    return Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
+    if convert
+        positions = cart_to_frac(positions, lattice)
+    end
+    velocities = spzeros(Float64, 3, Nion)
+
+    return Structure(a, lattice, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 
 """
@@ -71,7 +81,8 @@ function read_xdatcar_npt(xdatcar="XDATCAR")
     end
     positions = reshape(positions, (3, Nion, :))
     lattices = reshape(lattices, (3, 3, :))
-    return Structure(a, lattices, atom_names, atom_numbers, positions, atom_types)
+    velocities = spzeros(Float64, 3, Nion)
+    return Structure(a, lattices, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 
 """
@@ -124,7 +135,7 @@ open("XDATCAR_combined", "w") do io
 end
 ```
 """
-function write_xdatcar(iostream, structure_n::Array{Structure{A, L, P}}) where {A, L, P}
+function write_xdatcar(iostream, structure_n::Vector{Structure{A, L, P, V}}) where {A, L, P, V}
     running_index = 1 # to keep track of the total amount of configurations
     if length(size(structure_n[1].lattice)) == 3
         for structure in structure_n, pos in axes(structure.positions, 3)
@@ -158,7 +169,7 @@ open("XDATCAR_combined", "w") do io
 end
 ```
 """
-function write_xdatcar(iostream, structure::Structure{A, L, P}) where {A, L, P}
+function write_xdatcar(iostream, structure::Structure{A, L, P, V}) where {A, L, P, V}
     running_index = 1 # to keep track of the total amount of configurations
     if length(size(structure.lattice)) == 3
         for pos in axes(structure.positions, 3)

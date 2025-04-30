@@ -24,7 +24,7 @@ function read_lammps(lammps_filename, npt=false)
 
     # number of atoms
     Nion = parse(Int64, lines[4][1])
-    
+
     # extract lattice vectors
     lattice = extract_lattice_lmp(lines[5:8])
 
@@ -42,7 +42,7 @@ function read_lammps(lammps_filename, npt=false)
     index_pos = findfirst(x -> x == "xs", table_line)
     if isnothing(index_pos)
         frac_coordinates = false
-        index_pos = findfirst(x -> x == "x", table_line) 
+        index_pos = findfirst(x -> x == "x", table_line)
     else
         throw("This LAMMPS output file does not contain atomic positions.")
     end
@@ -60,7 +60,7 @@ function read_lammps(lammps_filename, npt=false)
         index_type = findfirst(x -> x == "type", table_line)
         if isnothing(index_type)
             type = false
-            index_type = 0      
+            index_type = 0
         else
             index_type -= 2
         end
@@ -70,12 +70,13 @@ function read_lammps(lammps_filename, npt=false)
 
     # Initialize
     positions = zeros(Float64, 3, Nion, Nconfig)
+    velocities = [spzeros(Float64, 3, Nion) for _ in 1:Nconfig]
     atom_types = String[]
     lattices = Float64[]
 
     ### read all lammps data
     N = i_start + Nion
-    if (npt == false)    
+    if (npt == false)
         lattices = lattice
         for j in 1:Nconfig, i in 1:N
             if (i > i_start)
@@ -92,11 +93,11 @@ function read_lammps(lammps_filename, npt=false)
                 positions[:, i - i_start, j] = parse.(Float64, line[index_pos : index_pos + 2])
             end
         end
-    else 
+    else
         lattices = zeros(Float64, 3, 3, Nconfig)
         for j in 1:Nconfig, i in 1:N
             if (i == 5)
-                if j == 1 
+                if j == 1
                     lattices[:,:,j] = lattice
                 else
                     lattices[:,:,j] = extract_lattice_lmp(lines[(j - 1) * N + i: (j - 1) * N + i + 3])
@@ -117,20 +118,20 @@ function read_lammps(lammps_filename, npt=false)
         end
     end
 
-    # extract atom_names and atom_numbers from atom_types array 
+    # extract atom_names and atom_numbers from atom_types array
     atom_dict = countmap(atom_types)
     atom_numbers = collect(values(atom_dict))
     atom_names = collect(keys(atom_dict))
 
     # transform to fractional coordinates if needed
     if frac_coordinates == false
-        positions = cart_to_frac(positions, lattice) 
+        positions = cart_to_frac(positions, lattice)
     end
 
     # Adjust positions for periodic boundary conditions
     adjust_pos_PBC!(positions)
 
-    return Structure(a, lattices, atom_names, atom_numbers, positions, atom_types)
+    return Structure(a, lattices, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 
 """
@@ -150,12 +151,12 @@ function extract_lattice_lmp(lines)
 
     # Lattice vectors
     lattice = zeros(Float64, 3, 3)
-    
-    if (lines[1][4] == "xy")  # non-cubic cell 
-    
+
+    if (lines[1][4] == "xy")  # non-cubic cell
+
         # Extract parameter from files
         l = parse_lines_as_array(lines[2:4])
-        
+
         # Assign lattice vectors
         latt_11 = l[1,2] + max(0, l[1,3], l[2,3], l[2,3] + l[3,3]) - (l[1,1] + min(0, l[2,2], l[2,3], l[2,3] + l[3,3]))
         latt_22 = l[2,2] + max(0, l[3,3]) - (l[2,1] + min(0, l[3,3]))
@@ -183,7 +184,7 @@ function extract_lattice_lmp(lines)
         lattice[1,1] = latt_11
         lattice[2,2] = latt_22
         lattice[3,3] = latt_33
-        
+
     end
 
 

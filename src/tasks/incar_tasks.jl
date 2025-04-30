@@ -25,16 +25,16 @@ Available commands:
 run_task(::Type{Val{:incar}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] incar make [--par <key(s)>] [--val <key(s)>] [--block <block_label>] [--p <path>] [--incar <file>]
+    vamp [-r] incar make --par <key(s)> --val <key(s)> --block <block_label> [--p <path>] [--incar <file>]
 
 Create a new INCAR file with specified parameters or blocks. If no values are provided, default values are used.
 
 # Arguments
 - `par`: Name of the tag(s) to include in the INCAR file. Multiple tags are separated by commas.
 - `val`: Values for the tag(s). Multiple values are separated by commas.
-- `block`: Block label to include in the INCAR file, with all associated default parameters. Multiple blocks are separated by commas.
-- `p`: Sets the path where the INCAR file will be created (optional).
-- `incar`: Name of the INCAR file to be created (optional; default is "INCAR").
+- `block`: (Optional) Block label to include in the INCAR file, with all associated default parameters. Multiple blocks are separated by commas.
+- `p`: (Optional) Sets the path where the INCAR file will be created (optional).
+- `incar`: (Optional) Name of the INCAR file to be created (optional; default is "INCAR").
 
 # Behavior
 - If `par` is provided, the function creates a new INCAR file with the specified parameters, each initialized with their default values.
@@ -54,6 +54,7 @@ vamp incar make --par EDIFF,LREAL --val 1e-5,False --p /path/to/dir
 ```
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:make}}, args)
+    if !check_required_parameters(["par", "val"], args); return; end
     incar = get_empty_incar()
     if length(args["par"]) > 0
         keys = split_line(args["par"], char=',')
@@ -75,8 +76,8 @@ Read and display the value(s) of specified parameter(s) from an INCAR file.
 
 # Arguments
 - `par`: Name of the tag(s) to read from the INCAR file. Multiple tags are separated by commas.
-- `p`: Sets the path where the INCAR file is located (optional).
-- `incar`: Name of the INCAR file to read (optional; default is "INCAR").
+- `p`: (Optional) Sets the path where the INCAR file is located (optional).
+- `incar`: (Optional) Name of the INCAR file to read (optional; default is "INCAR").
 
 # Behavior
 - The function reads the specified INCAR file and prints the values of the provided parameters.
@@ -95,6 +96,7 @@ vamp incar read --par EDIFF --incar INCAR_relax
 ```
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:read}}, args)
+    if !check_required_parameters(["par"], args); return; end
     incar = read_incar(joinpath(args["p"], args["incar"]))
     keys = split_line(args["par"], char=',')
     values = map(keys) do key
@@ -131,6 +133,7 @@ vamp incar whatis --par num_wann
 * `vamp whatis`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:whatis}}, args)
+    if !check_required_parameters(["par"], args); return; end
     param = args["par"]
     if iswannier90key(param)
         println("The $param keyword ", get_comment(param), ".")
@@ -142,18 +145,18 @@ end
 run_task(::Type{Val{:whatis}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("whatis")}, args)
 
 """
-    vamp [-r] incar set --par <key(s)> --val <value(s)> [--p <path>] [--incar <file>] [--block <block_label>] [--out <file>]
+    vamp [-r] incar set [--par <key(s)>] [--val <value(s)>] [--p <path>] [--incar <file>] [--block <block_label>] [--out <file>]
 
 Read a given incar file and add or change a tag to a certain value. Can also be used to add entire blocks with default values.
 
 # Arguments
 - `r`: Task is applied recursively to INCAR files in all subfolders.
-- `par`: Name of the tag(s). Multiple tags are separated by commas.
-- `val`: Value of the tag(s). Multiple tags are separated by commas.
-- `p`: Sets the path where the command is executed.
-- `incar`: Name of the INCAR file.
-- `block`: Block label within the INCAR file where the tag is placed. If `par` is not given, the block will be added with default values. Multiple blocks are separated by commas.
-- `out`: Sets the name of the modified INCAR file (default=INCAR).
+- `par`: (Optional if block is set) Name of the tag(s). Multiple tags are separated by commas.
+- `val`: (Optional if block is set) Value of the tag(s). Multiple tags are separated by commas.
+- `p`: (Optional) Sets the path where the command is executed.
+- `incar`: (Optional) Name of the INCAR file.
+- `block`: (Optional) Block label within the INCAR file where the tag is placed. If `par` is not given, the block will be added with default values. Multiple blocks are separated by commas.
+- `out`: (Optional) Sets the name of the modified INCAR file (default=INCAR).
 
 # Examples
 ```bash
@@ -176,6 +179,7 @@ vamp -r incar set --par EDIFF --val 1e-5
 * `vamp addincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:set}}, args)
+    if !check_required_parameters(["par", "val"], ["block"], args); return; end
     incar_in = joinpath(args["p"], args["incar"])
     incar_out = args["o"] == "none" ? incar_in : joinpath(args["p"], args["o"])
     if length(args["par"]) > 0
@@ -190,17 +194,18 @@ run_task(::Type{Val{:incar}}, ::Type{Val{:add}}, args) = run_task(Val{Symbol("in
 run_task(::Type{Val{:addincar}}, subtask, args) = run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 
 """
-    vamp [-r] incar rm --par <key(s)> [--p <path>] [--incar <file>] [--block <block_label>] [--out <file>]
+    vamp [-r] incar rm [--par <key(s)>] [--block <block_label>] [--p <path>] [--incar <file>] [--out <file>]
 
 Read a given INCAR file and remove a specified tag or an entire block of tags.
+    - *If `par` is not given, the entire block will be removed. Multiple blocks are separated by commas.*
 
 # Arguments
 - `r`: Task is applied recursively to INCAR files in all subfolders.
-- `par`: Name of the tag(s) to remove. Multiple tags are separated by commas.
-- `p`: Sets the path where the command is executed.
-- `incar`: Name of the INCAR file.
-- `block`: Block label within the INCAR file to remove. If `par` is not given, the entire block will be removed. Multiple blocks are separated by commas.
-- `out`: Sets the name of the modified INCAR file (default=INCAR).
+- `par`: (Optional) Name of the tag(s) to remove. Multiple tags are separated by commas.
+- `p`: (Optional) Sets the path where the command is executed.
+- `incar`: (Optional) Name of the INCAR file.
+- `block`: (Optional) Block label within the INCAR file to remove. If `par` is not given, the entire block will be removed. Multiple blocks are separated by commas.
+- `out`: (Optional) Sets the name of the modified INCAR file (default=INCAR).
 
 # Examples
 ```bash
@@ -221,7 +226,7 @@ vamp -r incar rm --par EDIFF
 * `vamp rmincar`
 """
 function run_task(::Type{Val{:incar}}, ::Type{Val{:rm}}, args)
-    if length(args["par"]) > 0 
+    if length(args["par"]) > 0
         remove_key_from_incar(args["par"], joinpath(args["p"], args["incar"]), out=joinpath(args["p"], args["incar"]))
     elseif length(args["block"]) > 0
         remove_block_from_incar(args["block"], joinpath(args["p"], args["incar"]))

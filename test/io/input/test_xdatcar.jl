@@ -19,8 +19,19 @@ xdatcar_npt = read_xdatcar_npt(test_file_path*"XDATCAR_si_npt")
     @test xdatcar_npt.atom_types == ["Si", "Si"]
 end
 
+xdatcar_cartesian = read_xdatcar(test_file_path*"XDATCAR_gaas_cartesian")
+@testset "XDATCAR GaAs Cartesian" begin
+    @test xdatcar_cartesian.lattice == [5.65 0.0 0.0; 0.0 5.65 0.0; 0.0 0.0 5.65]
+    @test isapprox(xdatcar_cartesian.positions, read_from_file(test_file_path*"configs_gaas_correct.dat")[:, :, 1:2], rtol=1e-6)
+    @test xdatcar_cartesian.a == 1
+    @test xdatcar_cartesian.atom_numbers == [4, 4]
+    @test xdatcar_cartesian.atom_names == ["Ga", "As"]
+    @test xdatcar_cartesian.atom_types == ["Ga", "Ga", "Ga", "Ga", "As", "As", "As", "As"]
+end
+
 # Create test data
 positions = reshape([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], 3, 3, 1)
+velocities = zeros(3,3,1)
 positions_scientific = reshape([1e-1, 1e-3, 3e-5, 0.4, -0.5, 0.00004, -0.2200001, 0.000001, 0.9], 3, 3, 1)
 lattice = reshape([4.0 0.0 0.0 0.0 2.0 0.0 0.0 0.0 1.0], 3, 3)
 lattice_scientific = reshape([3e-3 -2.0 0.0 -1.0 2.0 0.0 -3.5 0.0 1.0], 3, 3)
@@ -30,9 +41,9 @@ atom_names = ["Si", "Ga", "B"]
 atom_types = ["Si", "Ga", "Ga", "B", "B", "B", "B"]
 atom_numbers = [1, 2, 4]
 a = 3.4
-structure = Structure(a, lattice, atom_names, atom_numbers, positions, atom_types)
-structure_scientific = Structure(a, lattice_scientific, atom_names, atom_numbers, positions_scientific, atom_types)
-structure_npt = Structure(a, lattice_npt, atom_names, atom_numbers, positions_npt, atom_types)
+structure = Structure(a, lattice, atom_names, atom_numbers, positions, velocities, atom_types)
+structure_scientific = Structure(a, lattice_scientific, atom_names, atom_numbers, positions_scientific, velocities, atom_types)
+structure_npt = Structure(a, lattice_npt, atom_names, atom_numbers, positions_npt, velocities, atom_types)
 structure_array = repeat([structure], 17)
 
 @testset "XDATCAR write" begin

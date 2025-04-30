@@ -27,7 +27,7 @@ Create a supercell from a given POSCAR file by scaling the unit cell according t
 - `N`: Scaling factors for the supercell, specified as a comma-separated list (e.g., `2,2,2`). If not using commas, a single integer is interpreted as a uniform scaling factor for all dimensions.
 - `poscar`: Path to the POSCAR file that contains the original unit cell (optional; default is "POSCAR").
 - `o`: Name of the output file where the new POSCAR data will be written (optional; default is "SC_POSCAR").
-- `p`: Sets the pathW (optional).
+- `p`: Sets the path (optional).
 
 # Behavior
 - The function reads the POSCAR file, scales the unit cell by the specified factors, and writes the resulting supercell to a new POSCAR file.
@@ -46,6 +46,7 @@ vamp supercell make --N 1,2,3 --poscar structure/POSCAR
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
+    if !check_required_parameters(["N"], args); return; end
     poscar = read_poscar(joinpath(args["p"], args["poscar"]))
     N = occursin(',', args["N"]) ? split_line(args["N"], char=',') : args["N"]
     N = parse.(Int64, N)
@@ -62,9 +63,9 @@ Sample configurations from a XDATCAR file and create a folder for each one. Copy
 
 # Arguments
 - `N`: Defines the sample size, and the minimum index (in the XDATCAR) that can be sampled, e.g., `-N 10, 1000` results in a sample size of 10 with the minimum index being 1000. If only one value is provided, `Nmin` is set to 1.
-- `xdatcar`: Path to the XDATCAR file that contains the atomic positions for sampling (optional; default is "XDATCAR").
-- `method`: Method used for sampling configurations (optional; default is `random`). Alternatively, uniform sampling may be used.
-- `p`: Sets the path where the supercell and sample configurations will be created (optional).
+- `xdatcar`: (Optional) Path to the XDATCAR file that contains the atomic positions for sampling (optional; default is "XDATCAR").
+- `method`: (Optional) Method used for sampling configurations (optional; default is `random`). Alternatively, uniform sampling may be used.
+- `p`: (Optional) Sets the path where the supercell and sample configurations will be created (optional).
 
 # Examples
 ```bash
@@ -76,6 +77,7 @@ vamp supercell sample --N 100,4000 --xdatcar custom_XDATCAR --method uniform
 ```
 """
 function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
+    if !check_required_parameters(["N"], args); return; end
     poscar = joinpath(args["p"], args["poscar"])
     xdatcar = joinpath(args["p"], args["xdatcar"])
     incar = joinpath(args["p"], args["incar"])

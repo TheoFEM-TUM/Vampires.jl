@@ -25,7 +25,7 @@ Split each line of the input vector of strings into its constituent non-empty el
 - `lines::Vector{String}`: A vector of strings, where each string represents a line to be split.
 
 # Returns
-- `split_lines::Vector{Vector{String}}`: A vector of vectors of strings, where each inner vector 
+- `split_lines::Vector{Vector{String}}`: A vector of vectors of strings, where each inner vector
 contains the non-empty elements of the corresponding line from the input.
 """
 function split_lines(lines; char=" ")
@@ -79,7 +79,7 @@ end
 Find the next line in lines that contains a set of keywords.
 """
 function next_line_with(keywords::AbstractArray, lines)
-    index = false; keyline = false
+    index = 0; keyline = ""
     for (i, line) in enumerate(lines)
         if all(keyword->keyword in line, keywords)
             index = i
@@ -87,6 +87,7 @@ function next_line_with(keywords::AbstractArray, lines)
             return index, keyline
         end
     end
+    return index, keyline
 end
 
 next_line_with(s::String, lines) = next_line_with([s], lines)

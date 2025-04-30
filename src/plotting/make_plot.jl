@@ -1,14 +1,14 @@
 """
     make_plot(xdata, ydata; title="", xlabel="", ylabel="")
 
-Creates a plot using the provided `xdata` and `ydata` arrays. 
+Creates a plot using the provided `xdata` and `ydata` arrays.
 
 If `xdata` is non-empty, it is used as the x-axis data. If `xdata` is empty, `ydata` will be plotted as a function of its index.
 
 # Arguments
 - `xdata` : Array of x-axis data points. If empty, `ydata` is plotted against its index.
 - `ydata` : Array of y-axis data points.
-  
+
 # Keyword Arguments
 - `title` : Title of the plot. Default is an empty string (`""`).
 - `xlabel` : Label for the x-axis. Default is an empty string (`""`).
@@ -46,6 +46,124 @@ function make_plot(xdata, ydata; title="", xlabel="", ylabel="")
     return fig
 end
 
+
+"""
+    make_bar_plot(xdata, ydata; title="", xlabel="", ylabel="", xticks=[], bar_colors=[], ymin=0, ymax=0)
+
+Creates a bar plot using the provided `xdata` and `ydata` arrays.
+
+If `xticks` is not provided, the x-axis will be labeled using the indices of `xdata`. Bar colors can be customized using `bar_colors`.
+
+# Arguments
+- `xdata` : Array of x-axis data points.
+- `ydata` : Array of y-axis data points.
+
+# Keyword Arguments
+- `title` : Title of the plot. Default is an empty string (`""`).
+- `xlabel` : Label for the x-axis. Default is an empty string (`""`).
+- `ylabel` : Label for the y-axis. Default is an empty string (`""`).
+- `xticks` : Custom labels for x-axis ticks. Default is an empty array (`[]`), using `xdata` indices.
+- `bar_colors` : Array of colors for bars. Default is blue for all bars.
+- `ymin` : Minimum limit for the y-axis. Default is `0`.
+- `ymax` : Maximum limit for the y-axis. Default is `0`, meaning automatic scaling.
+
+# Returns
+- `fig` : The bar plot object with the specified data and labels.
+"""
+
+function make_bar_plot(xdata, ydata; title="", xlabel="", ylabel="", xticks=[], bar_colors=[], ymin=0, ymax=0)
+    # Adjust x values for equidistant bars
+    xdata_equi = 1:length(xdata)
+    if size(xticks, 1) == 0
+        xticks = xdata_equi
+    end
+    if !(typeof(bar_colors) <: AbstractArray)
+        bar_colors = repeat([vcolors.blue], size(xdata_equi, 1))
+    end
+
+    # Create the bar plot
+    fig = bar(
+        xdata_equi,
+        ydata,
+        label = "",
+        color = bar_colors,
+        xlab = xlabel,
+        ylab = ylabel,
+        tick_direction = :in,
+        yticks = :auto,
+        bar_width = 0.7,  # Make bars broader
+        legend = false,
+        xticks = (xdata_equi, xticks),  # Replace x-axis ticks with core_n values
+        framestyle = :box,  # Add a frame around the plot
+        xmirror = false,  # Add axis to the top
+        ymirror = false   # Add axis to the right
+
+    )
+    # Add plot title and customize ticks
+    if title != ""; title!(title); end
+     # Adjust y-axis limits for better text visibility
+    if ymin != ymax; ylims!(ymin, ymax); end
+    return fig
+end
+
+
+"""
+    plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title="Strong scaling VASP", figure_filename="plot.png", xticks=string.(core_n))
+
+Plots a bar chart of the speedup in VASP strong scaling tests based on the number of CPU cores or GPUs.
+
+# Arguments
+- `core_n`: An array of core (CPU) or GPU counts used in the scaling test.
+- `avg_time_scf_step_n`: The corresponding average SCF step times for each configuration.
+- `type`: (Optional) The scaling type. Options:
+  - `"cpu"` (default): Plots speedup based on CPU cores.
+  - `"gpu"`: Plots speedup based on GPUs.
+  - `"mixed"`: Plots both CPU and GPU speedup results.
+- `title`: (Optional) The title of the plot.
+- `figure_filename`: (Optional) The filename to save the plot (default: `"plot.png"`).
+- `xticks`: (Optional) Custom x-axis tick labels.
+"""
+function plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type="cpu", title="Strong scaling VASP", figure_filename="plot.png", xticks=string.(core_n))
+    # Calculate speedup relative to the first element in avg_time_scf_step_n
+    speedup = avg_time_scf_step_n[1] ./ avg_time_scf_step_n
+
+    # Set the color and x-axis label based on the type
+    bar_color = type == "gpu" ? vcolors.green : type=="mixed" ? vcat([vcolors.sky_blue], repeat([vcolors.green], length(speedup)-1)) : vcolors.sky_blue
+    xlab = type == "gpu" ? "Number of GPUs" : type == "mixed" ? "" : "Number of Cores"
+
+    p = make_bar_plot(core_n, speedup; title="Speedup", xlabel=xlab, ylabel="Speedup", xticks=xticks, ymin=0, ymax=maximum(speedup) * 1.2, bar_colors=bar_color)
+
+    # Add speedup text on top of each bar
+    for (i, s) in enumerate(speedup)
+        annotate!(i, s, text("$(round(s, digits=1)) x", :black, :bottom, 10))
+    end
+    savefig(figure_filename)
+end
+
+
+"""
+    plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n; type="mixed", title="Strong scaling VASP", figure_filename="plot.png", index=2)
+
+Plots a bar chart of strong scaling results for both CPU and GPU configurations.
+
+# Arguments
+- `core_n`: An array of core counts used in CPU-based scaling tests.
+- `core_avg_time_scf_step_n`: The corresponding average SCF step times for CPU configurations.
+- `gpu_n`: An array of GPU counts used in GPU-based scaling tests.
+- `gpu_avg_time_scf_step_n`: The corresponding average SCF step times for GPU configurations.
+- `type`: (Optional) Scaling type. Defaults to `"mixed"` (CPU and GPU combined).
+- `title`: (Optional) The title of the plot.
+- `figure_filename`: (Optional) The filename to save the plot (default: `"plot.png"`).
+- `index`: (Optional) The index of the CPU configuration to use as a reference point in mixed plots (default: `2`).
+"""
+function plot_strong_scaling_bars(core_n, core_avg_time_scf_step_n, gpu_n, gpu_avg_time_scf_step_n; type="mixed", title="Strong scaling VASP", figure_filename="plot.png", index=2)
+    core_n = vcat([core_n[index]], gpu_n)
+    avg_time_scf_step_n = vcat([core_avg_time_scf_step_n[index]], gpu_avg_time_scf_step_n)
+    xticks = type == "mixed" ? vcat(["CPU"], string.(core_n[2:end]) .* " GPU" ) : string.(core_n)
+    plot_strong_scaling_bars(core_n, avg_time_scf_step_n; type=type, title=title, figure_filename=figure_filename, xticks=xticks)
+end
+
+
 """
     get_colors(y)
 
@@ -53,7 +171,7 @@ Returns a set of colors based on the input `y`.
 
 # Arguments
 - `y::AbstractMatrix`: A matrix or multidimensional array, where each column is treated as a separate series.
-  
+
 # Returns
 - A `Matrix` of colors (for matrix input) or a single color (for non-matrix input).
 """
@@ -66,6 +184,7 @@ function get_colors(y)
     end
 end
 
+
 """
     get_plotting_data(out, args)
 
@@ -75,7 +194,7 @@ The function identifies `x` and `y` data for plotting based on keys in the `out`
 
 # Arguments
 - `out::Dict`: A dictionary where the keys represent data names, and the values are the corresponding data to be plotted. The function checks for keys matching `xdata` and `ydata` specified in `args` to assign the data to `xdata` and `ydata` arrays, respectively.
-  
+
 - `args::Dict`: A dictionary of parameters that control the data extraction and labeling:
   - `"xdata"`: A string representing the key for `x` data in `out` (default: `""`).
   - `"ydata"`: A string representing the key for `y` data in `out` (default: `""`).
@@ -142,7 +261,7 @@ end
 """
     check_transpose_for_plotting(A::AbstractMatrix)
 
-Ensures that a matrix `A` is oriented appropriately for plotting purposes. 
+Ensures that a matrix `A` is oriented appropriately for plotting purposes.
 
 If the number of rows in `A` is less than the number of columns, the matrix is transposed to make it taller rather than wider. Otherwise, the matrix is returned unchanged.
 
@@ -153,7 +272,7 @@ If the number of rows in `A` is less than the number of columns, the matrix is t
 - `AbstractMatrix`: The transposed matrix if `size(A, 1) < size(A, 2)`, otherwise the original matrix.
 """
 function check_transpose_for_plotting(A::AbstractMatrix)
-    if size(A, 1) < size(A, 2) 
+    if size(A, 1) < size(A, 2)
         return transpose(A)
     else
         return A

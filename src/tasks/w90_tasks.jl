@@ -132,15 +132,15 @@ function run_task(::Type{Val{:w90}}, ::Type{Val{:set}}, args)
         eig_file = joinpath(args["p"], args["eigenval"])
         bandmin = parse(Int64, args["N"]) == 0 ? 1 : parse(Int64, args["N"])
         num_wann = parse(Int64, findvalue(read_incar(incar), "num_wann"))
-        
+
         dis_win_min, dis_win_max, dis_froz_min, dis_froz_max = get_energy_windows(eig_file, num_wann; bandmin=bandmin, tol=tol)
-        
+
         args["par"] = "dis_win_min,dis_win_max,dis_froz_min,dis_froz_max"
         args["val"] = "$dis_win_min,$dis_win_max,$dis_froz_min,$dis_froz_max"
     elseif args["par"] == "projections"
         error("The functionality to set projections automatically is not implemented yet.")
     end
-    
+
     run_task(Val{Symbol("incar")}, Val{Symbol("set")}, args)
 end
 

@@ -34,7 +34,7 @@ Compute particle velocities from their positions over time, taking into account 
 Input is assumed in units of Å (`x`) and fs (`timestep`). Output is in units of m/ps.
 
 # Arguments
-- `x::Array{Float64, 3}`: A 3D array representing particle positions in Å. The array shape is `(d, n, t)`, where:
+- `x::Array{Float64, 3}`: A 3D array representing particle positions in fractional coordinates. The array shape is `(d, n, t)`, where:
     - `d` is the number of spatial dimensions,
     - `n` is the number of particles,
     - `t` is the number of timesteps.
@@ -45,12 +45,9 @@ Input is assumed in units of Å (`x`) and fs (`timestep`). Output is in units of
 - `Array{Float64, 3}`: A 3D array of velocities with the same shape as the input array `x` in units of m/s, except along the time dimension, which is reduced by one (i.e., shape `(d, n, t-1)`). Each velocity is computed as the finite difference of positions, adjusted for boundary crossings, divided by the timestep.
 """
 function compute_velocities(x::Array{Float64, 3}, timestep::T, cell::Matrix{Float64}) where T <: Number
-    cellsize = norm.(eachcol(cell))*u"Å"
     adjust_pos_PBC!(x)
-    # scale positions
-    x_scaled = frac_to_cart(x, cell)*u"Å"
-    dr = diff(x_scaled, dims=3)
-    # calculate and return velocity
-    return ustrip(uconvert.(u"m/ps", (dr) ./ (timestep*u"fs")))  # convert Å / fs -> m / ps and return raw values
+    x_diff = diff(x, dims=3)
+    dr_pbc = frac_to_cart(x_diff, cell)*u"Å"
+    return ustrip.(uconvert.(u"m/ps", (dr_pbc) ./ (timestep*u"fs")))  # convert Å / fs -> m / ps and return raw values
 end
 
