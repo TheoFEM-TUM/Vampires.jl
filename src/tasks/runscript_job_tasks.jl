@@ -26,11 +26,12 @@ Available commands:
 run_task(::Type{Val{:job}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] runscript make [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
+    vamp [-r] runscript make [--npar <integer>] [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
 
 Creates a run script that executes the VASP executable at the specified path.
 
 # Arguments
+- `npar`: The workload is split among `npar` run scripts.
 - `exe`: The name of the VASP executable that will be used in the run script.
 - `p`: The path where the run script will be created. This is the directory in which the script will be saved.
 - `exclude`: File or list of files to be removed after each calculation.
@@ -50,6 +51,9 @@ vamp -r runscript make --exe vasp_ncl
 
 # Example 3: Use the `exclude` keyword to specify files to be removed from each subfolder after each calculation.
 vamp -r runscript make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
+
+# Example 4: Use the `npar` keyword to split workload in two.
+vamp -r runscript make --npar 2 --exe vasp_std
 ```
 """
 function run_task(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
