@@ -58,14 +58,13 @@ Reads k-points, energy eigenvalues, and band occupations from an OUTCAR file gen
 
 # Arguments
 - `file::String`: Path to the OUTCAR file to read.
-- `line_jump::Int`: Number of lines to skip after encountering the "E-fermi" keyword to reach the first energy eigenvalue (default: 6).
 
 # Returns
 - `kpoints::Matrix{Float64}`: A matrix of k-points (3xNk), where `Nk` is the number of k-points.
 - `eigenvalues::Array{Float64, 3}`: A 3D array of energy eigenvalues (Nbands x Nk x Nconfig), where `Nbands` is the number of bands and `Nconfig` is the number of configurations.
 - `occupations::Array{Float64, 3}`: A 3D array of band occupations (Nbands x Nk x Nconfig).
 """
-function read_eigenvalues_from_outcar(file; line_jump=6)
+function read_eigenvalues_from_outcar(file)
     lines = open_and_read(file)
     lines = split_lines(lines)
     l = 1; nbands = 0; nconfig = 0; nkpts = 0
@@ -78,6 +77,7 @@ function read_eigenvalues_from_outcar(file; line_jump=6)
             l += 1
         else
             found_config = true
+            line_jump = findfirst(line->"k-point" ∈ line, lines[l+1:end]) + 2
             Es_config = Vector{Float64}[]
             occs_config = Vector{Float64}[]
             # jump `line_jump` lines ahead to the first energy eigenvalue
