@@ -87,6 +87,6 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
 
     Ns = parse.(Int64, split_line(args["N"], char=','))
     N, Nmin = length(Ns) > 1 ? Ns : (Ns[1], 1)
-    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar, include_files=include_files)
+    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar, include_files=include_files, lammps=args["lammps"])
     return nothing
 end
