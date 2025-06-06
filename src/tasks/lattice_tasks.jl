@@ -57,7 +57,7 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp supercell sample --N <size,minimum_index> [--xdatcar <file>] [--method <method>] [--p <path>]
+    vamp supercell sample --N <size,minimum_index> [--xdatcar <file>] [--method <method>] [--p <path>] [--lammps]
 
 Sample configurations from a XDATCAR file and create a folder for each one. Copy VASP input files into each folder if present.
 
@@ -66,6 +66,7 @@ Sample configurations from a XDATCAR file and create a folder for each one. Copy
 - `xdatcar`: (Optional) Path to the XDATCAR file that contains the atomic positions for sampling (optional; default is "XDATCAR").
 - `method`: (Optional) Method used for sampling configurations (optional; default is `random`). Alternatively, uniform sampling may be used.
 - `p`: (Optional) Sets the path where the supercell and sample configurations will be created (optional).
+- `lammps`: (Optional) If set to true, the script read lammps input files instead of VASP XDATCAR.
 
 # Examples
 ```bash
