@@ -6,7 +6,7 @@ lmp_elem = read_lammps(test_file_path*"position_elem.lammpstrj")
     @test lmp_elem.a == 1
     @test lmp_elem.atom_numbers == [15, 4, 4, 5, 24]
     @test lmp_elem.atom_names == ["I", "C", "N", "Pb", "H"]
-    @test lmp_elem.atom_types == [split_line(repeat("Pb I I I H H H N C H H H ", 4)); "Pb"; "I"; "I"; "I"]
+    @test lmp_elem.atom_types == [split_line(repeat("I ", 15)); split_line(repeat("C ", 4)); split_line(repeat("N ", 4)); split_line(repeat("Pb ", 5)); split_line(repeat("H ", 24))]
 end
 
 lmp_type = read_lammps(test_file_path*"position_type.lammpstrj")
@@ -17,7 +17,7 @@ lmp_type = read_lammps(test_file_path*"position_type.lammpstrj")
     @test lmp_type.a == 1
     @test lmp_type.atom_numbers == [8, 8, 24, 24, 6, 18, 8]
     @test lmp_type.atom_names == ["atom4", "atom7", "atom5", "atom6", "atom9", "atom8", "atom2"]
-    @test lmp_type.atom_types == [split_line(repeat("atom9 ", 6)); split_line(repeat("atom8 ", 18)); split_line(repeat("atom7 ", 8)); split_line(repeat("atom2 ", 8)); split_line(repeat("atom4 ", 8)); split_line(repeat("atom6 ", 24)); split_line(repeat("atom5 ", 24))]
+    @test lmp_type.atom_types == [split_line(repeat("atom4 ", 8)); split_line(repeat("atom7 ", 8));  split_line(repeat("atom5 ", 24)); split_line(repeat("atom6 ", 24)); split_line(repeat("atom9 ", 6)); split_line(repeat("atom8 ", 18)); split_line(repeat("atom2 ", 8))]
 end
 
 lmp_type_npt = read_lammps(test_file_path*"position_type.lammpstrj", true)
@@ -28,5 +28,5 @@ lmp_type_npt = read_lammps(test_file_path*"position_type.lammpstrj", true)
     @test lmp_type_npt.a == 1
     @test lmp_type_npt.atom_numbers == [8, 8, 24, 24, 6, 18, 8]
     @test lmp_type_npt.atom_names == ["atom4", "atom7", "atom5", "atom6", "atom9", "atom8", "atom2"]
-    @test lmp_type_npt.atom_types == [split_line(repeat("atom9 ", 6)); split_line(repeat("atom8 ", 18)); split_line(repeat("atom7 ", 8)); split_line(repeat("atom2 ", 8)); split_line(repeat("atom4 ", 8)); split_line(repeat("atom6 ", 24)); split_line(repeat("atom5 ", 24))]
+    @test lmp_type.atom_types == [split_line(repeat("atom4 ", 8)); split_line(repeat("atom7 ", 8));  split_line(repeat("atom5 ", 24)); split_line(repeat("atom6 ", 24)); split_line(repeat("atom9 ", 6)); split_line(repeat("atom8 ", 18)); split_line(repeat("atom2 ", 8))]
 end
