@@ -14,7 +14,7 @@ This function takes a vector of command-line arguments, strips formatting artifa
 """
 function get_command_from_cli_args(cli_args)
     command = string(cli_args)
-    command = replace(command, "\""=>"", "["=>"", "]"=>"", ","=>"")
+    command = replace(command, "\""=>"", "["=>"", "]"=>"", ","=>"", "Any"=>"")
     command = "vamp $command"
     return command
 end
