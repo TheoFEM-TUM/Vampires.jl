@@ -131,6 +131,15 @@ function read_lammps(lammps_filename, npt=false)
     # Adjust positions for periodic boundary conditions
     adjust_pos_PBC!(positions)
 
+    # Create a dictionary mapping atom_names to their sort priority
+    order_dict = Dict(atom_name => i for (i, atom_name) in enumerate(atom_names))
+
+    # Get sorting indices based on the order
+    sorted_indices = sortperm(1:length(atom_types), by = i -> order_dict[atom_types[i]])
+
+    atom_types = atom_types[sorted_indices]
+    positions = positions[:, sorted_indices, :]
+
     return Structure(a, lattices, atom_names, atom_numbers, positions, velocities, atom_types)
 end
 

@@ -57,7 +57,7 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
 end
 
 """
-    vamp supercell sample --N <size,minimum_index> [--xdatcar <file>] [--method <method>] [--p <path>]
+    vamp supercell sample --N <size,minimum_index> [--xdatcar <file>] [--method <method>] [--p <path>] [--lammps]
 
 Sample configurations from a XDATCAR file and create a folder for each one. Copy VASP input files into each folder if present.
 
@@ -66,6 +66,7 @@ Sample configurations from a XDATCAR file and create a folder for each one. Copy
 - `xdatcar`: (Optional) Path to the XDATCAR file that contains the atomic positions for sampling (optional; default is "XDATCAR").
 - `method`: (Optional) Method used for sampling configurations (optional; default is `random`). Alternatively, uniform sampling may be used.
 - `p`: (Optional) Sets the path where the supercell and sample configurations will be created (optional).
+- `lammps`: (Optional) If set to true, the script read lammps input files instead of VASP XDATCAR.
 
 # Examples
 ```bash
@@ -87,6 +88,6 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
 
     Ns = parse.(Int64, split_line(args["N"], char=','))
     N, Nmin = length(Ns) > 1 ? Ns : (Ns[1], 1)
-    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar, include_files=include_files)
+    supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar, include_files=include_files, lammps=args["lammps"])
     return nothing
 end
