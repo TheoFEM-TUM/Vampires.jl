@@ -100,8 +100,8 @@ function run_task(::Type{Val{:w90_hr}}, ::Type{Val{:test}}, args)
     hr_file = joinpath(args["p"], args["w90_hr"])
     eig_file = joinpath(args["p"], args["eigenval"])
 
-    error = compare_w90_and_dft(hr_file, eig_file, bandmin=bandmin, method=method)
-    return ["$method"*"_error"], [error]
+    difference = compare_w90_and_dft(hr_file, eig_file, bandmin=bandmin, method=method)
+    return (difference = difference,)
 end
 
 """

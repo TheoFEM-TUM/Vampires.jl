@@ -29,7 +29,8 @@ makedocs(
         "Tutorials" => [
             "tutorials/silicon.md",
             "tutorials/supercell.md",
-            "tutorials/wannier90.md"
+            "tutorials/wannier90.md",
+            "tutorials/jobs.md"
         ],
         "Library Mode" => [
             "man/library.md"
