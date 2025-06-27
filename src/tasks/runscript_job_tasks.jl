@@ -111,7 +111,7 @@ vamp run job make --exe vasp_std --module_list module1,module2 --module_path /pa
 ```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
-    if !check_required_parameters(["exe", "partition", "nodes", "time", "mail", ""], args); return; end
+    if !check_required_parameters(["exe", "partition", "nodes", "time"], args); return; end
     exe = args["exe"]
     partition = args["partition"]
     nodes = parse(Int64, args["nodes"])
@@ -119,17 +119,18 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     mail = args["mail"]
     module_list = split_line(args["module_list"], char=',')
     module_paths = split_line(args["module_paths"], char=',')
+    account = args["account"]
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
         for file in readdir(args["p"])
             if occursin(exe, file)
                 filename = args["o"] * "_$num_exe"
-                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
+                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, account=account, time=time, module_list=module_list, module_paths=module_paths)
                 num_exe += 1
             end
         end
     else
-        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
+        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, account=account, time=time, module_list=module_list, module_paths=module_paths)
     end
     return nothing
 end
@@ -169,12 +170,18 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
 
     cd(path)
     if hostname == "none" || occursin(hostname, current_hostname)
-        run(`sbatch -A $account \*.job`)
+        for file in readdir()
+            if occursin(".job", file); run(`sbatch -A $account $file`); end
+        end
     else
         scratch_path = "\$SCRATCH_$account/\$USER/"
         path_on_host = split_path_at_folder(pwd(), hostname)
         total_path = joinpath(scratch_path, path_on_host)
-        run(`ssh $hostname "cd $total_path && echo \"Submitting job at \$(pwd)\" && sbatch -A $account *.job"`)
+        for file in readdir()
+            if occursin(".job", file)
+                run(`ssh $hostname "cd $total_path && echo \"Submitting job at \$(pwd)\" && sbatch -A $account $file"`)
+            end
+        end
     end
     cd(original_working_directory)
     return nothing
