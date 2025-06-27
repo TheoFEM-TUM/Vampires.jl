@@ -32,7 +32,7 @@ Creates a run script that executes the VASP executable at the specified path.
 
 # Arguments
 - `npar`: (Optional) The workload is split among `npar` run scripts.
-- `exe`: (Optional) The name of the VASP executable that will be used in the run script.
+- `exe`: The name of the executable that will be used in the run script.
 - `p`: (Optional) The path where the run script will be created. This is the directory in which the script will be saved.
 - `exclude`: (Optional) File or list of files to be removed after each calculation.
 
@@ -54,15 +54,20 @@ vamp -r runscript make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
 
 # Example 4: Use the `npar` keyword to split workload in two.
 vamp -r runscript make --npar 2 --exe vasp_std
+
+# Example 4: Use `exe` keyword to run a no-SOC -> SOC calculation as recommended by VASP devs (see https://www.vasp.at/wiki/index.php/LNONCOLLINEAR; requires loading Vampires module!).
+vamp -r runscript make --exe vasp+soc
 ```
 """
 function run_task(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
+    if !check_required_parameters(["exe"], args); return; end
     cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
     return nothing
 end
 
 function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
+    if !check_required_parameters(["exe"], args); return; end
     base_path = args["p"]
     cb = get_exclude_callback(args["exclude"])
     nchunks = parse(Int64, args["npar"])

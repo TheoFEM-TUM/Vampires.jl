@@ -27,6 +27,11 @@ function write_run_script(exe, path; out="run_job.sh", cb="", run_out="vasp.log"
             println(runfile, "    cd \$folder")
             if occursin(".sh", exe)
                 println(runfile, "    bash $exe > $run_out")
+            elseif exe == "vasp+soc"
+                println(runfile, "    vamp incar set --par LSORBIT,LCHARG,LWAVE,ISTART,GGA_COMPAT,LASPH --val false,true,true,0,true,false")
+                println(runfile, "    srun vasp_std > vasp_std.log")
+                println(runfile, "    vamp incar set --par LSORBIT,LCHARG,LWAVE,ISTART,GGA_COMPAT,LASPH --val true,false,false,1,false,true")
+                println(runfile, "    srun vasp_ncl > vasp_ncl.log")
             else
                 println(runfile, "    srun $exe  > $run_out")
             end
