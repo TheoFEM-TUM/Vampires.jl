@@ -130,10 +130,10 @@ function copy_vasp_input(path, folder, files=["KPOINTS", "POTCAR", "POSCAR", "IN
     infiles = vcat(files, [a for (a, _) in include])
     outfiles = vcat(files, [b for (_, b) in include])
     for (infile, outfile) in zip(infiles, outfiles)
-        if !isfile(infile)
+        if !isfile(joinpath(path, infile))
             @info "$infile file was not found in current path ($path)."
-        elseif isfile(infile)
-            cp(infile, joinpath(path, folder, "$outfile"), force=true)
+        elseif isfile(joinpath(path, infile))
+            cp(joinpath(path, infile), joinpath(path, folder, "$outfile"), force=true)
         end
     end
 end
