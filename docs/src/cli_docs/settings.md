@@ -13,3 +13,15 @@ run_task(::Type{Val{:settings}}, ::Type{Val{:set}}, ::Any)
 ```@docs
 run_task(::Type{Val{:settings}}, ::Type{Val{:rm}}, ::Any)
 ```
+
+# Command log
+
+For reproducibility, it may be useful to log the commands executed by Vampires. By default, command logging is disabled. To enable it, set the `log` tag to either `"local"` (commands are written to `Vampires.log` in the current working directory) or `"global"` (commands are written to `Vampires.log` in `\$HOME/.Vampires/`). It is recommended to change the default setting to enabling this feature, so that your workflows are automatically recorded via
+```bash
+vamp settings set --par log --val local
+```
+or
+```bash
+vamp settings set --par log --val global
+```
+Note that no commands that executed with the `--help` flag are logged.

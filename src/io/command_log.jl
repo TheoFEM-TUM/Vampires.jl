@@ -27,7 +27,7 @@ Appends a command string to a log file, with a timestamp and user information.
 The logging behavior depends on the `args["log"]` setting:
 - `"none"`: No logging is performed.
 - `"local"`: Logs to the specified `filename` in the current working directory.
-- `"global"`: Logs to the `filename` inside a global `settings_folder` directory (\$Home/.Vampires).
+- `"global"`: Logs to the `filename` insid `settings_folder` directory (HOME/.Vampires).
 
 # Arguments
 - `command::String`: The command string to log.
