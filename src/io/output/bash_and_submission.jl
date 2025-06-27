@@ -142,7 +142,7 @@ write_slurm_script("vasp_std",
 )
 """
 function write_slurm_script(exe, path; module_paths::AbstractArray=[], module_list::AbstractArray=[],
-                            time=1, nodes=1, ntasks_per_node=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0,
+                            time=1, nodes=1, ntasks_per_node=48, ntasks_per_core=1, omp_num_threads=1, num_gpu=0, account="",
                             partition::AbstractString="batch", mail::AbstractString="", filename::AbstractString="job")
     out = joinpath(path, filename*".job")
     hrs = trunc(Int, time)
@@ -161,6 +161,9 @@ function write_slurm_script(exe, path; module_paths::AbstractArray=[], module_li
         #SBATCH --time=$time_str
         #SBATCH --partition=$partition
         """)
+        if length(account) > 0
+            println(outfile, "#SBATCH --account=$account")
+        end
         if num_gpu == 0
             print(outfile, """
             #SBATCH --ntasks-per-node=$ntasks_per_node
