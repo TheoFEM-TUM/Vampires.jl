@@ -33,6 +33,7 @@ end
     include("tasks/test_eigenval_task.jl")
     include("tasks/test_w90_tests.jl")
     include("tasks/test_scaling_tasks.jl")
+    include("tasks/test_recursive.jl")
 end
 
 @testset "calculations" begin
