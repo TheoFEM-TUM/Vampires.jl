@@ -162,7 +162,8 @@ function get_default_args()
         "module_list" => "",
         "module_paths" => "",
         "npt" => false,
-        "lammps" => ""
+        "lmp_file" => "",
+        "lammps" => false
     )
     read_settings!(args_dict)
     return args_dict
@@ -224,7 +225,8 @@ function get_arg_description()
             "xlabel" => "specifies the label of the x axis",
             "ylabel" => "specifies the label of the y axis",
             "npt" => "specifies if MD input is an NPT ensemble",
-            "lammps" => "set name of LAMMPS file"
+            "lmp_file" => "set name of LAMMPS file",
+            "lammps" => "use if trajectory is produced with LAMMPS (default: false)"
         )
     )
     return arg_descriptions
