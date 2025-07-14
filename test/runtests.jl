@@ -17,6 +17,7 @@ include("io/test_structure.jl")
     include("io/input/test_contcar.jl")
     include("io/input/test_extended_config.jl")
     include("io/plotting/test_colors.jl")
+    include("io/test_command_log.jl")
 end
 
 @testset "io/output" begin
@@ -32,6 +33,7 @@ end
     include("tasks/test_eigenval_task.jl")
     include("tasks/test_w90_tests.jl")
     include("tasks/test_scaling_tasks.jl")
+    include("tasks/test_recursive.jl")
 end
 
 @testset "calculations" begin
