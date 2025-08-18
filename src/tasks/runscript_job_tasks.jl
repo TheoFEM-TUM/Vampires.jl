@@ -273,15 +273,27 @@ vamp input cp --o MYFOLDER
 
 # Example 2: Copy all files but the `KPOINTS` file and include `myfile`.
 vamp input cp --o MYFOLDER --exclude KPOINTS --include myfile
+
+# Example 3: Copy input files to all subfolders in `CALC`.
+vamp -r input cp --o CALC
 ```
 """
 function run_task(::Type{Val{:input}}, ::Type{Val{:cp}}, args)
     path = args["p"]
     target = args["o"]
-    if target ∉ readdir(); mkdir(target); end
+    if !isdir(target); mkdir(target); end
     ignore = split_line(args["exclude"], char=',')
     include = get_include(split_line(args["include"], char=','))
     copy_vasp_input(path, target, ignore=ignore, include=include)
+end
+
+function run_task_recursive(task::Type{Val{:input}}, subtask::Type{Val{:cp}}, args)
+    base_path = args["o"] == "none" ? pwd() : args["o"]
+    for folder in readfolders(base_path)
+        args["o"] = joinpath(base_path, folder)
+        run_task(task, subtask, args)
+    end
+    return nothing
 end
 
 """
