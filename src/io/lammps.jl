@@ -15,133 +15,120 @@ Read the configurations in dump LAMMPS output file called 'lammps_filename' and 
     - `positions::Array{Float64, 3}`: 3xNionxNconfig, with Nconfig configurations represented by 3xNion coordinates
     - `atom_types`: An array of atom types corresponding to each atom position.
 """
-function read_lammps(lammps_filename, npt=false)
 
-    lines = split_lines(open_and_read(lammps_filename))
+function read_lammps(lammps_filename::AbstractString, npt::Bool=false)
+    # ---- First pass: read header metadata ----
+    open(lammps_filename) do io
+        # Skip lines until lattice info
+        readline(io)  # line 1
+        readline(io)  # line 2
+        readline(io)  # line 3
+        Nion = parse(Int, split_line(readline(io))[1])  # line 4: number of atoms
 
-    # Scaling parameter
-    a = 1
+        lattice = extract_lattice_lmp(split_lines([readline(io) for _ in 1:4]))  # lines 5-7
+        i_start = 9  # header line for atom columns
+        header_line = split_line(readline(io))
 
-    # number of atoms
-    Nion = parse(Int64, lines[4][1])
+        # Determine position columns
+        pos_idx = findfirst(==("xs"), header_line)
+        frac_coordinates = true
+        if pos_idx === nothing
+            pos_idx = findfirst(==("x"), header_line)
+            frac_coordinates = false
+        end
+        pos_idx -= 2  # adjust to 0-based for array indexing
 
-    # extract lattice vectors
-    lattice = extract_lattice_lmp(lines[5:8])
-
-    # Find starting line of configurations
-    i_start = 9
-
-    # Calculate the number of configurations
-    L = length(lines)
-    Nconfig = Int(L / (Nion + i_start))
-
-    table_line = lines[9]
-
-    # Determine which coordinates are used: direct (xs) or cartesian (x) and find its column
-    frac_coordinates = true
-    index_pos = findfirst(x -> x == "xs", table_line)
-    if isnothing(index_pos)
-        frac_coordinates = false
-        index_pos = findfirst(x -> x == "x", table_line)
-    else
-        throw("This LAMMPS output file does not contain atomic positions.")
-    end
-    index_pos -= 2
-
-    # find column for atom_types
-    elem = true
-    index_elem = findfirst(x -> x == "element", table_line)
-    type = false
-    index_type = 0
-    if isnothing(index_elem)
-        elem = false
-        index_elem = 0
-        type = true
-        index_type = findfirst(x -> x == "type", table_line)
-        if isnothing(index_type)
-            type = false
-            index_type = 0
+        # Determine atom type column
+        elem_idx = findfirst(==("element"), header_line)
+        type_idx = nothing
+        use_elem = true
+        if elem_idx === nothing
+            use_elem = false
+            type_idx = findfirst(==("type"), header_line)
+            type_idx = isnothing(type_idx) ? nothing : type_idx - 2
         else
-            index_type -= 2
+            elem_idx -= 2
         end
-    else
-        index_elem -= 2
-    end
 
-    # Initialize
-    positions = zeros(Float64, 3, Nion, Nconfig)
-    velocities = [spzeros(Float64, 3, Nion) for _ in 1:Nconfig]
-    atom_types = String[]
-    lattices = Float64[]
+        # ---- Count number of configurations ----
+        # Efficient estimate: total lines / (Nion + i_start)
+        total_lines = countlines(lammps_filename)
+        N = Nion + i_start
+        Nconfig = div(total_lines, N)
 
-    ### read all lammps data
-    N = i_start + Nion
-    if (npt == false)
-        lattices = lattice
-        for j in 1:Nconfig, i in 1:N
-            if (i > i_start)
-                line = lines[(j - 1) * N + i]
-                if j == 1
-                    if elem == true
-                        push!(atom_types, line[index_elem])
-                    elseif type == true
-                        push!(atom_types, "atom$(parse.(Int64, line[index_type]))")
-                    else
-                        push!(atom_types, "unknown")
-                    end
+        # ---- Preallocate arrays ----
+        positions = zeros(Float64, 3, Nion, Nconfig)
+        velocities = [spzeros(Float64, 3, Nion) for _ in 1:Nconfig]
+        atom_types = Vector{String}(undef, Nion)
+        lattices = npt ? zeros(Float64, 3, 3, Nconfig) : lattice
+
+        # ---- Parse frames ----
+        open(lammps_filename) do f
+            for j in 1:Nconfig
+                # Skip header lines for this frame
+                for _ in 1:4
+                    readline(f)
                 end
-                positions[:, i - i_start, j] = parse.(Float64, line[index_pos : index_pos + 2])
-            end
-        end
-    else
-        lattices = zeros(Float64, 3, 3, Nconfig)
-        for j in 1:Nconfig, i in 1:N
-            if (i == 5)
-                if j == 1
-                    lattices[:,:,j] = lattice
+
+                # Extract lattice if npt
+                if npt
+                    frame_lattice_lines = split_lines([readline(f) for _ in 1:4])
+                    lattices[:, :, j] = j == 1 ? lattice : extract_lattice_lmp(frame_lattice_lines)
+                    readline(f)
                 else
-                    lattices[:,:,j] = extract_lattice_lmp(lines[(j - 1) * N + i: (j - 1) * N + i + 3])
-                end
-            elseif (i > i_start)
-                line = lines[(j - 1) * N + i]
-                if j == 1
-                    if elem == true
-                        push!(atom_types, line[index_elem])
-                    elseif type == true
-                        push!(atom_types, "atom$(parse.(Int64, line[index_type]))")
-                    else
-                        push!(atom_types, "unknown")
+                    for _ in 1:i_start-4
+                        readline(f)
                     end
                 end
-                positions[:, i - i_start, j] = parse.(Float64, line[index_pos : index_pos + 2])
+
+                # Read atom positions
+                for i in 1:Nion
+                    line = split_line(readline(f))
+                    # Store atom types only once
+                    if j == 1
+                        if use_elem
+                            atom_types[i] = line[elem_idx]
+                        elseif type_idx !== nothing
+                            atom_types[i] = "atom$(parse(Int, line[type_idx]))"
+                        else
+                            atom_types[i] = "unknown"
+                        end
+                    end
+                    positions[:, i, j] .= parse.(Float64, line[pos_idx:pos_idx+2])
+                end
             end
         end
+
+        # ---- Extract atom names and counts ----
+        atom_dict = countmap(atom_types)
+        atom_numbers = collect(values(atom_dict))
+        atom_names = collect(keys(atom_dict))
+
+        #counts = Dict{String, Int}()
+        #for t in atom_types
+        #    counts[t] = get(counts, t, 0) + 1
+        #end
+        #atom_names = collect(keys(counts))
+        #atom_numbers = [counts[name] for name in atom_names]
+
+        # ---- Convert to fractional coordinates if needed ----
+        if !frac_coordinates
+            positions = cart_to_frac(positions, lattice)
+        end
+
+        # ---- Adjust PBC ----
+        adjust_pos_PBC!(positions)
+
+        # ---- Sort atoms by type ----
+        order = Dict(name => i for (i, name) in enumerate(atom_names))
+        sorted_idx = sortperm(1:length(atom_types), by=i -> order[atom_types[i]])
+        atom_types = atom_types[sorted_idx]
+        positions = positions[:, sorted_idx, :]
+
+        return Structure(1, lattices, atom_names, atom_numbers, positions, velocities, atom_types)
     end
-
-    # extract atom_names and atom_numbers from atom_types array
-    atom_dict = countmap(atom_types)
-    atom_numbers = collect(values(atom_dict))
-    atom_names = collect(keys(atom_dict))
-
-    # transform to fractional coordinates if needed
-    if frac_coordinates == false
-        positions = cart_to_frac(positions, lattice)
-    end
-
-    # Adjust positions for periodic boundary conditions
-    adjust_pos_PBC!(positions)
-
-    # Create a dictionary mapping atom_names to their sort priority
-    order_dict = Dict(atom_name => i for (i, atom_name) in enumerate(atom_names))
-
-    # Get sorting indices based on the order
-    sorted_indices = sortperm(1:length(atom_types), by = i -> order_dict[atom_types[i]])
-
-    atom_types = atom_types[sorted_indices]
-    positions = positions[:, sorted_indices, :]
-
-    return Structure(a, lattices, atom_names, atom_numbers, positions, velocities, atom_types)
 end
+
 
 """
     extract_lattice_lmp(lines::Array{String}, is_cubic::bool)
