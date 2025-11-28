@@ -35,6 +35,5 @@ vamp lammps read --lmp_file position.lammpstrj --p /home/LAMMPS_output/
 function run_task(::Type{Val{:lammps}}, ::Type{Val{:read}}, args)
     if !check_required_parameters(["lmp_file"], args); return; end
     lammps = read_lammps(joinpath(args["p"], args["lmp_file"]), args["npt"])
-    #lattice, configs = lammps.lattice, lammps.positions
     return (lattice = lammps.lattice, configs = lammps.positions)
 end
