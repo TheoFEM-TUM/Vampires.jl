@@ -30,3 +30,14 @@ lmp_type_npt = read_lammps(test_file_path*"position_type.lammpstrj", true)
     @test lmp_type_npt.atom_names == ["atom4", "atom7", "atom5", "atom6", "atom9", "atom8", "atom2"]
     @test lmp_type.atom_types == [split_line(repeat("atom4 ", 8)); split_line(repeat("atom7 ", 8));  split_line(repeat("atom5 ", 24)); split_line(repeat("atom6 ", 24)); split_line(repeat("atom9 ", 6)); split_line(repeat("atom8 ", 18)); split_line(repeat("atom2 ", 8))]
 end
+
+lmp_first = read_lammps_first_snapshot(test_file_path*"position_type.lammpstrj")
+
+@testset "LAMMPS first snapshot" begin
+    @test lmp_first.lattice == [12.529031559003998 0.0 0.0; -0.009804375927916135 12.512643577577357 0.0; 0.009047557978906707 -0.043298123969281 12.467076643736094]
+    @test lmp_first.positions == read_from_file(test_file_path*"configs_lammps_first.dat")[:, :, 1]
+    @test lmp_first.a == 1
+    @test lmp_first.atom_numbers == [8, 8, 24, 24, 6, 18, 8]
+    @test lmp_first.atom_names == ["atom4", "atom7", "atom5", "atom6", "atom9", "atom8", "atom2"]
+    @test lmp_first.atom_types == [split_line(repeat("atom4 ", 8)); split_line(repeat("atom7 ", 8));  split_line(repeat("atom5 ", 24)); split_line(repeat("atom6 ", 24)); split_line(repeat("atom9 ", 6)); split_line(repeat("atom8 ", 18)); split_line(repeat("atom2 ", 8))]
+end

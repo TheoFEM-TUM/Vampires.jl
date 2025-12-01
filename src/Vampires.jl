@@ -40,7 +40,7 @@ include("tasks/scaling_tasks.jl")
 include("cli_interface.jl")
 
 export Structure
-export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt, read_lammps, read_contcar
+export read_eigenval, read_doscar, Poscar, read_poscar, write_poscar, read_xdatcar, read_xdatcar_npt, read_lammps, read_contcar, read_lammps_first_snapshot
 export read_config
 export Incar, set_key!, remove_key!, findvalue, read_incar, write_incar
 export add_incar_block!, rm_incar_block!
