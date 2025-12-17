@@ -103,6 +103,13 @@ function read_lammps(lammps_filename::AbstractString, npt::Bool=false)
         atom_dict = countmap(atom_types)
         atom_numbers = collect(values(atom_dict))
         atom_names = collect(keys(atom_dict))
+        atom_names_ordered = unique(atom_types)
+        
+        if atom_names != atom_names_ordered
+            perm = indexin(atom_names_ordered, atom_names)
+            atom_numbers = atom_numbers[perm]
+            atom_names = atom_names_ordered
+        end 
 
         # ---- Convert to fractional coordinates if needed ----
         if !frac_coordinates
@@ -259,6 +266,13 @@ function read_lammps_first_snapshot(lammps_filename::AbstractString)
         atom_dict = countmap(atom_types)
         atom_numbers = collect(values(atom_dict))
         atom_names = collect(keys(atom_dict))
+        atom_names_ordered = unique(atom_types)
+        
+        if atom_names != atom_names_ordered
+            perm = indexin(atom_names_ordered, atom_names)
+            atom_numbers = atom_numbers[perm]
+            atom_names = atom_names_ordered
+        end 
 
         # ---- Convert to fractional coordinates if needed ----
         if !frac_coordinates
