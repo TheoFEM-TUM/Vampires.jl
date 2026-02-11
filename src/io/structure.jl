@@ -99,6 +99,7 @@ The header includes the system name, lattice scaling factor, lattice vectors, at
 open("structure_header.txt", "w") do io
     write_structure_file_header(io, structure, "Water Molecule")
 end
+```
 """
 function write_structure_file_header(iostream, structure::Structure; system_name="unknown structure", index=1)
     println(iostream, system_name)
