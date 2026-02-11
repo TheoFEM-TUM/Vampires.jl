@@ -28,3 +28,92 @@
         end
     end
 end
+
+@testset "Supercell rattle" begin
+    args = Vampires.parse_commandline(ARGS)
+    args["p"] = joinpath(@__DIR__, "test_files")
+    args["poscar"] = "SC_POSCAR"
+    args["o"] = "XDATCAR_test"
+
+    # Read original positions
+    input_file = joinpath(args["p"], args["poscar"])
+    poscar = read_poscar(input_file)
+    orig_positions = frac_to_cart(poscar.positions, poscar.lattice)
+    mass_dict = Dict{String, Float64}()
+    for type in poscar.atom_names
+        mass = elements[Symbol(type)].atomic_mass
+        mass_dict[type] = mass / unit(mass)
+    end
+    mass_min = minimum(values(mass_dict))
+
+    # Test different N values
+    for N in ("1", "3")
+        args["N"] = N
+        @run_task supercell rattle args
+
+        output_file = joinpath(args["p"], args["o"])
+        @test isfile(output_file)
+
+        xd = read_xdatcar(output_file)
+        @test size(xd.positions, 3) == parse(Int, N)
+
+        # Check that max displacement is not exceeded
+        for n in 1:parse(Int, N)
+            new_pos = frac_to_cart(xd.positions[:,:,n], xd.lattice)
+            for i in axes(orig_positions, 2)
+                disp = norm(new_pos[:,i] - orig_positions[:,i])
+                # compute maximum allowed sigma for this atom
+                sigma_i = 0.10 # default sigma
+                sigma_i *= (mass_min / mass_dict[poscar.atom_types[i]])^0.8  # default alpha
+                @test disp <= 3*sigma_i * 1.01  # allow tiny numerical tolerance
+            end
+        end
+        rm(output_file)
+    end
+
+    # Test different methods
+    for method in ("gaussian", "uniform")
+        args["N"] = "2"
+        args["method"] = method
+        @run_task supercell rattle args
+
+        output_file = joinpath(args["p"], args["o"])
+        @test isfile(output_file)
+
+        xd = read_xdatcar(output_file)
+        @test size(xd.positions, 3) == 2
+
+        for n in 1:2
+            new_pos = frac_to_cart(xd.positions[:,:,n], xd.lattice)
+            for i in axes(orig_positions, 2)
+                disp = norm(new_pos[:,i] - orig_positions[:,i])
+                sigma_i = 0.10 * (mass_min / mass_dict[poscar.atom_types[i]])^0.8
+                @test disp <= 3*sigma_i * 1.01
+            end
+        end
+        rm(output_file)
+    end
+
+    # Test custom rattle_cell parameters
+    args["N"] = "2"
+    args["method"] = "gaussian"
+    args["par"] = "sigma_min,sigma_max,alpha"
+    args["val"] = "0.01,0.05,0.8"
+    @run_task supercell rattle args
+
+    output_file = joinpath(args["p"], args["o"])
+    @test isfile(output_file)
+
+    xd = read_xdatcar(output_file)
+    @test size(xd.positions, 3) == 2
+
+    for n in 1:2
+        new_pos = frac_to_cart(xd.positions[:,:,n], xd.lattice)
+        for i in axes(orig_positions, 2)
+            disp = norm(new_pos[:,i] - orig_positions[:,i])
+            sigma_i = 0.05 * (mass_min / mass_dict[poscar.atom_types[i]])^0.8
+            @test disp <= 3*sigma_i * 1.01
+        end
+    end
+    rm(output_file)
+end
