@@ -122,7 +122,7 @@ end
     args["method"] = "gaussian"
     args["par"] = "sigma_min,sigma_max,strain_max"
     args["val"] = "0.01,0.05,0.05"
-    @run_task supercell rattle args
+    run_task(Val{Symbol("supercell")}, Val{Symbol("rattle")}, args)
 
     output_file = joinpath(args["p"], args["o"])
     @test isfile(output_file)
