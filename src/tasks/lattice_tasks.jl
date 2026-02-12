@@ -91,3 +91,67 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:sample}}, args)
     supercell_create_subdirectories(args["p"], xdatcar, N, method=args["method"], Nmin=Nmin, potcar=potcar, kpoints=kpoints, incar=incar, include_files=include_files, lammps=args["lammps"])
     return nothing
 end
+
+"""
+    vamp supercell rattle --N <int> [--poscar <file>] [--method <method>]
+                            [--p <path>] [--par <params>] [--val <values>] [--o <output>]
+
+Rattle a POSCAR structure and generate multiple distorted configurations.  
+All generated structures are written to a single XDATCAR file.
+
+# Arguments
+- `N` : Number of configurations to create.
+- `method` : (Optional) Method used for random numbers; `"gaussian"` (default) or `"uniform"`.
+- `p` : (Optional) Path where sampled supercells will be created. Default: current directory.
+- `par` : (Optional) Comma-separated list of additional keyword parameters, e.g., `sigma_min,sigma_max,strain_max`.
+- `val` : (Optional) Comma-separated list of values corresponding to `--par`.
+
+# Additional rattle parameters (passed via `--par` and `--val`)
+- `sigma_min` : Minimum atomic displacement amplitude (Å). Default: 0.03
+- `sigma_max` : Maximum atomic displacement amplitude (Å). Default: 0.10
+- `min_dist_factor` : Minimum allowed distance between atoms relative to the reference structure. Default: 0.8
+- `strain_max` : Maximum isotropic lattice strain (fractional). Default: 0.0
+- `N` : Number of configurations to generate. Default: 1
+- `method` : Displacement method; `"gaussian"` or `"uniform"`. Default: `"gaussian"`
+- `attempt_max` : Maximum number of attempts to generate a valid configuration before giving up. Default: 20
+- `alpha` : Mass scaling exponent; determines how displacement scales with atom mass. Default: 0.5
+             (1 → lightest atom moves full sigma, heavier atoms scaled down relative to lightest)
+
+# Examples
+```bash
+# Example 1: Sample 10 random configurations from the default POSCAR file
+vamp supercell rattle --N 10
+
+# Example 2: Sample 100 configurations using uniform displacements
+vamp supercell rattle --N 100 --method uniform
+
+# Example 3: Sample 5 configurations and pass custom rattle_cell parameters (sigma_min and sigma_max)
+vamp supercell rattle --N 5 --par sigma_min,sigma_max --val 0.02,0.08
+
+# Example 4: Sample configurations from a custom POSCAR file in a custom output path
+vamp supercell rattle --N 10 --poscar my_POSCAR --p ./samples
+
+# Example 5: Sample 10 configurations with isotropic strain and stronger mass scaling (heavy atoms move less)
+vamp supercell rattle --N 10 --par strain_max,alpha --val 0.1,1
+
+# Example 6: Sample 10 configurations with increased attempt_max and reduced min_dist_factor
+vamp supercell rattle --N 10 --par attempt_max,min_dist_factor --val 100,0.5
+```
+"""
+function run_task(::Type{Val{:supercell}}, ::Type{Val{:rattle}}, args)
+    if !check_required_parameters(["N"], args); return; end
+    poscar = read_poscar(joinpath(args["p"], args["poscar"]))
+    
+    N = parse.(Int64, args["N"])
+    method = args["method"] == "none" ? "gaussian" : args["method"]
+    params = split_line(args["par"], char=',')
+    vals = parse.(Float64, split_line(args["val"], char=','))
+    @assert length(params) == length(vals)
+    func_args = NamedTuple{Tuple(Symbol.(params))}(vals)
+    strc_out = rattle_cell(poscar, method=method, N=N; func_args...)
+
+    open(joinpath(args["p"], args["o"]), "w") do file
+        write_xdatcar(file, strc_out)
+    end
+    return nothing
+end

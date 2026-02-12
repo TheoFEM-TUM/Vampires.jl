@@ -51,3 +51,103 @@ function compute_velocities(x::Array{Float64, 3}, timestep::T, cell::Matrix{Floa
     return ustrip.(uconvert.(u"m/ps", (dr_pbc) ./ (timestep*u"fs")))  # convert Å / fs -> m / ps and return raw values
 end
 
+"""
+    rattle_cell(strc; σmin=0.03, σmax=0.10, min_dist_factor=0.8, strain_max=0.0,
+                N=1, method="gaussian", attempt_max=20)
+
+Generate physically reasonable distorted structures from a base structure for.
+
+The function applies:
+1. Optional isotropic strain to the lattice vectors.
+2. Random atomic displacements scaled by atomic masses.
+3. Rejection of structures where atoms are closer than a specified fraction of the 
+   original minimum interatomic distance.
+
+# Arguments
+- `strc`: Structure object
+
+# Keyword Arguments
+- `sigma_min`, `sigma_max` :: Float64 - Minimum and maximum displacement amplitude (Å).
+- `min_dist_factor` :: Float64 - Minimum allowed interatomic distance relative to original.
+- `strain_max` :: Float64 - Maximum isotropic lattice strain (fractional, e.g., 0.01 = ±1%).
+- `N` :: Int - Number of rattled structures to generate.
+- `method` :: String - `"gaussian"` (default) or `"uniform"` displacement.
+- `attempt_max` :: Int - Maximum rejection attempts per structure.
+- `alpha` :: Float64 - Parameter for mass scaling of distortion (0 = no scaling, <1 = soft scaling, >1 = strong scaling).
+
+# Returns
+- `Structure` object containing:
+    - `positions` :: 3 × N_atoms × N array of rattled positions.
+    - `lattice`   :: 3 × 3 × N array of lattices.
+    - Original atomic information copied from `strc`.
+"""
+function rattle_cell(strc; sigma_min=0.03, sigma_max=0.10, min_dist_factor=0.8, strain_max=0.0,
+                           N=1, method="gaussian", attempt_max=20, alpha=0.5)
+
+    lattice = strc.lattice
+    positions = frac_to_cart(strc.positions, lattice)
+
+    mass_dict = Dict{String, Float64}()
+    for type in strc.atom_names
+        mass = elements[Symbol(type)].atomic_mass
+        mass_dict[type] = mass / unit(mass)
+    end
+
+    # reference minimum distance
+    Natoms = size(positions, 2)
+    function min_distance(pos)
+        dmin = Inf
+        for i in 1:Natoms-1, j in i+1:Natoms
+            d = norm(pos[i] - pos[j])
+            dmin = min(dmin, d)
+        end
+        return dmin
+    end
+
+    ref_min_dist = min_distance(positions)
+    mass_min = minimum(values(mass_dict))
+
+    rattled_positions = zeros(3, size(positions, 2), N)
+    rattled_lattice = zeros(3, 3, N)
+    for n in 1:N
+        attempt = 0
+        success = false
+
+        while attempt < attempt_max && !success
+            attempt += 1
+
+            # optional isotropic strain
+            ε = 0.0
+            if strain_max > 0
+                ε = rand() * 2*strain_max - strain_max
+            end
+            strain_matrix = (1 + ε) * I
+            new_lattice = lattice * strain_matrix
+
+            # scale positions with lattice
+            new_positions = [(strain_matrix * p) for p in eachcol(positions)]
+
+            # select displacement amplitude
+            σ0 = rand()*(sigma_max - sigma_min) + sigma_min
+
+            # apply atomic displacements
+            for i in axes(positions, 2)
+                mass_i = mass_dict[strc.atom_types[i]]
+                σi = σ0 * (mass_min / mass_i)^alpha
+                disp = method == "gaussian" ? randn(3) .* σi :
+                       method == "uniform"  ? (2rand(3).-1) .* σi :
+                       error("Unknown method $method, choose 'gaussian' or 'uniform'")
+                new_positions[i] += disp
+            end
+
+            # reject if atoms too close
+            if min_distance(new_positions) >= min_dist_factor * ref_min_dist
+                rattled_positions[:, :, n] = cart_to_frac(hcat(new_positions...), new_lattice)
+                rattled_lattice[:, :, n]   = new_lattice
+                success = true
+            end
+        end
+    end
+    lattice_out = strain_max == 0 ? strc.lattice : rattled_lattice
+    return Structure(strc.a, lattice_out, strc.atom_names, strc.atom_numbers, rattled_positions, strc.velocities, strc.atom_types)
+end

@@ -1,4 +1,4 @@
-using Vampires, Test, LinearAlgebra, HDF5, Plots, Unitful
+using Vampires, Test, LinearAlgebra, HDF5, Plots, Unitful, PeriodicTable
 
 global test_file_path = joinpath(string(@__DIR__), "test_files/")
 
