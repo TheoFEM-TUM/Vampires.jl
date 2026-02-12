@@ -116,4 +116,20 @@ end
         end
     end
     rm(output_file)
+
+    # Test custom rattle_cell parameters
+    args["N"] = "2"
+    args["method"] = "gaussian"
+    args["par"] = "sigma_min,sigma_max,strain_max"
+    args["val"] = "0.01,0.05,0.05"
+    @run_task supercell rattle args
+
+    output_file = joinpath(args["p"], args["o"])
+    @test isfile(output_file)
+
+    xd = read_xdatcar_npt(output_file)
+    @test size(xd.positions, 3) == 2
+    @test size(xd.lattice, 3) == 2
+
+    rm(output_file)
 end
