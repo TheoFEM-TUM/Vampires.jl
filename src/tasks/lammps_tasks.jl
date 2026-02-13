@@ -42,7 +42,7 @@ end
 """
     vamp [-r] lammps write_poscar --lmp_file <file> [--p <path>]
 
-Reads frist snapshot from a LAMMPS trajectory and writes it to a POSCAR file.
+Reads frist snapshot from a LAMMPS trajectory and writes it to a POSCAR file without reading in the whole trajectory which can be useful for large supecell calculation.
 
 # Arguments
 - `lmp_file`: The name of the LAMMPS file containing atomic configurations from a molecular dynamics simulation.
