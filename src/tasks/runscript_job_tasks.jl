@@ -26,12 +26,13 @@ Available commands:
 run_task(::Type{Val{:job}}, ::Type{Val{:none}}, args) = nothing
 
 """
-    vamp [-r] runscript make [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
+    vamp [-r] runscript make [--npar <integer>] [--exe <vasp_executable>] [--p <path>] [--exclude <files>]
 
 Creates a run script that executes the VASP executable at the specified path.
 
 # Arguments
-- `exe`: (Optional) The name of the VASP executable that will be used in the run script.
+- `npar`: (Optional) The workload is split among `npar` run scripts.
+- `exe`: The name of the executable that will be used in the run script.
 - `p`: (Optional) The path where the run script will be created. This is the directory in which the script will be saved.
 - `exclude`: (Optional) File or list of files to be removed after each calculation.
 
@@ -50,15 +51,23 @@ vamp -r runscript make --exe vasp_ncl
 
 # Example 3: Use the `exclude` keyword to specify files to be removed from each subfolder after each calculation.
 vamp -r runscript make --exe vasp_std --exclude WAVECAR,CONTCAR,CHGCAR,CHG
+
+# Example 4: Use the `npar` keyword to split workload in two.
+vamp -r runscript make --npar 2 --exe vasp_std
+
+# Example 4: Use `exe` keyword to run a no-SOC -> SOC calculation as recommended by VASP devs (see https://www.vasp.at/wiki/index.php/LNONCOLLINEAR; requires loading Vampires module!).
+vamp -r runscript make --exe vasp+soc
 ```
 """
 function run_task(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
+    if !check_required_parameters(["exe"], args); return; end
     cb = get_exclude_callback(args["exclude"])
     write_run_script(args["exe"], args["p"], cb=cb)
     return nothing
 end
 
 function run_task_recursive(::Type{Val{:runscript}}, ::Type{Val{:make}}, args)
+    if !check_required_parameters(["exe"], args); return; end
     base_path = args["p"]
     cb = get_exclude_callback(args["exclude"])
     nchunks = parse(Int64, args["npar"])
@@ -115,17 +124,18 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
     mail = args["mail"]
     module_list = split_line(args["module_list"], char=',')
     module_paths = split_line(args["module_paths"], char=',')
+    account = args["account"]
     if exe ∉ readdir(args["p"]) && any(occursin.(exe, readdir(args["p"])))
         num_exe = 1
         for file in readdir(args["p"])
             if occursin(exe, file)
                 filename = args["o"] * "_$num_exe"
-                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
+                write_slurm_script(file, args["p"], filename=filename, partition=partition, nodes=nodes, mail=mail, account=account, time=time, module_list=module_list, module_paths=module_paths)
                 num_exe += 1
             end
         end
     else
-        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, time=time, module_list=module_list, module_paths=module_paths)
+        write_slurm_script(exe, args["p"], filename=args["o"], partition=partition, nodes=nodes, mail=mail, account=account, time=time, module_list=module_list, module_paths=module_paths)
     end
     return nothing
 end
@@ -165,12 +175,18 @@ function run_task(::Type{Val{:job}}, ::Type{Val{:submit}}, args)
 
     cd(path)
     if hostname == "none" || occursin(hostname, current_hostname)
-        run(`sbatch -A $account \*.job`)
+        for file in readdir()
+            if occursin(".job", file); run(`sbatch -A $account $file`); end
+        end
     else
         scratch_path = "\$SCRATCH_$account/\$USER/"
         path_on_host = split_path_at_folder(pwd(), hostname)
         total_path = joinpath(scratch_path, path_on_host)
-        run(`ssh $hostname "cd $total_path && echo \"Submitting job at \$(pwd)\" && sbatch -A $account *.job"`)
+        for file in readdir()
+            if occursin(".job", file)
+                run(`ssh $hostname "cd $total_path && echo \"Submitting job at \$(pwd)\" && sbatch -A $account $file"`)
+            end
+        end
     end
     cd(original_working_directory)
     return nothing
@@ -257,15 +273,27 @@ vamp input cp --o MYFOLDER
 
 # Example 2: Copy all files but the `KPOINTS` file and include `myfile`.
 vamp input cp --o MYFOLDER --exclude KPOINTS --include myfile
+
+# Example 3: Copy input files to all subfolders in `CALC`.
+vamp -r input cp --o CALC
 ```
 """
 function run_task(::Type{Val{:input}}, ::Type{Val{:cp}}, args)
     path = args["p"]
     target = args["o"]
-    if target ∉ readdir(); mkdir(target); end
+    if !isdir(target); mkdir(target); end
     ignore = split_line(args["exclude"], char=',')
     include = get_include(split_line(args["include"], char=','))
     copy_vasp_input(path, target, ignore=ignore, include=include)
+end
+
+function run_task_recursive(task::Type{Val{:input}}, subtask::Type{Val{:cp}}, args)
+    base_path = args["o"] == "none" ? pwd() : args["o"]
+    for folder in readfolders(base_path)
+        args["o"] = joinpath(base_path, folder)
+        run_task(task, subtask, args)
+    end
+    return nothing
 end
 
 """

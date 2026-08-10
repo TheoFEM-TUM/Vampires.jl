@@ -1,6 +1,6 @@
 module Vampires
 
-using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful, FFTW, Printf, PeriodicTable, TensorOperations, SparseArrays
+using OrderedCollections, Plots, LinearAlgebra, StatsBase, HDF5, ChunkSplitters, LsqFit, Unitful, FFTW, Printf, PeriodicTable, TensorOperations, SparseArrays, Dates
 import PhysicalConstants.CODATA2018: ħ, m_e, h, c_0
 import Documenter: @doc
 
@@ -10,7 +10,7 @@ include("io/read_utils.jl")
 include("io/structure.jl"); include("io/eigenval.jl"); include("io/doscar.jl"); include("io/poscar.jl"); include("io/contcar.jl"); include("io/xdatcar.jl"); include("io/lammps.jl"); include("io/extended_config.jl")
 include("io/incar/incar_line.jl"); include("io/incar/incar.jl"); include("io/incar/incar_kw.jl"); include("io/incar/incar_tags.jl"); include("io/incar/incar_blocks.jl")
 include("io/outcar.jl"); include("io/settings.jl"); include("io/output/error_reduce_funcs.jl")
-include("io/w90_hr.jl")
+include("io/w90_hr.jl"); include("io/command_log.jl")
 
 # output
 include("io/output/folder_management.jl"); include("io/output/bash_and_submission.jl");

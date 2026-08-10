@@ -36,6 +36,11 @@ function main(cli_args)
     time = @elapsed begin
         args = parse_commandline(cli_args)
 
+        if !args["help"]
+            command = get_command_from_cli_args(cli_args)
+            write_command_to_logfile(command, args)
+        end
+
         # Read task and subtask parameters
         task = Val{Symbol(args["task"])}
         subtask = Val{Symbol(args["subtask"])}
@@ -112,6 +117,7 @@ function get_default_args()
         "r" => false,
         "v" => false,
         "help" => false,
+        "log" => "none",
         "par" => "",
         "val" => "",
         "block" => "",
@@ -134,7 +140,7 @@ function get_default_args()
         "outcar" => "OUTCAR",
         "kpoints" => "KPOINTS",
         "w90_hr" => "wannier90_hr.dat",
-        "exe" => "vasp_std",
+        "exe" => "none",
         "h5" => "",
         "account" => "none",
         "hostname" => "none",
@@ -148,9 +154,9 @@ function get_default_args()
         "ydata" => "",
         "xlabel" => "",
         "ylabel" => "",
-        "partition" => "batch",
-        "time" => "1",
-        "nodes" => "1",
+        "partition" => "none",
+        "time" => "0",
+        "nodes" => "0",
         "mail" => "",
         "module_list" => "",
         "module_paths" => "",
@@ -172,6 +178,7 @@ function get_arg_description()
             "r" => "if true, task will be applied recursively to all folders",
             "v" => "if true, Vampires are verbos",
             "help" => "print help output",
+            "log" => "commands are logged in vampires.log file, local->pwd, global->.Vampires",
             "par" => "define a parameter that is to be adapted",
             "val" => "define the value of the parameter",
             "block" => "define the block that a parameter belongs to",

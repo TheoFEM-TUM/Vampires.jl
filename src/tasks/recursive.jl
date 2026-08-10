@@ -18,7 +18,21 @@ Returns a list of folder names in the specified directory.
 # Returns
 - `Vector{String}`: A vector containing the names of subdirectories in the given path.
 """
-readfolders(path=".") = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
+function readfolders(path=".")
+    folders = filter(entry -> isdir(joinpath(path, entry)), readdir(path))
+    sort(folders, lt=_compare_folders)
+end
+
+function _compare_folders(f1, f2)
+    num1 = match(r"\d+$", f1)
+    num2 = match(r"\d+$", f2)
+
+    if isnothing(num1) || isnothing(num2)
+        return f1 < f2
+    else
+        return parse(Int, num1.match) < parse(Int, num2.match)
+    end
+end
 
 """
     run_task_recursive(task, subtask, args)

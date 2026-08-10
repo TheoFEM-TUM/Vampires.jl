@@ -10,6 +10,7 @@ makedocs(
     prettyurls=get(ENV, "CI", nothing) == "true",
     edit_link="master",
     size_threshold=nothing,  # do not fail build if large HTML outputs
+    size_threshold_warn=nothing,
     ),
     pages = [
         "Home" => "index.md",
@@ -29,7 +30,8 @@ makedocs(
         "Tutorials" => [
             "tutorials/silicon.md",
             "tutorials/supercell.md",
-            "tutorials/wannier90.md"
+            "tutorials/wannier90.md",
+            "tutorials/jobs.md"
         ],
         "Library Mode" => [
             "man/library.md"
