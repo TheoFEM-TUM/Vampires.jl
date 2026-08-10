@@ -82,7 +82,7 @@
     """
     function run_task(::Type{Val{:strong_scaling}}, subtask::Union{Type{Val{:cpu}}, Type{Val{:gpu}}}, args)
         keyword = string(subtask.parameters[1])
-        if (args["ext_par_file"] == "none" || args["block"]) == "none"
+        if (args["ext_par_file"] == "none" || args["block"] == "none")
             println("Error: Tasks preparing slurm scripts for strong scaling requires a parameter file and a specification of the input block. For examples check out `/test/test_files/extended_parameter_file`."); return;
         end
         if (args["kpar"] == "none" || ((args["nsim"] == "none" && keyword == "gpu") || (args["ncore"] == "none" && keyword == "cpu")))
@@ -151,7 +151,6 @@
                 cores = parse(Int, split(folder, "_")[3])
                 push!(core_n, cores)
             end
-            return (core_n = core_n, time_n = cpu_avg_time_scf_step_n)
         end
         if length(gpu_folders) > 0
             gpu_n = []
@@ -163,12 +162,13 @@
                 gpus = parse(Int, split(folder, "_")[3])
                 push!(gpu_n, gpus)
             end
-            return (gpu_m = gpu_n, time_m = gpu_avg_time_scf_step_n)
         end
-        if length(gpu_folders) > 0 && length(cpu_folders) > 0
-            index = parse(Int, args["N"])
-            index = index > 0 ? index : 2
+        if length(cpu_folders) > 0 && length(gpu_folders) > 0
             return (core_n = core_n, time_n = cpu_avg_time_scf_step_n, gpu_m = gpu_n, time_m = gpu_avg_time_scf_step_n)
+        elseif length(cpu_folders) > 0
+            return (core_n = core_n, time_n = cpu_avg_time_scf_step_n)
+        elseif length(gpu_folders) > 0
+            return (gpu_m = gpu_n, time_m = gpu_avg_time_scf_step_n)
         end
     end
 
@@ -191,7 +191,7 @@
     """
     function run_task(::Type{Val{:strong_scaling}}, ::Type{Val{:plot}}, args)
         scaling_results = run_task(Val{Symbol("strong_scaling")}, Val{Symbol("read")}, args)
-        if haskey(scaling_results, :gpu_n) && haskey(scaling_results, :core_n)
+        if haskey(scaling_results, :gpu_m) && haskey(scaling_results, :core_n)
             if (args["N"] == "none"); println("For mixed CPU and GPU plots, please use `--N` to specify the running index of the CPU comparison you want to show."); exit(); end
             index = parse(Int, args["N"])
             index = index > 0 ? index : 2

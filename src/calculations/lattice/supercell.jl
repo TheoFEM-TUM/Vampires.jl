@@ -22,7 +22,7 @@ function transform_primitive_cell(poscar, Ns::Vector{Int64}; digits=10)
     Nion_sc = Nion*prod(Ns)
 
     Rs_sc = zeros(3, Nion_sc)
-    velocities = spzeros(Float64, 3, Nion)
+    velocities = spzeros(Float64, 3, Nion_sc)
     sc_ion_types = Array{String}(undef, Nion_sc)
 
     # Multiply lattice vectors

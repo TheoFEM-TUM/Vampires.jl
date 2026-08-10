@@ -45,7 +45,7 @@ vamp kpoints make --N 10,10,10 --method Monkhorst-Pack
 """
 function run_task(::Type{Val{:kpoints}}, ::Type{Val{:make}}, args)
     out = args["o"] == "none" ? "KPOINTS" : args["o"]
-    gamma_centered = lowercase(args["method"]) == 'm' ? false : true
+    gamma_centered = length(args["method"]) > 0 && lowercase(args["method"])[1] == 'm' ? false : true
     if args["par"] == "KSPACING"
         kspacing = parse(Float64, args["val"])
         write_kpoints(kspacing, joinpath(args["p"], args["poscar"]), out=joinpath(args["p"], out), gamma_centered=gamma_centered)

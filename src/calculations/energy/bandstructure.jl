@@ -6,7 +6,7 @@ Calculate the bandgap from the given energy values.
 # Arguments
 - `Es::Array{Float64, 2}`: A 2D array of energy values where rows correspond to different k-points and columns correspond to different energy bands.
 - `kvalmax::Int64`: The index of the highest occupied energy band (valence band maximum).
-- `printit::Bool=true`: A boolean flag to control whether the bandgap value should be printed. Default is `true`.
+- `printit::Bool=false`: A boolean flag to control whether the bandgap value should be printed. Default is `false`.
 
 # Returns
 - `ΔE::Float64`: The calculated bandgap energy.
@@ -27,7 +27,7 @@ Calculate the bandgap from the energy eigenvalues and occupation numbers.
 # Arguments
 - `Es::AbstractMatrix`: The energy eigenvalues.
 - `occs::AbstractMatrix`: The occupation numbers.
-- `printit::Bool=true`: A boolean flag to control whether the bandgap value should be printed. Default is `true`.
+- `printit::Bool=false`: A boolean flag to control whether the bandgap value should be printed. Default is `false`.
 
 # Returns
 - `ΔE::Float64`: The calculated bandgap energy.
@@ -82,7 +82,7 @@ end
 
 
 """
-    get_fermi_level(Es, occ; occ_threshold=0.9, printit::Bool=false)
+    get_fermi_energy(Es, occ; occ_threshold=0.9, printit::Bool=false)
 
 Calculate the Fermi level of a system given the energy levels and their corresponding occupancies.
 
@@ -156,7 +156,7 @@ end
 function get_effective_mass(kp, Es::AbstractMatrix, lattice; method="parabola")
     meffs = zeros(length(eachcol(Es)))
     @views for (i, E_band) in enumerate(eachcol(Es))
-        meffs[i] = get_effective_mass(kp[:, k_ind:k_ind+N], E_band[k_ind:k_ind+N], lattice, method=method)
+        meffs[i] = get_effective_mass(kp, E_band, lattice, method=method)
     end
     return meffs
 end
@@ -164,8 +164,9 @@ end
 function get_effective_mass(kp, Es::Array{<:Number, 3}, lattice; method="parabola")
     meffs = zeros(size(Es, 1), size(Es, 3))
     @views for j in axes(meffs, 2), i in axes(meffs, 1)
-        meffs[i, j] = get_effective_mass(kp[:, k_ind:k_ind+N], Es[i, k_ind:k_ind+N, j], lattice, method=method)
+        meffs[i, j] = get_effective_mass(kp, Es[i, :, j], lattice, method=method)
     end
+    return meffs
 end
 
 function parse_effective_mass_parameters(args, kp)

@@ -26,7 +26,7 @@ function read_hrdat(file="wannier90_hr.dat")
     # Up to 15 degeneracy values are written per line
     Ldeg = Int(ceil(NR / 15))
     deg = collect(Iterators.flatten([parse.(Int64, lines[k]) for k in 4:3+Ldeg]))
-    if length(deg) ≠ NR; throw("Invalid number of degeneracy values found!"); end
+    if length(deg) ≠ NR; error("Invalid number of degeneracy values found!"); end
 
     Rind = 0
     hr_start = 4+Ldeg

@@ -54,7 +54,7 @@ function run_task(::Type{Val{:xdatcar}}, ::Type{Val{:read}}, args)
         msd, err = compute_msd(poscar.positions, configs, lattice)
         return (msd = msd, deviation = err)
     elseif lowercase(args["par"]) == "vdos"
-        δt = args["N"] == "none" ? read_value_from_outcar("POTIM", args["outcar"]) : parse(Float64, args["N"])
+        δt = args["N"] == "0" ? read_value_from_outcar("POTIM", joinpath(args["p"], args["outcar"])) : parse(Float64, args["N"])
         if !(typeof(δt) <: Number) || δt == 0.0
             println("Please specify a time step larger than 0.0 (you may use '--N'). Exiting...")
             exit()

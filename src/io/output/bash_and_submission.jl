@@ -20,7 +20,7 @@ function write_run_script(exe, path; out="run_job.sh", cb="", run_out="vasp.log"
             if path ≠ "./"
                 println(runfile, "folders=(\"$path\")")
             else
-                println(runfile, "folders=()")
+                println(runfile, "folders=(\".\")")
             end
             println(runfile, "for folder in \"\${folders[@]}\"")
             println(runfile, "do")
@@ -113,7 +113,7 @@ Generate a SLURM batch script for running VASP on an HPC system, optimized for J
 - `nodes::Int=1`: The number of nodes to allocate.
 - `ntasks_per_node::Int=48`: The total number of tasks per node
 - `ntasks_per_core::Int=1`: Number of tasks per core.
-- `omp_num_threads::Int=24`: Number of OpenMP threads.
+- `omp_num_threads::Int=1`: Number of OpenMP threads.
 - `num_gpu::Int=0`: The number of GPUs to allocate.
 - `partition::String="batch"`: The partition to submit the job to.
 - `mail::String=""`: Email address for job notifications.
@@ -148,7 +148,7 @@ function write_slurm_script(exe, path; module_paths::AbstractArray=[], module_li
     hrs = trunc(Int, time)
     min = trunc(Int, modf(time)[1]*60)
     sec = trunc(Int, modf(modf(time)[1]*60)[1]*60)
-    time_str = lpad(hrs, 2, "0")*":"*lpad(sec, 2, "0")*":"*lpad(sec, 2, "0")
+    time_str = lpad(hrs, 2, "0")*":"*lpad(min, 2, "0")*":"*lpad(sec, 2, "0")
     open(out, "w") do outfile
         print(outfile, """
         #!/bin/bash

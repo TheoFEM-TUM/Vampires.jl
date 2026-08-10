@@ -52,7 +52,7 @@ function run_task(::Type{Val{:supercell}}, ::Type{Val{:make}}, args)
     N = parse.(Int64, N)
     sc_poscar = transform_primitive_cell(poscar, N)
     filename = args["o"] == "none" ? "SC_POSCAR" : args["o"]
-    write_poscar(sc_poscar, filename=args["p"]*filename)
+    write_poscar(sc_poscar, filename=joinpath(args["p"], filename))
     return nothing
 end
 

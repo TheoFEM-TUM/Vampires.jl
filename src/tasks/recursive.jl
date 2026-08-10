@@ -42,7 +42,7 @@ function run_task_recursive(task, subtask, args)
         run_task(task, subtask, args)
     end
     args["p"] = base_path
-    if out[1] ≠ nothing
+    if !isempty(out) && out[1] ≠ nothing
         out_keys = keys(out[1])
         out_values = map(out_keys) do key
             _concat_values([pair[key] for pair in out])

@@ -107,7 +107,7 @@ vamp run job make --exe vasp_std --module_list module1,module2 --module_path /pa
 ```
 """
 function run_task(::Type{Val{:job}}, ::Type{Val{:make}}, args)
-    if !check_required_parameters(["exe", "partition", "nodes", "time", "mail", ""], args); return; end
+    if !check_required_parameters(["exe", "partition", "nodes", "time", "mail"], args); return; end
     exe = args["exe"]
     partition = args["partition"]
     nodes = parse(Int64, args["nodes"])
