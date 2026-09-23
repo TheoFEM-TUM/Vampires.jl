@@ -31,8 +31,8 @@ to point to the last of any consecutive duplicate k-points (as this sometimes ha
 """
 function find_kpoint(kpoint, kpoints)
     k_ind = findfirst(k -> isapprox(k, kpoint), eachcol(kpoints))
-    if k_ind ≠ nothing && size(kpoints, 2) > k_ind
-        while kpoints[:, k_ind + 1] == kpoints[:, k_ind]
+    if k_ind ≠ nothing
+        while k_ind < size(kpoints, 2) && kpoints[:, k_ind + 1] == kpoints[:, k_ind]
             k_ind += 1
         end
     end

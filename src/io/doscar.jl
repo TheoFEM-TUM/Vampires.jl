@@ -134,7 +134,7 @@ function get_pdos_orbital_list(;ISPIN=1, LORBIT=0, LSORBIT=false, LMAXMIX=2)
             elseif orb == "d"
                 append!(orbs_out, ["d_xy", "d_yz", "d_z2", "d_xz", "d_x2-y2"])
             elseif orb == "f"
-                ["f_z^3", "f_xz^2", "f_yz^2", "f_x(x^2-3y^2)", "f_y(3x^2-y^2)", "f_xyz", "f_x^3-3xy^2"]
+                append!(orbs_out, ["f_z^3", "f_xz^2", "f_yz^2", "f_x(x^2-3y^2)", "f_y(3x^2-y^2)", "f_xyz", "f_x^3-3xy^2"])
             end
         end
     else

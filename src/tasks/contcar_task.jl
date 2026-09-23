@@ -39,7 +39,6 @@ function run_task(::Type{Val{:contcar}}, ::Type{Val{:read}}, args)
     if !check_required_parameters(["par"], args); return; end
     param = args["par"]
     input_file = joinpath(args["p"], args["contcar"])
-    println(input_file)
 
     if param == "lattice"
         contcar, velocities = read_contcar(input_file)

@@ -98,7 +98,7 @@ function main(cli_args)
                 task_output(out, args)
             end
         catch e
-            if e == ArgumentError
+            if e isa MethodError
                 @error "No task of name $task found."
             else
                 rethrow(e)
@@ -125,7 +125,6 @@ function get_default_args()
         "o" => "none",
         "N" => "0",
         "tol"=>"0.1",
-        "npar"=>"1",
         "npar"=>"1",
         "method" => "none",
         "reduce" => "none",
@@ -186,7 +185,6 @@ function get_arg_description()
             "p" => "set the default path",
             "o" => "set the output (file-) name",
             "N" => "general task dependent integer (Int) parameter",
-            "npar" => "parallelization parameter",
             "tol" => "a numerical tolerance parameter",
             "npar" => "general task dependent parallelization parameter",
             "method" => "general task dependent method parameter",

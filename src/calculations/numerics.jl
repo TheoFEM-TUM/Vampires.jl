@@ -50,15 +50,16 @@ function compute_full_autocorrelation(x::AbstractArray{T, 1}) where T <: Number
     n = length(x)
     result = Array{Number}(undef, 2 * n - 1)
     @inbounds for lag in 1:(n-1)
-        result[n + lag] = sum(x[1:(n - lag)] .* x[(1 + lag):n])
-        result[n - lag] = sum(x[(lag + 1):n] .* x[1:(n - lag)])
+        v = sum(x[1:(n - lag)] .* x[(1 + lag):n])
+        result[n + lag] = v
+        result[n - lag] = v
     end
     result[n] = sum(x .* x)
     return result
 end
 
-function compute_full_autocorrelation(x::AbstractArray{T, 3}, weights::AbstractArray{<:Number}=[]) where T <: Number
-    weights = size(weights) == 0 ? ones(size(x, 2)) : weights
+function compute_full_autocorrelation(x::AbstractArray{T, 3}, weights::AbstractArray{<:Number}=Float64[]) where T <: Number
+    weights = isempty(weights) ? ones(size(x, 2)) : weights
     t = hcat([weights[j] .* compute_full_autocorrelation(x[i, j, :]) for i in axes(x, 1), j in axes(x, 2)]...)
     return reshape(t, :, size(x, 2), 3)
 end

@@ -76,9 +76,9 @@ function write_poscar(poscar::Structure; system_name="unknown_system", filename=
 end
 
 """
-    add_atom_counts!(atom_types)
+    add_atom_counts(atom_types)
 
-Modifies the `atom_types` array in-place by appending a unique count suffix to each atom type.
+Returns a new array with a unique count suffix appended to each atom type.
 This function is useful for assigning unique labels to atoms of the same type when differentiating them
 is necessary (e.g., when visualizing or processing atomic data).
 

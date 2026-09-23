@@ -9,6 +9,7 @@ function plot_bandstructure(Es, kp, output_filename)
 end
 
 function plot_bandstructure_dos(Es, kp, output_filename)
+    @warn "plot_bandstructure_dos is not yet implemented"
     return 0
     # TODO: implement
     band_plot = plot(title="Band Structure", xlabel="k-point distance", ylabel="Energy (eV)", legend=false)

@@ -93,7 +93,7 @@ function write_line(key, incar_value, file; isW90=false, isprojection=false)
     sep = isprojection ? ":" : " = "
     line_string = " "^Nin * key * sep * incar_value.value
     L = length(line_string)
-    N_spaces = 35 - L
+    N_spaces = max(1, 35 - L)
     if length(incar_value.comment) > 1; line_string *= " "^N_spaces * "!" * incar_value.comment; end
     println(file, line_string)
 end

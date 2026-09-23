@@ -45,7 +45,7 @@ function read_value_from_outcar(param, file; type=Float64, line_mode="first")::V
         end
     end
     if length(param_values) == 0
-        throw("No value for parameter $param found.")
+        error("No value for parameter $param found.")
     else
         return param_values
     end

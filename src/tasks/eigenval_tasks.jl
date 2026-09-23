@@ -57,7 +57,7 @@ function run_task(::Type{Val{:eigenval}}, ::Type{Val{:read}}, args)
         return (bandgap = ΔE,)
     elseif args["par"] == "effective_mass"
         N, k_ind, lattice = parse_effective_mass_parameters(args, kp)
-        meffs = get_effective_mass(kp[:, k_ind:k_ind+N], E[:, k_ind:k_ind+N], lattice, method=args["method"])
+        meffs = get_effective_mass(kp[:, k_ind:k_ind+N], Es[:, k_ind:k_ind+N], lattice, method=args["method"])
         return (effective_mass = meffs,)
     else
         return (kpoints = kp, eigenvalues = Es, occupations = occs)
@@ -86,7 +86,7 @@ vamp bands plot --p /path/to/files --eigenval EIGENVAL --o bandstructure.png
 """
 function run_task(::Type{Val{:bands}}, ::Type{Val{:plot}}, args)
     output_filename = args["o"]
-    input_filename = args["p"] * args["eigenval"]
+    input_filename = joinpath(args["p"], args["eigenval"])
     kp, Es, _ = read_eigenval(input_filename)
     plot_bandstructure(Es, kp, output_filename)
 end

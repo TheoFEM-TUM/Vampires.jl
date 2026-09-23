@@ -11,9 +11,7 @@ Add a block of default INCAR settings to an existing INCAR object.
 function add_incar_block!(incar::Incar, block_label::AbstractString; verbose=true)
     keys = get_keywords_for_block(block_label)
     for key in keys
-        try findvalue(incar, key)
-            nothing
-        catch e
+        if !haskey(incar, key)
             value = get_default_for_keyword(key)
             set_key!(incar, key, value, block_label=block_label, verbose=verbose)
         end

@@ -18,18 +18,19 @@ If `xdata` is non-empty, it is used as the x-axis data. If `xdata` is empty, `yd
 - `fig` : The plot object with the specified data and labels.
 """
 function make_plot(xdata, ydata; title="", xlabel="", ylabel="")
+    resetcolor()
     fig = plot(title=title, xlabel=xlabel, ylabel=ylabel, legend=false, framestyle=:box, tickfontsize=18, labelfontsize=18)
     if length(xdata) > 0
         if length(xdata) == length(ydata)
             for (x, y) in zip(xdata, ydata)
-                y = check_transpose_for_plotting(y)
+                y = check_transpose_for_plotting(y, length(x))
                 x, y = check_sorting_for_plotting(x, y)
                 colors = get_colors(y)
                 plot!(fig, x, y, color=colors)
             end
         elseif length(xdata) == 1
             for y in ydata
-                y = check_transpose_for_plotting(y)
+                y = check_transpose_for_plotting(y, length(xdata[1]))
                 colors = get_colors(y)
                 plot!(fig, xdata[1], y, color=colors)
             end
@@ -77,7 +78,7 @@ function make_bar_plot(xdata, ydata; title="", xlabel="", ylabel="", xticks=[], 
     if size(xticks, 1) == 0
         xticks = xdata_equi
     end
-    if !(typeof(bar_colors) <: AbstractArray)
+    if size(bar_colors, 1) == 0
         bar_colors = repeat([vcolors.blue], size(xdata_equi, 1))
     end
 
@@ -271,14 +272,17 @@ If the number of rows in `A` is less than the number of columns, the matrix is t
 # Returns
 - `AbstractMatrix`: The transposed matrix if `size(A, 1) < size(A, 2)`, otherwise the original matrix.
 """
-function check_transpose_for_plotting(A::AbstractMatrix)
-    if size(A, 1) < size(A, 2)
+function check_transpose_for_plotting(A::AbstractMatrix, target_length=nothing)
+    if target_length !== nothing
+        if size(A, 1) != target_length && size(A, 2) == target_length
+            return transpose(A)
+        end
+    elseif size(A, 1) < size(A, 2)
         return transpose(A)
-    else
-        return A
     end
+    return A
 end
-check_transpose_for_plotting(A) = A
+check_transpose_for_plotting(A, target_length=nothing) = A
 
 function check_sorting_for_plotting(x::AbstractVector, y::AbstractVector)
     inds = sortperm(x)

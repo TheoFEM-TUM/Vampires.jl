@@ -58,7 +58,6 @@ function run_task(::Type{Val{:doscar}}, ::Type{Val{:read}}, args)
 
         _, pdos, _ = read_doscar_with_pdos(doscar)
         for (i, type) in enumerate(atom_types), (j, orbital) in enumerate(orbitals)
-            dos_output[] = pdos[i][1+j, :]
             push!(dos_keys, "$type"*"_"*"$orbital")
             push!(dos_values, pdos[i][1+j, :])
         end
@@ -87,7 +86,7 @@ vamp doscar plot --p /path/to/files --doscar DOSCAR --o dos_plot
 ```
 """
 function run_task(::Type{Val{:doscar}}, ::Type{Val{:plot}}, args)
-    input_filename = args["p"] * args["doscar"]
+    input_filename = joinpath(args["p"], args["doscar"])
     dos, _ = read_doscar(input_filename)
     plot_dos(dos, args["o"])
 end

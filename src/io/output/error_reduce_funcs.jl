@@ -53,8 +53,7 @@ function calculate(::Type{Val{:diff}}, key, x, broadcasted)
 end
 function calculate(::Type{Val{:diff}}, key, x, ::Type{Val{:broadcasted}})
     ks = [_get_key("diff", key)]
-    vals = [diff(x, dims=ndims(x)-1)]
-    vals = cat([diff(selectdim(x, ndims(x), i), dims=ndims(x)-1) for i in axes(x, ndims(x))]..., dims=ndims(x))
+    vals = [cat([diff(selectdim(x, ndims(x), i), dims=ndims(x)-1) for i in axes(x, ndims(x))]..., dims=ndims(x))]
     return NamedTuple(zip(ks, vals))
 end
 

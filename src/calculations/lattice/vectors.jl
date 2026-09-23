@@ -87,8 +87,8 @@ Calculate the lattice parameters (a, b, c, α, β, γ) and the unit cell volume 
 
 # Returns
 - `a`: length of the first lattice vector
-- `b`: length of the first lattice vector
-- `c`: length of the first lattice vector
+- `b`: length of the second lattice vector
+- `c`: length of the third lattice vector
 - `α`: angle between the second and third lattice vector
 - `β`: angle between the first and third lattice vector
 - `γ`: angle between the first and second lattice vector
