@@ -6,10 +6,10 @@
 [![codecov](https://codecov.io/gh/TheoFEM-TUM/Vampires.jl/graph/badge.svg?token=LJT1XRIQBZ)](https://codecov.io/gh/TheoFEM-TUM/Vampires.jl)
 [![docs](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/docs.yml/badge.svg)](https://github.com/TheoFEM-TUM/Vampires.jl/actions/workflows/docs.yml)
 
-# VASP Analysis for Materials Properties In Realistic Energy Surfaces
-## A Collection of Toolkits for VASP Postprocessing in Julia, currently named:
+# Visualization and Analysis of Materials Properties In Realistic Energy Surfaces
+## A Collection of Toolkits for Postprocessing of Typical Computational Material Science Data in Julia
 
-`Vampires.jl` is a Julia package designed to streamline the analysis of VASP (Vienna Ab initio Simulation Package) output files. It provides a comprehensive suite of tools for parsing and visualizing data from VASP calculations, including electronic structure, band structure, density of states, and more. With a focus on ease of use and performance, `Vampires.jl` leverages Julia's capabilities to handle large datasets efficiently.
+`Vampires.jl` is a Julia package designed to streamline the analysis of computational material science output files. It provides a comprehensive suite of tools for parsing and visualizing data from various types of calculations, including electronic structure, band structure, density of states, and more. With a focus on ease of use and performance, `Vampires.jl` leverages Julia's capabilities to handle large datasets efficiently.
 
 ## How to install `Vampires.jl` in Julia
 
